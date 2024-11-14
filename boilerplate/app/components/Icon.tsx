@@ -120,6 +120,13 @@ export const iconRegistry = {
   nw: require("../../assets/icons/nw.png"),
   add: require("../../assets/icons/add.png"),
   nwDark: require("../../assets/icons/nwDark.png"),
+  list: require("../../assets/icons/list.png"),
+  grid: require("../../assets/icons/layout.png"),
+  arrowDown: require("../../assets/icons/arrowDown.png"),
+  inspo: require("../../assets/icons/inspiration.png"),
+  dashboard: require("../../assets/icons/dashboard.png"),
+  coworker: require("../../assets/icons/community.png"),
+  user: require("../../assets/icons/user.png"),
 }
 
 const $imageStyleBase: ImageStyle = {

@@ -40,8 +40,10 @@ export type AppStackParamList = {
   Join: undefined
   Join2: undefined
   Demo: NavigatorScreenParams<DemoTabParamList> // @demo remove-current-line
-  // 🔥 Your screens go here
-  // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
+  Dashboard: undefined
+  Profile: undefined
+	Coworkers: undefined
+  Main: NavigatorScreenParams<MainTabParamList>
 }
 
 /**
@@ -73,10 +75,9 @@ const AppStack = observer(function AppStack() {
       {/* @demo remove-block-start */}
       {isAuthenticated ? (
         <>
-          {/* @demo remove-block-end */}
-          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} />
-          {/* @demo remove-block-start */}
-          <Stack.Screen name="Demo" component={DemoNavigator} />
+          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="Main" component={MainTabNavigator} options={{header: ({ navigation }) => 
+            <CustomHeader navigation={navigation} source={"dashboard"} />}}/>
         </>
       ) : (
         <>
