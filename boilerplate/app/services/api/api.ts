@@ -58,10 +58,10 @@ export class Api {
     return { kind: "ok", authToken: token, user: response.data.user };
   }
 
-  async signUp(data: { name: string; email: string; password: string; rank: string; joiningDate: string; amount: number }): Promise<{ kind: "ok"; message: string } | GeneralApiProblem> {
+  async signUp(data: { name: string; username: string; password: string; rank: string; joiningDate: string; amount: string }): Promise<{ kind: "ok"; message: string } | GeneralApiProblem> {
     const signUpData = {
       ...data,
-      roles: ["ADMIN"], // Adding the roles property
+      roles: [{"name": data.rank}],
     };
     const response: ApiResponse<{ message: string }> = await this.apisauce.post("auth/signup", signUpData);
     

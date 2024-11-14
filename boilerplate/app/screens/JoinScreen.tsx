@@ -19,28 +19,70 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
 
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [attemptsCount, setAttemptsCount] = useState(0)
-  const [isPortrait, setIsPortrait] = useState(true);
+  const [isPortrait, setIsPortrait] = useState(true)
+  
+  // Error states
+  const [errors, setErrors] = useState<{ [key: string]: string }>({
+    name: "",
+    email: "",
+    password: "",
+  });
 
-    const onChange = ({ window: { width, height  } }) => {
-      setIsPortrait(height >= width);
-    };
-
-    useEffect(() => {
-      const subscription = Dimensions.addEventListener('change', onChange);
-      return () => subscription?.remove();
-    }, []);
+  const onChange = ({ window: { width, height } }) => {
+    setIsPortrait(height >= width);
+  };
 
   useEffect(() => {
-   
-  }, [])
+    const subscription = Dimensions.addEventListener('change', onChange);
+    return () => subscription?.remove();
+  }, []);
 
-  const error = isSubmitted ? validationError : ""
+  const validateName = () => {
+    if (!signUpStore.name.trim()) {
+      setErrors((prevErrors) => ({ ...prevErrors, name: "Name is required." }));
+      return false;
+    }
+    setErrors((prevErrors) => ({ ...prevErrors, name: "" }));
+    return true;
+  };
 
-  const  handleJoin = () => {
-    
-    _props.navigation.navigate("Join2")
-  }
+  const validateEmail = () => {
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!signUpStore.email.trim()) {
+      setErrors((prevErrors) => ({ ...prevErrors, email: "Email is required." }));
+      return false;
+    } else if (!emailPattern.test(signUpStore.email)) {
+      setErrors((prevErrors) => ({ ...prevErrors, email: "Enter a valid email address." }));
+      return false;
+    }
+    setErrors((prevErrors) => ({ ...prevErrors, email: "" }));
+    return true;
+  };
+
+  const validatePassword = () => {
+    if (!signUpStore.password.trim()) {
+      setErrors((prevErrors) => ({ ...prevErrors, password: "Password is required." }));
+      return false;
+    } else if (signUpStore.password.length < 6) {
+      setErrors((prevErrors) => ({ ...prevErrors, password: "Password must be at least 6 characters." }));
+      return false;
+    }
+    setErrors((prevErrors) => ({ ...prevErrors, password: "" }));
+    return true;
+  };
+
+  const handleJoin = () => {
+    setIsSubmitted(true);
+
+    // Validate all fields when the submit button is pressed
+    const isNameValid = validateName();
+    const isEmailValid = validateEmail();
+    const isPasswordValid = validatePassword();
+
+    if (isNameValid && isEmailValid && isPasswordValid) {
+      _props.navigation.navigate("Join2");
+    }
+  };
 
   const PasswordRightAccessory: ComponentType<TextFieldAccessoryProps> = useMemo(
     () =>
@@ -78,9 +120,11 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
             autoComplete="username"
             autoCorrect={false}
             keyboardType="default"
-            //labelTx="loginScreen.emailFieldLabel"
-            placeholder="signUpScreen.fullName"
-            onSubmitEditing={() => authPasswordInput.current?.focus()}
+            placeholderTx="signUpScreen.fullName"
+            onSubmitEditing={() => {}}
+            helper={errors.name}
+            status={errors.name ? "error" : undefined}
+            onEndEditing={validateName}
           />
 
           <TextField
@@ -91,11 +135,11 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
             autoComplete="email"
             autoCorrect={false}
             keyboardType="email-address"
-            //labelTx="loginScreen.emailFieldLabel"
-            placeholder="loginScreen.emailFieldPlaceholder"
-            helper={error}
-            status={error ? "error" : undefined}
-            onSubmitEditing={() => authPasswordInput.current?.focus()}
+            placeholderTx="loginScreen.emailFieldPlaceholder"
+            helper={errors.email}
+            status={errors.email ? "error" : undefined}
+            onSubmitEditing={() => {}}
+            onEndEditing={validateEmail}
           />
 
           <TextField
@@ -107,10 +151,12 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
             autoComplete="password"
             autoCorrect={false}
             secureTextEntry={isAuthPasswordHidden}
-            //labelTx="loginScreen.passwordFieldLabel"
             placeholderTx="loginScreen.passwordFieldPlaceholder"
-            onSubmitEditing={handleJoin}
+            onSubmitEditing={() => authPasswordInput.current?.focus()}
             RightAccessory={PasswordRightAccessory}
+            helper={errors.password}
+            status={errors.password ? "error" : undefined}
+            onEndEditing={validatePassword}
           />
 
           <Button

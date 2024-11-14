@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite"
 import React, { FC, useEffect, useRef, useState } from "react"
-import { View, TextInput, ImageBackground, TouchableOpacity, ViewStyle, TextStyle, Dimensions, ActivityIndicator, Alert } from "react-native"
+import { View, TextInput, ImageBackground, TouchableOpacity, ViewStyle, TextStyle, Dimensions, ActivityIndicator, Alert, ImageStyle } from "react-native"
 import { Button, Icon, Screen, Text, Modal } from "../components"
 import { useStores } from "../models"
 import { AppStackScreenProps } from "../navigators"
@@ -24,7 +24,7 @@ export const JoinScreen2: FC<JoinScreen2Props> = observer(function JoinScreen2(_
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isPortrait, setIsPortrait] = useState(true);
   const [loading, setLoading] = useState(false); // Loading state
-  const [modalVisible, setModalVisible] = useState(true); // Modal state
+  const [modalVisible, setModalVisible] = useState(false); // Modal state
 
   const onChange = ({ window: { width, height  } }) => {
     setIsPortrait(height >= width);
@@ -88,7 +88,7 @@ export const JoinScreen2: FC<JoinScreen2Props> = observer(function JoinScreen2(_
       setModalVisible(true);
     } else {
       // Handle sign-up error (you could also show an alert)
-      Alert.alert("Sign-Up Failed", result.message || "Please try again."); 
+      Alert.alert("Sign-Up Failed", result.kind || "Please try again."); 
     }
   }
 
@@ -311,7 +311,7 @@ const $selectionContainer: ViewStyle = {
   paddingLeft: 20,
 }
 
-const $selectionIcon: ViewStyle = {
+const $selectionIcon: ImageStyle = {
   marginRight: 15,
 }
 
