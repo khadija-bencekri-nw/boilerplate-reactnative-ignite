@@ -48,6 +48,30 @@ export class Api {
     })
   }
 
+  async login(email: string, password: string): Promise<{ kind: "ok"; authToken: string, user: object } | GeneralApiProblem> {
+    const response: ApiResponse<{ token: string , user: object}> = await this.apisauce.post("auth/login", { username: email, password });
+    if (!response.ok) {
+      return getGeneralApiProblem(response);
+    }
+  
+    const token  = response?.headers?.authorization;
+    return { kind: "ok", authToken: token, user: response.data.user };
+  }
+
+  async signUp(data: { name: string; email: string; password: string; rank: string; joiningDate: string; amount: number }): Promise<{ kind: "ok"; message: string } | GeneralApiProblem> {
+    const signUpData = {
+      ...data,
+      roles: ["ADMIN"], // Adding the roles property
+    };
+    const response: ApiResponse<{ message: string }> = await this.apisauce.post("auth/signup", signUpData);
+    
+    if (!response.ok) {
+      return getGeneralApiProblem(response);
+    }
+  
+    return { kind: "ok", message: response.data ? response.data.message : ""};
+  }
+
   // @demo remove-block-start
   /**
    * Gets a list of recent React Native Radio episodes.

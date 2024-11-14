@@ -36,7 +36,9 @@ import { colors } from "app/theme"
  */
 export type AppStackParamList = {
   Welcome: undefined
-  Login: undefined // @demo remove-current-line
+  Login?: undefined
+  Join: undefined
+  Join2: undefined
   Demo: NavigatorScreenParams<DemoTabParamList> // @demo remove-current-line
   // 🔥 Your screens go here
   // IGNITE_GENERATOR_ANCHOR_APP_STACK_PARAM_LIST
@@ -78,7 +80,10 @@ const AppStack = observer(function AppStack() {
         </>
       ) : (
         <>
-          <Stack.Screen name="Login" component={Screens.LoginScreen} />
+          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="Join" component={Screens.JoinScreen} options={{headerShown: false}}/>
+          <Stack.Screen name="Join2" component={Screens.JoinScreen2} options={{headerShown: false}}/>
+          <Stack.Screen name="Login" component={Screens.LoginScreen} options={{headerShown: false}}/>
         </>
       )}
       {/* @demo remove-block-end */}

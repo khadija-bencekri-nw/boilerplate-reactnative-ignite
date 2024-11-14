@@ -1,70 +1,78 @@
+import React, { FC, useEffect, useState } from "react"
 import { observer } from "mobx-react-lite"
-import React, { FC } from "react"
-import { Image, ImageBackground, ImageStyle, TextStyle, View, ViewStyle } from "react-native"
-import {
-  Button, // @demo remove-current-line
-  Text,
-} from "app/components"
-import { isRTL } from "../i18n"
-import { useStores } from "../models" // @demo remove-current-line
+import { ImageBackground, View, ViewStyle, TextStyle, ImageStyle, Image, Dimensions } from "react-native"
+import { Text, PrimaryButton, SecondaryButton } from "../components"
 import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
-import { useHeader } from "app/utils/useHeader"
-import { useSafeAreaInsetsStyle } from "app/utils/useSafeAreaInsetsStyle"
+import { TouchableOpacity } from "react-native-gesture-handler"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
+const { width } = Dimensions.get("window")
+const isTablet = width > 600
 const backgroundImage = require("../../assets/images/backgroundImage.png")
-const welcomeLogo = require("../../assets/images/logo.png")
-const welcomeFace = require("../../assets/images/welcome-face.png")
+const logo = require("../../assets/images/logo.png")
+const userFilled = require("../../assets/icons/userFilled.png")
 
 interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {}
 
-export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen(
-  _props, // @demo remove-current-line
-) {
-  // @demo remove-block-start
-  const { navigation } = _props
-  const {
-    authenticationStore: { logout },
-  } = useStores()
+export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeScreen({
+  navigation,
+}) {
+  const [username, setUsername] = useState<string | null>(null)
+  const [isPortrait, setIsPortrait] = useState(false);
 
-  function goNext() {
-    navigation.navigate("Demo", { screen: "DemoShowroom", params: {} })
+  const onChange = ({ window: { width, height  } }) => {
+    setIsPortrait(height >= width);
+  };
+
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', onChange);
+    return () => subscription?.remove();
+  }, []);
+
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const storedName = await AsyncStorage.getItem("LAST_CONNECTED_USER")
+        if (storedName) setUsername(JSON.parse(storedName).name)
+      } catch (error) {
+        console.error("Failed to load username", error)
+      }
+    }
+
+    fetchUsername()
+  }, [])
+
+  function handleJoin() {
+    navigation.navigate("Join")
   }
 
-  useHeader(
-    {
-      rightTx: "common.logOut",
-      onRightPress: logout,
-    },
-    [logout],
-  )
-  // @demo remove-block-end
+  function handleSignIn(param?: string) {
+    param ? navigation.navigate("Login", {param}) : navigation.navigate("Login") ;
+  }
 
-  const $bottomContainerInsets = useSafeAreaInsetsStyle(["bottom"])
-
+  console.log('isPortrait', isPortrait)
   return (
     <ImageBackground source={backgroundImage} style={$background}>
-        <View style={$topContainer}>
-          <Image style={$welcomeLogo} source={welcomeLogo} resizeMode="contain" />
-          <Text
-            testID="welcome-heading"
-            style={$welcomeHeading}
-            tx="welcomeScreen.readyForLaunch"
-            preset="heading"
-          />
-          <Text tx="welcomeScreen.exciting" preset="subheading" />
-          <Image style={$welcomeFace} source={welcomeFace} resizeMode="contain" />
+      {username && (
+        <TouchableOpacity style={$loggedInContainer} onPress={() => handleSignIn(username)}>
+          <Image source={userFilled} style={$iconStyle} />
+          <Text style={$loggedInText}>Continue as </Text>
+          <Text style={$userNameText}>{username}</Text>
+        </TouchableOpacity>
+      )}
+      <View style={$container}>
+        <View style={$textContainer}>
+          <Image source={logo} style={$logo} />
+          <Text testID="login-heading" tx="joinScreen.firstHeadline" preset="heading" style={$headline} />
+          <Text testID="join-heading-1" tx="joinScreen.secondHeadline" preset="heading" style={$headline} />
+          <Text testID="join-heading-2" tx="joinScreen.subtitle" preset="subheading" style={$subtitle} />
         </View>
-      <View style={[$bottomContainer, $bottomContainerInsets]}>
-        <Text tx="welcomeScreen.postscript" size="md" />
-        {/* @demo remove-block-start */}
-        <Button
-          testID="next-screen-button"
-          preset="reversed"
-          tx="welcomeScreen.letsGo"
-          onPress={goNext}
-        />
-        {/* @demo remove-block-end */}
+        <View style={isPortrait? $buttonContainerPortrait : $buttonContainerLandscape}>
+          <PrimaryButton text={"joinScreen.join"} onPress={handleJoin} />
+          <SecondaryButton text={"joinScreen.signIn"} onPress={handleSignIn} />
+        </View>
       </View>
     </ImageBackground>
   )
@@ -75,44 +83,80 @@ const $background: ImageStyle = {
   resizeMode: "stretch",
 }
 
+const $loggedInContainer: ViewStyle = {
+  position: "absolute",
+  top: spacing.lg,
+  right: spacing.lg,
+  flexDirection: "row",
+  alignItems: "center",
+}
+
+const $iconStyle: ImageStyle = {
+  width: isTablet ? 24 : 16,
+  height: isTablet ? 24 : 16,
+  marginRight: spacing.sm,
+}
+
+const $loggedInText: TextStyle = {
+  fontSize: isTablet ? 18 : 12,
+  color: colors.palette.neutral500,
+}
+
+const $userNameText: TextStyle = {
+  fontSize: isTablet ? 18 : 12,
+  fontWeight: "bold",
+  color: colors.palette.neutral100,
+}
+
 const $container: ViewStyle = {
   flex: 1,
-  backgroundColor: colors.background,
+  justifyContent: "space-between",
+  padding: isTablet ? 30 : 16,
+  backgroundColor: colors.transparent,
 }
 
-const $topContainer: ViewStyle = {
-  flexShrink: 1,
-  flexGrow: 1,
-  flexBasis: "57%",
+const $textContainer: ViewStyle = {
+  flex: 1,
   justifyContent: "center",
-  paddingHorizontal: spacing.lg,
+  alignItems: "center",
 }
 
-const $bottomContainer: ViewStyle = {
-  flexShrink: 1,
-  flexGrow: 0,
-  flexBasis: "43%",
-  backgroundColor: colors.palette.neutral100,
-  borderTopLeftRadius: 16,
-  borderTopRightRadius: 16,
-  paddingHorizontal: spacing.lg,
-  justifyContent: "space-around",
-}
-const $welcomeLogo: ImageStyle = {
-  height: 88,
-  width: "100%",
-  marginBottom: spacing.xxl,
-}
-
-const $welcomeFace: ImageStyle = {
-  height: 169,
-  width: 269,
-  position: "absolute",
-  bottom: -47,
-  right: -80,
-  transform: [{ scaleX: isRTL ? -1 : 1 }],
-}
-
-const $welcomeHeading: TextStyle = {
+const $logo: ImageStyle = {
+  width: isTablet ? width * 0.1 : 80,
+  height: isTablet ? width * 0.1 : 80,
   marginBottom: spacing.md,
+}
+
+const $headline: TextStyle = {
+  fontSize: isTablet ? 55 : 24,
+  fontWeight: "bold",
+  textAlign: "center",
+  color: colors.palette.neutral100,
+  marginBottom: spacing.sm,
+  paddingTop: spacing.sm,
+}
+
+const $subtitle: TextStyle = {
+  fontSize: isTablet ? 20 : 12,
+  textAlign: "center",
+  marginTop: spacing.md,
+  color: colors.palette.neutral100,
+}
+
+const $buttonContainerLandscape: ViewStyle = {
+  flex: 0.5,
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "flex-start",
+  paddingBottom: spacing.xl,
+  paddingHorizontal: isTablet ? 420 : "auto",
+}
+
+const $buttonContainerPortrait: ViewStyle = {
+  flex: 0.5,
+  flexDirection: "row",
+  justifyContent: "space-around",
+  alignItems: "flex-start",
+  paddingBottom: spacing.xl,
+  paddingHorizontal: isTablet ? 150 : "auto",
 }

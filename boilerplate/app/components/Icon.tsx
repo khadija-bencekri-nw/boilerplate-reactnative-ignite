@@ -108,6 +108,18 @@ export const iconRegistry = {
   slack: require("../../assets/icons/demo/slack.png"), // @demo remove-current-line
   view: require("../../assets/icons/view.png"),
   x: require("../../assets/icons/x.png"),
+  arrowleft: require("../../assets/icons/arrow-left.png"),
+  calendar: require("../../assets/icons/calendar.png"),
+  close: require("../../assets/icons/close.png"),
+  code: require("../../assets/icons/fullstack-dev.png"),
+  info: require("../../assets/icons/info.png"),
+  tl: require("../../assets/icons/techlead.png"),
+  userFilled: require("../../assets/icons/userFilled.png"),
+  apple: require("../../assets/icons/apple.png"),
+  google: require("../../assets/icons/google.png"),
+  nw: require("../../assets/icons/nw.png"),
+  add: require("../../assets/icons/add.png"),
+  nwDark: require("../../assets/icons/nwDark.png"),
 }
 
 const $imageStyleBase: ImageStyle = {

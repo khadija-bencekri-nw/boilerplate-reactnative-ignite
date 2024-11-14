@@ -44,6 +44,20 @@ const fr: Translations = {
     tapToSignIn: "Appuyez pour vous connecter !",
     hint: "Astuce : vous pouvez utiliser n'importe quelle adresse e-mail et votre mot de passe préféré :)",
   },
+  joinScreen: {
+    firstHeadline: "Outils sélectionnés",
+    secondHeadline: "pour vous équiper !",
+    subtitle: "Rejoignez l'initiative des outils de travail de Nimbleway pour être prêt pour vos tâches quotidiennes.",
+    join: "Rejoindre",
+    signIn: "Se connecter",
+  },  
+  signUpScreen: {
+    headline: "Account informations",
+    step1: "step 1  of 2",
+    step2: "step 2  of 2",
+    fullName: "Full name",
+    next: "Next, your personal informations",
+  },  
   demoNavigator: {
     componentsTab: "Composants",
     debugTab: "Débogage",

@@ -43,6 +43,20 @@ const ar: Translations = {
     tapToSignIn: "انقر لتسجيل الدخول!",
     hint: "(: تلميح: يمكنك استخدام اي عنوان بريد الكتروني وكلمة السر المفضلة لديك",
   },
+  joinScreen: {
+    firstHeadline: "أدوات مختارة",
+    secondHeadline: "لتجهيزك!",
+    subtitle: "انضم إلى مبادرة أدوات العمل من Nimbleway لتجهيزك لمهامك اليومية.",
+    join: "انضم",
+    signIn: "تسجيل الدخول",
+  },
+  signUpScreen: {
+    firstHeadline: "Outils sélectionnés",
+    secondHeadline: "pour vous équiper !",
+    subtitle: "Rejoignez l'initiative des outils de travail de Nimbleway pour être prêt pour vos tâches quotidiennes.",
+    join: "Rejoindre",
+    signIn: "Se connecter",
+  },    
   demoNavigator: {
     componentsTab: "عناصر",
     debugTab: "تصحيح",
