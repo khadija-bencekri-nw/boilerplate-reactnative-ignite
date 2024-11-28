@@ -49,21 +49,18 @@ export class Api {
   }
 
   async login(email: string, password: string): Promise<{ kind: "ok"; authToken: string, user: object } | GeneralApiProblem> {
-    const response: ApiResponse<{ token: string , user: object}> = await this.apisauce.post("auth/login", { username: email, password });
+    const response: ApiResponse<{ token: string , user: object}> = await this.apisauce.post("auth/login", { email, password });
     if (!response.ok) {
       return getGeneralApiProblem(response);
     }
   
     const token  = response?.headers?.authorization;
-    return { kind: "ok", authToken: token, user: response.data.user };
+    return { kind: "ok", authToken: token };
   }
 
-  async signUp(data: { name: string; username: string; password: string; rank: string; joiningDate: string; amount: string }): Promise<{ kind: "ok"; message: string } | GeneralApiProblem> {
-    const signUpData = {
-      ...data,
-      roles: [{"name": data.rank}],
-    };
-    const response: ApiResponse<{ message: string }> = await this.apisauce.post("auth/signup", signUpData);
+  async signUp(data: { name: string; username: string; password: string; role: string; joiningDate: Date; amount: string }): Promise<{ kind: "ok"; message: string } | GeneralApiProblem> {
+    
+    const response: ApiResponse<{ message: string }> = await this.apisauce.post("auth/signup", data);
     
     if (!response.ok) {
       return getGeneralApiProblem(response);
