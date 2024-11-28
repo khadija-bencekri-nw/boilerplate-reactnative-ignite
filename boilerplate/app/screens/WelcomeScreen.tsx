@@ -52,7 +52,6 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
     param ? navigation.navigate("Login", {param}) : navigation.navigate("Login") ;
   }
 
-  console.log('isPortrait', isPortrait)
   return (
     <ImageBackground source={backgroundImage} style={$background}>
       {username && (

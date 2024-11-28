@@ -14,8 +14,6 @@ const DATA = [
   { id: '5',image : require("../../assets/images/backgroundImage.png"), title: 'Samsung Galaxy Buds', price: '2999,00 DH' },
   { id: '6', image : require("../../assets/images/airpods.png"), title: 'Bose QuietComfort', price: '3799,00 DH' },
   { id: '7', image : require("../../assets/images/backgroundImage.png") , title: 'Apple AirPods Pro', price: '3299,00 DH' },
-  { id: '8',image : require("../../assets/images/airpods.png"), title: 'Samsung Galaxy Buds', price: '2999,00 DH' },
-  { id: '9', image : require("../../assets/images/backgroundImage.png"), title: 'Bose QuietComfort', price: '3799,00 DH' },
   // Add more items as needed
 ];
 
@@ -33,8 +31,6 @@ const PurchaseListScreen: FC<ProductListScreenProps> = observer(function Product
   const handleRatingChange = (rating: number) => {
     console.log("Selected Rating:", rating)
   }
-
-  console.log('props', props)
 
   const renderItem = ({ item }) => (
     <TouchableOpacity style={[isGridView ? styles.gridItem : styles.listItem, {flexDirection: 'row'}]}>

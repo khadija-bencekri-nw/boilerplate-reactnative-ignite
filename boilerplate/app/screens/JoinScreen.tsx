@@ -19,7 +19,7 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
 
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [isPortrait, setIsPortrait] = useState(true)
+  const [isPortrait, setIsPortrait] = useState(false)
   
   // Error states
   const [errors, setErrors] = useState<{ [key: string]: string }>({

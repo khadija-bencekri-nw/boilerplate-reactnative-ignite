@@ -16,7 +16,7 @@ const logo = require("../../assets/images/logo.png")
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
-  const [isPortrait, setIsPortrait] = useState(true);
+  const [isPortrait, setIsPortrait] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const onChange = ({ window: { width, height  } }) => {

@@ -12,7 +12,7 @@ const isTablet = width > 600
 interface ProductScreenProps extends AppStackScreenProps<"Product"> {}
 
 export const ProductScreen: FC<ProductScreenProps> = observer(function ProductScreen(props) {
-  const [isPortrait, setIsPortrait] = useState(true);
+  const [isPortrait, setIsPortrait] = useState(false);
 
   useEffect(() => {
     setIsPortrait(height >= width);
@@ -28,7 +28,6 @@ export const ProductScreen: FC<ProductScreenProps> = observer(function ProductSc
     console.log("Selected Rating:", rating)
   }
 
-  console.log('isPortraitProduct', isPortrait);
 
   return (
     <View style={styles.container} >
