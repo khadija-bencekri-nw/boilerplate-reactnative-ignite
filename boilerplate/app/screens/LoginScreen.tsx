@@ -30,6 +30,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
 
   const authPasswordInput = useRef<TextInput>(null)
 
+  const [errorMessage, setErrorMessage] = useState("");
   const [authPassword, setAuthPassword] = useState("")
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -41,8 +42,8 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   useEffect(() => {
     // Here is where you could fetch credentials from keychain or storage
     // and pre-fill the form fields.
-    setAuthEmail("john.wick@nimbleways.com")
-    setAuthPassword("nimbleways")
+    //setAuthEmail("john.wick@nimbleways.com")
+    //setAuthPassword("nimbleways")
 
     // Return a "cleanup" function that React will run when the component unmounts
     return () => {
@@ -60,9 +61,9 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           throw err;
       }
       console.log("success");
-  }).catch((err)=> {
-      console.log("error is: " + err);
-  });
+      }).catch((err)=> {
+          console.log("error is: " + err);
+      });
   }
 
   const error = isSubmitted ? validationError : ""
@@ -79,13 +80,17 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       setAuthToken(result.authToken);
       setAuthEmail("");
       setAuthPassword("");
-      storeConnecteduser(result?.user);
-      //_props.navigation.navigate("Dashboard");
-      _props.navigation.navigate("Main", { screen: "Dashboard", params: {} })
+      //storeConnecteduser(result?.user);
+      _props.navigation.navigate("Main", { screen: "MainTabNavigator"})
 
     } else {
-      // Handle the error (e.g., show a message to the user)
-      console.error(result);
+      if (result.kind === "not-found") {
+        setErrorMessage("No user is signed up with this email. Please sign up.");
+      } else if (result.kind === "unauthorized") {
+        setErrorMessage("Email or password is incorrect.");
+      } else {
+        setErrorMessage("An unexpected error occurred. Please try again.");
+      }
     }
     setLoading(false);
   }
@@ -151,6 +156,12 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               onSubmitEditing={login}
               RightAccessory={PasswordRightAccessory}
             />
+
+            {errorMessage ? (
+              <Text style={{ color: colors.error, marginBottom: spacing.md }}>
+                {errorMessage}
+              </Text>
+            ) : null}
 
             <Button
               testID="login-button"

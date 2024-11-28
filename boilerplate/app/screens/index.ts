@@ -1,5 +1,4 @@
-export * from "./WelcomeScreen"
-// @demo remove-block-start
+
 export * from "./LoginScreen"
 export * from "./WelcomeScreen"
 export * from "./JoinScreen"
@@ -8,8 +7,9 @@ export * from "./DemoCommunityScreen"
 export * from "./DemoDebugScreen"
 export * from "./DemoShowroomScreen/DemoShowroomScreen"
 export * from "./DashboardScreen"
-// @demo remove-block-end
 export * from "./ErrorScreen/ErrorBoundary"
-// export other screens here
 export * from "./ProfileScreen"
 export * from "./CoworkersScreen"
+export * from "./ProductScreen"
+export * from "./AddProductScreen"
+export * from "./HelpScreen"

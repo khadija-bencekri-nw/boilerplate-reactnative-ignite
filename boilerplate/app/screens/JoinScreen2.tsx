@@ -19,10 +19,10 @@ export const JoinScreen2: FC<JoinScreen2Props> = observer(function JoinScreen2(_
   const {signUpStore} = useStores()
 
   const [selectedRole, setSelectedRole] = useState<string | null>(null) // State for selected role
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
-  const [isPortrait, setIsPortrait] = useState(true);
+  const [isPortrait, setIsPortrait] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state
   const [modalVisible, setModalVisible] = useState(false); // Modal state
 
@@ -37,16 +37,15 @@ export const JoinScreen2: FC<JoinScreen2Props> = observer(function JoinScreen2(_
 
   const handleRoleSelect = (role: string) => {
     setSelectedRole(role === selectedRole ? null : role) 
-    signUpStore.setRank(role);
+    signUpStore.setRole(role);
   }
 
 
-   const onDateChange = (event: any, selectedDate: Date | undefined) => {
+   const onDateChange = (event: any, selectedDate_: Date | undefined) => {
     setShowPicker(false);
-    if (selectedDate) {
-      setSelectedDate(selectedDate);
-      const date_ = selectedDate.toString;
-      signUpStore.setJoiningDate(date_);
+    if (selectedDate_) {
+      setSelectedDate(selectedDate_);
+      signUpStore.setJoiningDate(selectedDate_);
     }
   };
 
@@ -72,23 +71,27 @@ export const JoinScreen2: FC<JoinScreen2Props> = observer(function JoinScreen2(_
     // Now you can send the concatenated data to your backend
     const signUpData = {
       name: signUpStore.name,
-      username: signUpStore.email,
+      email: signUpStore.email,
       password: signUpStore.password,
-      rank: signUpStore.rank,
-      joiningDate: signUpStore.joiningDate,
+      role: signUpStore.role,
+      employmentDate: signUpStore.joiningDate,
       amount: signUpStore.amount,
     };
 
-    const result = await api.signUp(signUpData);
+    const result = await api.signUp(signUpData)
 
     setLoading(false); // Hide loading indicator
 
     if (result.kind === "ok") {
+      _props.navigation.navigate("Main", {result})
       // Show confirmation modal
-      setModalVisible(true);
+      //setModalVisible(true);
     } else {
-      // Handle sign-up error (you could also show an alert)
-      Alert.alert("Sign-Up Failed", result.kind || "Please try again."); 
+      let message = ""
+      if(result.kind == "user-already-exists") {
+        message = "Un compte avec cet e-mail existe déjà. Veuillez vous connecter ou utiliser un autre e-mail."
+      }
+      Alert.alert("Sign-Up Failed", message); 
     }
   }
 
