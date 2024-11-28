@@ -17,6 +17,7 @@ import type {
   ApiFeedResponse, // @demo remove-current-line
 } from "./api.types"
 import type { EpisodeSnapshotIn } from "../../models/Episode" // @demo remove-current-line
+import { PurchaseSnapshotIn } from "app/models/Purchase"
 
 /**
  * Configuring the apisauce instance.
@@ -69,15 +70,9 @@ export class Api {
     return { kind: "ok", message: response.data ? response.data.message : ""};
   }
 
-  // @demo remove-block-start
-  /**
-   * Gets a list of recent React Native Radio episodes.
-   */
-  async getEpisodes(): Promise<{ kind: "ok"; episodes: EpisodeSnapshotIn[] } | GeneralApiProblem> {
+  async getPurchases(): Promise<{ kind: "ok"; purchases: PurchaseSnapshotIn[] } | GeneralApiProblem> {
     // make the api call
-    const response: ApiResponse<ApiFeedResponse> = await this.apisauce.get(
-      `api.json?rss_url=https%3A%2F%2Ffeeds.simplecast.com%2FhEI_f9Dx`,
-    )
+    const response: ApiResponse<ApiFeedResponse> = await this.apisauce.get("purchases")
 
     // the typical ways to die when calling an api
     if (!response.ok) {
@@ -90,12 +85,12 @@ export class Api {
       const rawData = response.data
 
       // This is where we transform the data into the shape we expect for our MST model.
-      const episodes: EpisodeSnapshotIn[] =
+      const purchases: PurchaseSnapshotIn[] =
         rawData?.items.map((raw) => ({
           ...raw,
         })) ?? []
 
-      return { kind: "ok", episodes }
+      return { kind: "ok", purchases }
     } catch (e) {
       if (__DEV__ && e instanceof Error) {
         console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
@@ -103,7 +98,6 @@ export class Api {
       return { kind: "bad-data" }
     }
   }
-  // @demo remove-block-end
 }
 
 // Singleton instance of the API for convenience
