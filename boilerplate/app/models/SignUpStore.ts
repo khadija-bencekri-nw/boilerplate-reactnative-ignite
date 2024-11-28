@@ -11,9 +11,9 @@ export const SignUpStoreModel = types
     name: "",
     email: "",
     password: "",
-    joiningDate: "",
+    joiningDate: new Date,
     amount: "",
-    rank:""
+    role:"",
   })
   .actions((store) => ({
     setName(value: string) {
@@ -25,10 +25,10 @@ export const SignUpStoreModel = types
     setPassword(value: string) {
       store.password = value;
     },
-    setRank(value: string) {
-      store.rank = value;
+    setRole(value: string) {
+      store.role = value;
     },
-    setJoiningDate(value: string) {
+    setJoiningDate(value: Date) {
       store.joiningDate = value;
     },
     setAmount(value: string) {
@@ -39,8 +39,8 @@ export const SignUpStoreModel = types
       store.email = "";
       store.password = "";
       store.role = "";
-      store.joiningDate = "";
-      store.amount = 0;
+      store.joiningDate = new Date;
+      store.amount = "0";
     },
   }))
   .views((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars

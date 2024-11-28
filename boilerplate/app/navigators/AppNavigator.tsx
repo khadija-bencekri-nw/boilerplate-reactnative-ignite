@@ -8,19 +8,22 @@ import {
   DarkTheme,
   DefaultTheme,
   NavigationContainer,
-  NavigatorScreenParams, // @demo remove-current-line
+  NavigatorScreenParams,
+  useNavigation,
 } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import { observer } from "mobx-react-lite"
 import React from "react"
-import { useColorScheme } from "react-native"
+import { Linking, SafeAreaView, ScrollView, ScrollViewProps, useColorScheme } from "react-native"
 import * as Screens from "app/screens"
 import Config from "../config"
 import { useStores } from "../models" // @demo remove-current-line
-import { DemoNavigator, DemoTabParamList } from "./DemoNavigator" // @demo remove-current-line
+import { DemoNavigator, DemoTabParamList } from "./DemoNavigator"
+import { MainTabNavigator, MainTabParamList } from "./MainTabNavigator"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
-
+import CustomHeader from "app/components/CustomHeader";
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
  * as well as what properties (if any) they might take when navigating to them.
@@ -39,10 +42,11 @@ export type AppStackParamList = {
   Login?: undefined
   Join: undefined
   Join2: undefined
-  Demo: NavigatorScreenParams<DemoTabParamList> // @demo remove-current-line
   Dashboard: undefined
   Profile: undefined
-	Coworkers: undefined
+  Coworkers: undefined
+  Product: undefined
+  AddProduct: undefined
   Main: NavigatorScreenParams<MainTabParamList>
 }
 
@@ -59,6 +63,7 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 
 // Documentation: https://reactnavigation.org/docs/stack-navigator/
 const Stack = createNativeStackNavigator<AppStackParamList>()
+const Drawer = createDrawerNavigator();
 
 const AppStack = observer(function AppStack() {
   // @demo remove-block-start
@@ -66,18 +71,21 @@ const AppStack = observer(function AppStack() {
     authenticationStore: { isAuthenticated },
   } = useStores()
 
+
   // @demo remove-block-end
   return (
     <Stack.Navigator
-      screenOptions={{ headerShown: false, navigationBarColor: colors.background }}
-      initialRouteName={isAuthenticated ? "Welcome" : "Login"} // @demo remove-current-line
+      screenOptions={{ navigationBarColor: colors.background }}
+      initialRouteName={isAuthenticated ? "Main" : "Welcome"} // @demo remove-current-line
     >
       {/* @demo remove-block-start */}
       {isAuthenticated ? (
         <>
-          <Stack.Screen name="Welcome" component={Screens.WelcomeScreen} options={{headerShown: false}}/>
-          <Stack.Screen name="Main" component={MainTabNavigator} options={{header: ({ navigation }) => 
-            <CustomHeader navigation={navigation} source={"dashboard"} />}}/>
+          <Stack.Screen name="Main" component={DrawerNavigator} options={{headerShown: false}}/>
+          <Stack.Screen name="Product" component={Screens.ProductScreen} 
+            options={{header: ({ navigation }) => <CustomHeader navigation={navigation} source={"Product"} />}}/>
+          <Stack.Screen name="AddProduct" component={Screens.AddProductScreen} options={{header: ({ navigation }) => 
+            <CustomHeader navigation={navigation} source="addProduct" />}}/>
         </>
       ) : (
         <>
@@ -87,12 +95,32 @@ const AppStack = observer(function AppStack() {
           <Stack.Screen name="Login" component={Screens.LoginScreen} options={{headerShown: false}}/>
         </>
       )}
-      {/* @demo remove-block-end */}
-      {/** 🔥 Your screens go here */}
-      {/* IGNITE_GENERATOR_ANCHOR_APP_STACK_SCREENS */}
     </Stack.Navigator>
   )
 })
+
+function CustomDrawerContent(props) {
+  return (
+    <DrawerContentScrollView {...props}>
+      <DrawerItem
+        label="Help"
+        onPress={() => Linking.openURL('https://google.com')}
+      />
+    </DrawerContentScrollView>
+  );
+}
+
+const DrawerNavigator = () => (
+  <SafeAreaView style={{ flex: 1 }}>
+    <Drawer.Navigator >
+      <Drawer.Screen name="MainTabNavigator" component={MainTabNavigator} options={{header: ({ navigation }) => 
+        <CustomHeader onDrawerToggle={() => navigation.toggleDrawer()} navigation={navigation} source={"dashboard"} />}}/>
+      <Drawer.Screen name="Help" component={Screens.HelpScreen} options={{header: ({ navigation }) => 
+        <CustomHeader onDrawerToggle={() => navigation.toggleDrawer()} navigation={navigation}  source={"help"}/>}}/>
+    </Drawer.Navigator>
+  </SafeAreaView>
+  
+);
 
 export interface NavigationProps
   extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
