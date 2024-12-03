@@ -1,15 +1,13 @@
 import * as React from "react"
 import { ActivityIndicator, StyleProp, View, ViewStyle } from "react-native"
 import { observer } from "mobx-react-lite"
+import { colors } from "app/theme"
 
 export interface LoaderProps {
   loading ?: boolean
   style?: StyleProp<ViewStyle>
 }
 
-/**
- * Describe your component here
- */
 export const Loader = observer(function Loader(props: LoaderProps) {
   const { style } = props
   const $styles = [$container, style]
@@ -17,7 +15,7 @@ export const Loader = observer(function Loader(props: LoaderProps) {
 
   return (
     <View style={$loaderContainer}>
-      <ActivityIndicator size="large" color="#6200EE" />
+      <ActivityIndicator size="large" color={colors.palette.primary500} />
     </View>
   )
 })

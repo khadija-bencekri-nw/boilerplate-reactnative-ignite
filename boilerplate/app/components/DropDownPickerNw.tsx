@@ -11,49 +11,63 @@ export interface DropDownPickerNwProps {
    */
   data: Array<{}>,
   placeholder: string,
-  style?: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>,
+  open: boolean
+  setOpen: () => void,
+  zIndex: number,
+  zIndexInverse: number,
 }
 
 /**
  * Describe your component here
  */
 export const DropDownPickerNw = observer(function DropDownPickerNw(props: DropDownPickerNwProps) {
-  const { style, data, placeholder } = props
+  const { style, data, placeholder, open, setOpen, zIndex, zIndexInverse } = props;
   const $styles = [$container, style]
 
-  const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(null);
   const [items, setItems] = React.useState([]);
 
+  function transformBrandsData(array: Array<object>) {
+    return array.map(item => ({
+        label: item.name,
+        value: item.id
+    }));
+}
+
   React.useEffect(() => {
-    setItems(data)
-  },[])
+    const dropdownData = transformBrandsData(data)
+    console.log('dropdownData', dropdownData, ' data', data)
+    setItems(dropdownData)
+  },[data])
   
   return (
     <View style={$styles}>
       <DropDownPicker
-          placeholder={placeholder}
-          open={open}
-          value={value}
-          items={items}
-          setOpen={setOpen}
-          setValue={setValue}
-          setItems={setItems}
-          placeholderStyle={{
-            color: "white",
-          }}
-          labelStyle={{color: "white"}}
-          style={{backgroundColor:'#232323',  borderWidth: 0, borderBottomWidth:1, borderColor: "#404040"}}
-          listItemContainerStyle={{
-            backgroundColor:'#2E2E2E',
-            borderColor: "#fff",
-            borderWidth:1,
-            zIndex:1
-          }}
-          listItemLabelStyle={{
-            color: "#fff"
-          }}
-          theme="DARK"
+        placeholder={placeholder}
+        open={open}
+        value={value}
+        items={items}
+        setOpen={setOpen}
+        setValue={setValue}
+        setItems={setItems}
+        placeholderStyle={{
+          color: "white",
+        }}
+        labelStyle={{color: "white"}}
+        style={{backgroundColor:'#232323',  borderWidth: 0, borderBottomWidth:1, borderColor: "#404040"}}
+        listItemContainerStyle={{
+          backgroundColor:'#2E2E2E',
+          borderColor: "#fff",
+          borderWidth:1,
+          zIndex:1
+        }}
+        listItemLabelStyle={{
+          color: "#fff"
+        }}
+        theme="DARK"
+        zIndex={zIndex}
+        zIndexInverse={zIndexInverse}
         />
     </View>
   )
