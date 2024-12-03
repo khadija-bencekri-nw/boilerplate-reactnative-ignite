@@ -7,6 +7,7 @@ import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 import { api } from "app/services/api"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { saveString } from "app/utils/secureStorage"
 
 const { width } = Dimensions.get("window")
 const isTablet = width > 600
@@ -31,7 +32,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   const authPasswordInput = useRef<TextInput>(null)
 
   const [errorMessage, setErrorMessage] = useState("");
-  const [authPassword, setAuthPassword] = useState("")
+  const [authPassword, setAuthPassword] = useState("password")
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [attemptsCount, setAttemptsCount] = useState(0)
@@ -40,15 +41,11 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   } = useStores()
 
   useEffect(() => {
-    // Here is where you could fetch credentials from keychain or storage
-    // and pre-fill the form fields.
-    //setAuthEmail("john.wick@nimbleways.com")
-    //setAuthPassword("nimbleways")
-
-    // Return a "cleanup" function that React will run when the component unmounts
+    setAuthPassword("password")
+      setAuthEmail("khadija.bencekri@theodo.com")
     return () => {
-      setAuthPassword("")
-      setAuthEmail("")
+      setAuthPassword("password")
+      setAuthEmail("khadija.bencekri@theodo.com")
     }
   }, [])
 
@@ -80,8 +77,11 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       setAuthToken(result.authToken);
       setAuthEmail("");
       setAuthPassword("");
-      //storeConnecteduser(result?.user);
-      _props.navigation.navigate("Main", { screen: "MainTabNavigator"})
+      await saveString("token", result.authToken).then(
+        _props.navigation.navigate("Main", { screen: "MainTabNavigator"})
+      ).catch(
+        console.log("token not saved")
+      )
 
     } else {
       if (result.kind === "not-found") {
@@ -128,7 +128,8 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             <Text testID="login-heading" text="Welcome Back" preset="heading" style={$headline} />
           </View>
             <TextField
-              value={authEmail}
+              value={"khadija.bencekri@theodo.com"}
+              //value={authEmail}
               onChangeText={setAuthEmail}
               containerStyle={$textField}
               autoCapitalize="none"
