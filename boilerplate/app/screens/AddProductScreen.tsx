@@ -1,10 +1,13 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { View, TextInput, Dimensions, Text, TouchableOpacity, Alert, StyleSheet, Image } from "react-native";
-import { DropDownPickerNw, Icon } from "app/components";
+import { AlertDialog, AlertDialogRef, DropDownPickerNw, Icon, Loader } from "app/components";
 import * as ImagePicker from "expo-image-picker";
 import { StackActions } from '@react-navigation/native';
 import { AppStackScreenProps } from "app/navigators";
+import { api } from "app/services/api";
+import { runInAction } from "mobx";
+import { useStores } from "app/models";
 
 const { width } = Dimensions.get("window");
 const isTablet = width > 600;
@@ -14,67 +17,204 @@ interface AddProductScreenProps extends AppStackScreenProps<"AddProduct"> {
 }
 
 export const AddProductScreen: FC<AddProductScreenProps> = observer(function AddProductScreen(props: AddProductScreenProps) {
+  const {
+    authenticationStore: { user, logout },
+  } = useStores()
+  
   const [isPortrait, setIsPortrait] = useState(false);
   const [price, setPrice] = useState("");
+  const [model, setModel] = useState("");
   const [screenWidth, setScreenWidth] = useState(width);
   const [file, setFile] = useState<string | null>(null);
   const [files, setFiles] = useState<any[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const alertRef = useRef<AlertDialogRef>(null)
+  const [loading, setLoading] = useState(false)
+  const [brands, setBrands] = useState([]);
+  const [stores, setStores] = useState([]);
+  const [brandOpen, setBrandOpen] = useState(false);
+  const [storeOpen, setStoreOpen] = useState(false);
+  const brandRef = useRef<AlertDialogRef>(null)
+  const storeRef = useRef<AlertDialogRef>(null)
+  
 
   const onChange = ({ window: { width, height } }: any) => {
     setScreenWidth(width);
     setIsPortrait(height >= width);
   };
 
+  const getFormData = async () => {
+    setLoading(true);
+    try {
+      const response = await api.getFormData();
+      if (response.kind == "ok") {
+        setLoading(false);
+        setBrands(response.data.brands)
+        setStores(response.data.stores)
+      } else {
+        setLoading(false);
+        if(response.kind == "forbidden" || response.kind == "unauthorized") {
+          const title= "Session expired";
+          const message= "Your session has expired. Please log in again.";
+          const   redirectLabel= "Login again";
+          const   onRedirect= () => logout();
+          showDialog(title, message, redirectLabel, onRedirect);
+        } else {
+          const title= "";
+          const message= "Une erreur est survenue, veuillez réessayer.";
+          const   redirectLabel= "Réessayer";
+          const   onRedirect= () => getFormData();
+          showDialog(title, message, redirectLabel, onRedirect);
+        }
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("An error occurred while fetching purchases:", error);
+    }
+  }
+
   useEffect(() => {
     const subscription = Dimensions.addEventListener("change", onChange);
+    getFormData();
     return () => subscription?.remove();
   }, []);
 
-  const pickImage = async () => {
+  const saveProduct = async () => {
+    setLoading(true);
+    var body = new FormData();
+ 
+    const data={
+      brand: brandRef.current.getValue()?.label,
+      model: model,
+      store: storeRef.current.getValue()?.label,
+      price: price,
+      userId: user.id,
+    }
+    
+    body.append("purchase", JSON.stringify(data));
+    //body.append("files", files)
+    files?.forEach((file, index) => {
+      const localUri = file.uri;
+      const filename = localUri.split("/").pop();
+      const type = file.mimeType || "image"; // Use the correct MIME type
+      body.append("files", {
+        uri: localUri,
+        name: filename,
+        type,
+      });
+    });
+
+    try {
+      const response = await api.savePurchase(body);
+      console.log('response.kind', response.kind)
+      if (response.kind == "ok") {
+        setLoading(false);
+        const title= "Congratulations";
+        const message= "Your purchase has been added successfully.";
+        const   redirectLabel= "Go to product List";
+        const   onRedirect= () => props.navigation.navigate("Main", { screen: "MainTabNavigator"});
+        showDialog(title, message, redirectLabel, onRedirect);
+      } else {
+        setLoading(false);
+        if(response.kind == "forbidden" || response.kind == "unauthorized") {
+          const title= "Session expired";
+          const message= "Your session has expired. Please log in again.";
+          const   redirectLabel= "Login again";
+          const   onRedirect= () => logout();
+          showDialog(title, message, redirectLabel, onRedirect);
+        } else if(response.kind == "bad-data") {
+          const title= "Invalid file type";
+          const message= "Only JPEG and PNG are supported.";
+          const   redirectLabel= "Go back to my form";
+          const   onRedirect= () => alertRef.current?.hide();
+          showDialog(title, message, redirectLabel, onRedirect);
+        }
+         else {
+          const title= "";
+          const message= "Une erreur est survenue, veuillez réessayer";
+          const   redirectLabel= "try again";
+          const   onRedirect= () => saveProduct();
+          showDialog(title, message, redirectLabel, onRedirect);
+        }
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("An error occurred while fetching purchases:", error);
+    }
+  }
+
+  const pickImage = async (allowsMultipleSelection: boolean) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert("Permission Denied", "Sorry, we need camera roll permission to upload images.");
       return;
     }
-    const result = await ImagePicker.launchImageLibraryAsync();
+    const result = await ImagePicker.launchImageLibraryAsync({allowsMultipleSelection});
     if (!result.canceled) {
-      setFile(result.assets[0]?.uri || null);
+      allowsMultipleSelection ? setFiles(result.assets) : setFile(result.assets[0]?.uri || null);
       setError(null);
     }
   };
 
-  const pickImages = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission Denied", "Sorry, we need camera roll permission to upload images.");
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({ allowsMultipleSelection: true });
-    if (!result.canceled) {
-      setFiles(result.assets || null);
-      setError(null);
+  const showDialog = (title: string, message: string, redirectLabel: string, onRedirect: Function) => {
+    alertRef?.current.set({
+      title,
+      message,
+      redirectLabel,
+      onRedirect: onRedirect,
+    })
+    alertRef.current?.show()
+  }
+
+  const handleDropdownOpen = (dropdown: string) => {
+    if (dropdown === "brand") {
+      setBrandOpen(!brandOpen); 
+      setStoreOpen(false);
+    } else if (dropdown === "store") {
+      setBrandOpen(false);
+      setStoreOpen(!storeOpen); 
     }
   };
 
   return (
     <View style={[styles.root, isPortrait ? styles.rootPortrait : styles.rootLandscape]}>
       <View style={styles.formContainer}>
-        <DropDownPickerNw placeholder="Brand" data={[{ label: "Apple", value: "apple" }, { label: "Banana", value: "banana" }]} />
-        <DropDownPickerNw placeholder="Model" data={[{ label: "Apple", value: "apple" }, { label: "Banana", value: "banana" }]} />
+        <DropDownPickerNw 
+          ref={brandRef}
+          open={brandOpen}
+          placeholder="Brand" data={brands} 
+          setOpen={() => handleDropdownOpen("brand")}
+          zIndex={3000} 
+          zIndexInverse={1000} 
+        />
+        <TextInput
+          placeholder="Model"
+          style={[styles.textInput, { width: screenWidth - 110 }, isPortrait ? styles.textInputPortrait : styles.textInputLandscape]}
+          onChangeText={setModel}
+          value={model}
+          placeholderTextColor={"white"}
+        />
         <TextInput
           placeholder="Price"
           style={[styles.textInput, { width: screenWidth - 110 }, isPortrait ? styles.textInputPortrait : styles.textInputLandscape]}
           onChangeText={setPrice}
           value={price}
+          keyboardType="numeric"
           placeholderTextColor={"white"}
         />
-        <DropDownPickerNw placeholder="Store" data={[{ label: "Apple", value: "apple" }, { label: "Banana", value: "banana" }]} />
+        <DropDownPickerNw 
+          ref={storeRef}
+          placeholder="Store" data={stores} 
+          open={storeOpen}
+          setOpen={() => handleDropdownOpen("store")}
+          zIndex={2000}
+          zIndexInverse={2000}
+        />
         <View style={[styles.invoiceSection, isPortrait ? styles.invoiceSectionPortrait : styles.invoiceSectionLandscape]}>
           <Text style={styles.sectionHeader}>INVOICE AND MEDIA</Text>
           <View style={[styles.mediaContainer, isPortrait ? null : styles.mediaContainerLandscape]}>
             {[1, 2,].map((_, index) => (
-              <TouchableOpacity key={index} style={[styles.pickPicture, !isPortrait ? styles.pickPictureLandscape : null]} onPress={pickImage}>
+              <TouchableOpacity key={index} style={[styles.pickPicture, !isPortrait ? styles.pickPictureLandscape : null]} onPress={() => pickImage(false)}>
                 <View style={styles.imageContainer}>
                   {file ? (
                     <Image source={{ uri: file }} style={isPortrait ? styles.image : styles.imageLandscape} />
@@ -85,7 +225,7 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
               </TouchableOpacity>
             ))}
           </View>
-          <TouchableOpacity onPress={pickImages} style={styles.button}>
+          <TouchableOpacity onPress={() => pickImage(true)} style={styles.button}>
             <Icon icon="add" size={30} style={styles.addIcon} />
             <Text style={styles.buttonText}>Add multiple photos</Text>
           </TouchableOpacity>
@@ -101,10 +241,12 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
         <TouchableOpacity style={styles.cancelButton} onPress={() => props.navigation?.dispatch(StackActions.pop(1))}>
           <Text style={styles.cancelText}>Cancel</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.confirmButton}>
+        <TouchableOpacity style={styles.confirmButton} onPress={saveProduct}>
           <Text style={styles.confirmText}>Confirm</Text>
         </TouchableOpacity>
       </View>
+      <AlertDialog ref={alertRef} />
+      <Loader loading={loading}/>
     </View>
   );
 });

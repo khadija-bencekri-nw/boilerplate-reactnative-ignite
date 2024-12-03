@@ -118,6 +118,35 @@ export class Api {
       return { kind: "bad-data" }
     }
   }
+
+  async savePurchase(purchaseRequest: FormData): Promise<{ kind: "ok"; purchase: Purchase } | GeneralApiProblem> {
+    // make the api call
+    this.apisauce.addRequestTransform((request) => {
+      request.headers = request.headers || {};
+      request.headers["Content-Type"] = "multipart/form-data";
+    })
+    const response: ApiResponse<ApiFeedResponse> = await this.apisauce.post("purchases", purchaseRequest)
+
+    // the typical ways to die when calling an api
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) return problem
+    }
+    const purchaseResp: Purchase = response;
+    return { kind: "ok", purchase: purchaseResp }
+
+  }
+
+  async getFormData(): Promise<{ kind: "ok"; data} | GeneralApiProblem> {
+    
+    const response: ApiResponse<{ data }> = await this.apisauce.get("purchases/form-data");
+    
+    if (!response.ok) {
+      return getGeneralApiProblem(response);
+    }
+  
+    return { kind: "ok", data: response.data};
+  }
 }
 
 // Singleton instance of the API for convenience

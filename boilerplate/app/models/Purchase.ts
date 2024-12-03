@@ -10,9 +10,10 @@ interface Enclosure {
   store: string
   price: number
   purchaseDate: Date
-  rating: Object
+  rating: number
+  //rating: Object
   userId: string
-  images: Array<string>
+  images: string[]
 }
 
 /**
@@ -27,10 +28,11 @@ export const PurchaseModel = types
     model: "",
     store: "",
     price: 0,
-    rating: types.model({
-      stars: types.optional(types.number, 0), // Default stars: 0
-      reviews: types.optional(types.number, 0), // Default reviews: 0
-    }),
+    rating: 0,
+    // rating: types.model({
+    //   stars: types.optional(types.number, 0), // Default stars: 0
+    //   reviews: types.optional(types.number, 0), // Default reviews: 0
+    // }),
     userId: "",
     images: types.optional(types.array(types.string), []),
   })
