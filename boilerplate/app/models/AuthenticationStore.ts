@@ -1,10 +1,22 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
 
+interface User {
+  id: string
+  name: string
+  email: string
+  role: string
+  employementDate: Date
+  shouldReceiveMailNotifications: boolean
+  shouldReceiveApprovalNotifications: boolean
+}
+
 export const AuthenticationStoreModel = types
   .model("AuthenticationStore")
   .props({
     authToken: types.maybe(types.string),
     authEmail: "",
+    user: types.frozen<User>(),
+
   })
   .views((store) => ({
     get isAuthenticated() {
@@ -24,6 +36,9 @@ export const AuthenticationStoreModel = types
     },
     setAuthEmail(value: string) {
       store.authEmail = value.replace(/ /g, "")
+    },
+    setUser(value?: User) {
+      store.user = value
     },
     logout() {
       store.authToken = undefined
