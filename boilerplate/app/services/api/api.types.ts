@@ -8,10 +8,22 @@ export interface PurchaseItem {
   store: string
   price: number
   purchaseDate: Date
-  rating: { scheme: string; value: string }
+  rating: number
+  //rating: { scheme: string; value: string }
   userId: string
   images: string[]
 }
+
+export interface User {
+  id: string 
+  name: string
+  email: string
+  role: string
+  employmentDate: Date
+  shouldReceiveMailNotifications: boolean 
+  shouldReceiveApprovalNotifications: boolean 
+}
+
 
 export interface ApiFeedResponse {
   status: string

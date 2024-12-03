@@ -1,32 +1,108 @@
-import React, { FC, useState } from "react"
+import React, { FC, useEffect, useRef, useState } from "react"
 import { observer } from "mobx-react-lite"
 import { ViewStyle, View, TextStyle, TouchableOpacity, Image, ImageBackground, FlatList, StyleSheet } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
-import { Screen, Text, Icon, Rating } from "app/components"
+import { Screen, Text, Icon, Rating, AlertDialog, AlertDialogRef, Loader } from "app/components"
 import { colors } from "app/theme"
 import PurchaseListScreen from "./PurchaseListScreen"
 import { MasonryFlashList } from "@shopify/flash-list"
-// import { useNavigation } from "@react-navigation/native"
-// import { useStores } from "app/models"
-
-const DATA = [
-  { id: '1', image : require("../../assets/images/backgroundLogin.png") , title: 'Apple AirPods Pro', price: '3299,00 DH' },
-  { id: '2',image : require("../../assets/images/airpods.png"), title: 'Samsung Galaxy Buds', price: '2999,00 DH' },
-  { id: '3', image : require("../../assets/images/airpods.png"), title: 'Bose QuietComfort', price: '3799,00 DH' },
-  { id: '4', image : require("../../assets/images/backgroundLogin.png") , title: 'Apple AirPods Pro', price: '3299,00 DH' },
-  { id: '5',image : require("../../assets/images/backgroundImage.png"), title: 'Samsung Galaxy Buds', price: '2999,00 DH' },
-  { id: '6', image : require("../../assets/images/airpods.png"), title: 'Bose QuietComfort', price: '3799,00 DH' },
-  { id: '7', image : require("../../assets/images/backgroundImage.png") , title: 'Apple AirPods Pro', price: '3299,00 DH' },
-  { id: '8',image : require("../../assets/images/airpods.png"), title: 'Samsung Galaxy Buds', price: '2999,00 DH' },
-  { id: '9', image : require("../../assets/images/backgroundImage.png"), title: 'Bose QuietComfort', price: '3799,00 DH' },
-  // Add more items as needed
-];
+import { api } from "app/services/api"
+import { runInAction } from "mobx"
+import { useStores } from "app/models"
+import { useIsFocused } from "@react-navigation/native"
 
 interface DashboardScreenProps extends AppStackScreenProps<"Dashboard"> {}
 
 export const DashboardScreen: FC<DashboardScreenProps> = observer(function DashboardScreen(props) {
 
+  const {
+    authenticationStore: { logout, setUser },
+  } = useStores()
+  
   const [isGridView, setIsGridView] = useState(false);
+  const [purchases, setPurchases] = useState([]);
+  const [userState, setUserState] = useState({});
+  const [loading, setLoading] = useState(false)
+  const alertRef = useRef<AlertDialogRef>(null)
+
+  const isFocused = useIsFocused();
+
+
+  useEffect(() => {
+    fetchUser();
+  }, [])
+  
+  useEffect(() => {
+    isFocused && fetchUser()
+  },[isFocused]);
+
+  const fetchUser = async () => {
+    setLoading(true);
+    try {
+      const response = await api.getUser();
+      if (response.kind == "ok") {
+        runInAction(() => {
+          setUserState(response.user);
+          setUser(response.user)
+          fetchPurchases(response.user.id)
+        });
+      } else {
+        setLoading(false);
+        if(response.kind == "forbidden" || response.kind == "unauthorized") {
+          alertRef?.current.set({
+            title: "Session expired",
+            message: "Your session has expired. Please log in again.",
+            redirectLabel: "Proceed",
+            onRedirect: () => logout(),
+          })
+          alertRef.current?.show()
+        } else {
+          alertRef?.current.set({
+            title: "",
+            message: "An error has occured, please try again.",
+            redirectLabel: "Proceed",
+            onRedirect: () => logout(),
+          })
+          alertRef.current?.show()
+        }
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching purchases:", error);
+    }
+  };
+
+  const fetchPurchases = async (id: string) => {
+    try {
+      const response = await api.getPurchases(id);
+      if (response.kind == "ok") {
+        setLoading(false);
+        runInAction(() => {
+          setPurchases(response.purchases); 
+        });
+      } else {
+        setLoading(false);
+        if(response.kind == "forbidden" || response.kind == "unauthorized") {
+          alertRef?.current.set({
+            title: "Session expired",
+            message: "Your session has expired. Please log in again.",
+            redirectLabel: "Log in again",
+            onRedirect: () => logout(),
+          })
+          alertRef.current?.show()
+        } else {
+          alertRef?.current.set({
+            title: "",
+            message: "An error has occured, please try again.",
+            redirectLabel: "try again",
+            onRedirect: () => fetchPurchases(id),
+          })
+          alertRef.current?.show()
+        }
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching purchases:", error);
+    }
+  };
 
   const toggleView = () => {
     setIsGridView((prev) => !prev);
@@ -36,23 +112,23 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
     console.log("Selected Rating:", rating)
   }
 
-  const goToProduct =() => {
-    props.navigation.navigate("Product")
+  const goToProduct =(item) => {
+    props.navigation.navigate("Product", {item})
   }
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={goToProduct} style={[isGridView ? styles.gridItem : styles.listItem, {flexDirection: 'row'}]}>
+    <TouchableOpacity onPress={() => goToProduct(item)} style={[isGridView ? styles.gridItem : styles.listItem, {flexDirection: 'row'}]}>
       <View style={{flex:0.7, alignItems: 'center', paddingHorizontal: 10}}>
-        <Image source={item.image}  style={{width: 120, height: 100, borderRadius: 10, paddingRight: 10}} />
+        <Image source={item.images.length > 0? { uri: item.images[0]} : require("../../assets/images/backgroundLogin.png")}  style={{width: 120, height: 100, borderRadius: 10, paddingRight: 10}} />
       </View>
       <View style={{flex: 3, marginHorizontal: 15}}>
-        <Text style={{color: colors.palette.neutral100, fontSize:16, fontWeight: "bold"}} >{item.title}</Text>
+        <Text style={{color: colors.palette.neutral100, fontSize:16, fontWeight: "bold"}} >{item.brand+" "+item.model}</Text>
         <Text style={{color: colors.palette.neutral300, fontSize:12}}>{item.price}</Text>
       </View>
       <View style={{flex: 1.5, justifyContent:"flex-end", flexDirection: 'row', alignItems: 'center'}}>
         <Rating
           maxRating={5}
-          initialRating={3}
+          initialRating={item.rating}
           onRatingChange={handleRatingChange}
           starSize={20}
           starColor={"#646464"}
@@ -66,16 +142,16 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
   );
 
   const renderGridItem = ({ item }) => (
-    <TouchableOpacity onPress={goToProduct}>
-      <ImageBackground source={item.image} style={[styles.gridItem, {alignItems: 'flex-start',height: 200}]}>
+    <TouchableOpacity onPress={() => goToProduct(item)}>
+      <ImageBackground source={{uri: item.images[0]}} style={[styles.gridItem, {alignItems: 'flex-start',height: 200}]}>
         <View style={{flex: 3, width:'100%'}}>
-          <Text style={{color: colors.palette.neutral100, fontSize:16, fontWeight: "bold"}} >{item.title}</Text>
+          <Text style={{color: colors.palette.neutral100, fontSize:16, fontWeight: "bold"}} >{item.brand+" "+item.model}</Text>
           <Text style={{color: colors.palette.neutral300, fontSize:12}}>{item.price}</Text>
         </View>
         <View style={{flex: 1,  width:'100%', justifyContent:"space-between", flexDirection: 'row', alignItems: 'center'}}>
           <Rating
             maxRating={5}
-            initialRating={3}
+            initialRating={item.rating}
             onRatingChange={handleRatingChange}
             starSize={20}
             starColor={"#646464"}
@@ -105,20 +181,22 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
       <Text style={styles.headerText}>Purchases: </Text>
       {isGridView ?   
         <MasonryFlashList
-          data={DATA}
+          data={purchases}
           numColumns={3}
           renderItem={renderGridItem}
           estimatedItemSize={200}
         />
         :
         <FlatList
-        data={DATA}
+        data={purchases}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         numColumns={isGridView ? 3 : 1} 
         key={isGridView ? 'grid' : 'list'} 
         columnWrapperStyle={isGridView ? styles.columnWrapper : null} 
       />}
+        <AlertDialog ref = {alertRef} />
+        <Loader loading={loading} />
     </View>
   );
 })
@@ -136,16 +214,6 @@ const $purchasesSection: ViewStyle = {
 const $title: TextStyle ={
   fontSize: 24,
   color: '#FFFFFF', // White text for title
-}
-
-const $emptyMessage: TextStyle ={
-  marginTop: 10,
-  color: '#B0B0B0', // Grey text for message
-  textAlign: 'center',
-}
-
-const $totalPurchases: TextStyle ={
-  color: '#B0B0B0', // Grey text for total purchases
 }
 
 const styles = StyleSheet.create({

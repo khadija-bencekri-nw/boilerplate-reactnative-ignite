@@ -6,18 +6,20 @@
  * documentation for more details.
  */
 import {
-  ApiResponse, // @demo remove-current-line
+  ApiResponse, 
   ApisauceInstance,
   create,
 } from "apisauce"
 import Config from "../../config"
-import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem" // @demo remove-current-line
+import { GeneralApiProblem, getGeneralApiProblem } from "./apiProblem" 
 import type {
   ApiConfig,
-  ApiFeedResponse, // @demo remove-current-line
+  ApiFeedResponse,
+  User, 
 } from "./api.types"
-import type { EpisodeSnapshotIn } from "../../models/Episode" // @demo remove-current-line
-import { PurchaseSnapshotIn } from "app/models/Purchase"
+import type { EpisodeSnapshotIn } from "../../models/Episode" 
+import { Purchase, PurchaseSnapshotIn } from "app/models/Purchase"
+import { load } from "app/utils/secureStorage"
 
 /**
  * Configuring the apisauce instance.
@@ -27,39 +29,45 @@ export const DEFAULT_API_CONFIG: ApiConfig = {
   timeout: 10000,
 }
 
-/**
- * Manages all requests to the API. You can use this class to build out
- * various requests that you need to call from your backend API.
- */
 export class Api {
   apisauce: ApisauceInstance
   config: ApiConfig
 
-  /**
-   * Set up our API instance. Keep this lightweight!
-   */
   constructor(config: ApiConfig = DEFAULT_API_CONFIG) {
     this.config = config
     this.apisauce = create({
       baseURL: this.config.url,
       timeout: this.config.timeout,
       headers: {
-        Accept: "application/json",
+        Accept: "*/*",
+        "Content-Type": "application/json"
       },
     })
+
+    // Add a request transform to inject the token dynamically
+    this.apisauce.addAsyncRequestTransform(async (request) => {
+      const token = await load("token"); 
+      if (token) {
+        request.headers.Authorization = token; // Inject the token
+      }
+    });
   }
 
   async login(email: string, password: string): Promise<{ kind: "ok"; authToken: string, user: object } | GeneralApiProblem> {
+    this.apisauce.addRequestTransform((request) => {
+      request.headers = request.headers || {};
+      request.headers["Content-Type"] = "application/json";
+    })
     const response: ApiResponse<{ token: string , user: object}> = await this.apisauce.post("auth/login", { email, password });
     if (!response.ok) {
       return getGeneralApiProblem(response);
     }
-  
+
     const token  = response?.headers?.authorization;
     return { kind: "ok", authToken: token };
   }
 
-  async signUp(data: { name: string; username: string; password: string; role: string; joiningDate: Date; amount: string }): Promise<{ kind: "ok"; message: string } | GeneralApiProblem> {
+  async signUp(data: { name: string; email: string; password: string; role: string; joiningDate: Date; amount: string }): Promise<{ kind: "ok"; message: string } | GeneralApiProblem> {
     
     const response: ApiResponse<{ message: string }> = await this.apisauce.post("auth/signup", data);
     
@@ -70,9 +78,20 @@ export class Api {
     return { kind: "ok", message: response.data ? response.data.message : ""};
   }
 
-  async getPurchases(): Promise<{ kind: "ok"; purchases: PurchaseSnapshotIn[] } | GeneralApiProblem> {
+  async getUser(): Promise<{ kind: "ok"; user: User} | GeneralApiProblem> {
+    
+    const response: ApiResponse<{ user: User }> = await this.apisauce.get("users/iiiiii");
+    
+    if (!response.ok) {
+      return getGeneralApiProblem(response);
+    }
+  
+    return { kind: "ok", user: response.data};
+  }
+
+  async getPurchases(id: string): Promise<{ kind: "ok"; purchases: PurchaseSnapshotIn[] } | GeneralApiProblem> {
     // make the api call
-    const response: ApiResponse<ApiFeedResponse> = await this.apisauce.get("purchases")
+    const response: ApiResponse<ApiFeedResponse> = await this.apisauce.get("purchases", {"userId": id})
 
     // the typical ways to die when calling an api
     if (!response.ok) {
@@ -86,8 +105,9 @@ export class Api {
 
       // This is where we transform the data into the shape we expect for our MST model.
       const purchases: PurchaseSnapshotIn[] =
-        rawData?.items.map((raw) => ({
+      response?.data.map((raw) => ({
           ...raw,
+          images: Array.isArray(raw.images) && raw.images.length > 0 ? raw.images : [], // Ensure images is always an array
         })) ?? []
 
       return { kind: "ok", purchases }

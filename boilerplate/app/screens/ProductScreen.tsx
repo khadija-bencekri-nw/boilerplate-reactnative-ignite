@@ -1,104 +1,99 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { FC, useEffect, useState, useCallback } from "react"
 import { observer } from "mobx-react-lite"
-import { ViewStyle, View, StyleSheet, TouchableOpacity, Image, Dimensions } from "react-native"
+import { ScrollView, View, StyleSheet, TouchableOpacity, Image, Dimensions } from "react-native"
 import { AppStackScreenProps } from "app/navigators"
 import { Rating, Screen, Text } from "app/components"
 import { colors } from "app/theme"
-// import { useNavigation } from "@react-navigation/native"
-// import { useStores } from "app/models"
 
 const { width, height } = Dimensions.get("window")
 const isTablet = width > 600
-interface ProductScreenProps extends AppStackScreenProps<"Product"> {}
 
-export const ProductScreen: FC<ProductScreenProps> = observer(function ProductScreen(props) {
-  const [isPortrait, setIsPortrait] = useState(false);
+interface ProductScreenProps extends AppStackScreenProps<"Product"> {}
+export const ProductScreen: FC<ProductScreenProps> = observer(({ route }) => {
+  const { item } = route.params;
+  const [isPortrait, setIsPortrait] = useState(height >= width);
+
+  const onChange = useCallback(({ window: { width, height } }) => {
+    setIsPortrait(height >= width);
+  }, []);
 
   useEffect(() => {
-    setIsPortrait(height >= width);
-    const subscription = Dimensions.addEventListener('change', onChange);
+    const subscription = Dimensions.addEventListener("change", onChange);
     return () => subscription?.remove();
-  }, [])
-
-  const onChange = ({ window: { width, height  } }) => {
-    setIsPortrait(height >= width);
-  };
+  }, [onChange]);
 
   const handleRatingChange = (rating: number) => {
-    console.log("Selected Rating:", rating)
-  }
+    console.log("Selected Rating:", rating);
+  };
 
+  const renderDetails = () =>
+    [
+      { title: "Brand", value: item.brand },
+      { title: "Model", value: item.model },
+      { title: "Store", value: item.store },
+      { title: "Purchase Date", value: item.purchaseDate },
+      { title: "Price", value: `$${item.price}` },
+    ].map(({ title, value }, index) => (
+      <View key={index} style={styles.detailRow}>
+        <Text style={styles.detailTitle}>{title}</Text>
+        <Text style={styles.detailValue}>{value}</Text>
+      </View>
+    ));
+
+  const renderMedia = () =>
+    item.images.map((image, index) => (
+      <Image
+        key={index}
+        source={{ uri: image }}
+        style={[styles.productImage, { width: isPortrait ? 150 : 200 }]}
+        resizeMode="cover"
+      />
+    ));
 
   return (
-    <View style={styles.container} >
-      <View style={[styles.header, isPortrait ? { flex: 0.5 } : { flex: 0.2}]}>
+    <ScrollView  contentContainerStyle={styles.container}>
+      <View style={[styles.header, { flex: isPortrait ? 0.5 : 0.2 }]}>
         <TouchableOpacity style={styles.purchaseStatus}>
           <Text style={styles.purchaseText}>✓ PURCHASED</Text>
         </TouchableOpacity>
-        <Text style={styles.productName}>Apple AirPods Pro</Text>
+        <Text style={styles.productName}>{`${item.brand} ${item.model}`}</Text>
       </View>
 
-      <View style={[styles.productDetails , isPortrait ? { flex: 0.6, marginBottom: 20 } : { flex: 0.6 }]}>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailTitle}>Brand</Text>
-          <Text style={styles.detailValue}>Apple</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailTitle}>Model</Text>
-          <Text style={styles.detailValue}>AirPods Pro</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailTitle}>Store</Text>
-          <Text style={styles.detailValue}>Virgin Megastore</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailTitle}>Query Date</Text>
-          <Text style={styles.detailValue}>26/09/2021</Text>
-        </View>
-        <View style={styles.detailRow}>
-          <Text style={styles.detailTitle}>Price</Text>
-          <Text style={styles.detailValue}>3299,00 DH</Text>
-        </View>
-      </View>
-
+      <View style={[styles.productDetails, { flex: 0.6, marginBottom: isPortrait ? 20 : 0 }]}>{renderDetails()}</View>
       <View style={[styles.mediaSection, isPortrait ? { flex: 0.6, paddingVertical: 10, marginBottom: 50 } : { flex: 0.5, marginVertical: 10 }]}>
         <Text style={{ fontWeight: 'bold', color: colors.palette.neutral100, paddingTop: 20 }}>Invoice and media</Text>
-        <View style={{ width: '100%', flexDirection: isPortrait ? 'row' : 'row', flexWrap: isPortrait ? 'wrap' : 'nowrap', justifyContent: "space-between", marginTop: 10 }}>
-          <Image source={require("../../assets/images/backgroundLogin.png")} style={[styles.productImage, isPortrait ? { width: 150 } : { width: 200 }]} />
-          <Image source={require("../../assets/images/backgroundLogin.png")} style={[styles.productImage, isPortrait ? { width: 150 } : { width: 200 }]} />
-          <Image source={require("../../assets/images/backgroundLogin.png")} style={[styles.productImage, isPortrait ? { width: 150 } : { width: 200 }]} />
-        </View>
+        <View style={{ width: '100%', flexDirection: isPortrait ? 'row' : 'row', flexWrap: isPortrait ? 'wrap' : 'nowrap', justifyContent: "space-between", marginTop: 10 }}>{renderMedia()}</View>
       </View>
 
-      <View style={[styles.reviewSection, isPortrait ? { flex: 0.6 } : { flex: 0.4 }]}>
+      <View style={[styles.reviewSection, { flex: isPortrait ? 0.6 : 0.4 }]}>
         <Text style={{ fontWeight: 'bold', color: colors.palette.neutral100, paddingBottom: 10 }}>Review</Text>
         <View style={{ flex: 1 }}>
           <View style={{ flex: 1, flexDirection: 'row' }}>
             <Text style={styles.reviewTitle}>How would you rate this product?</Text>
-            <Rating  
+            <Rating
               maxRating={5}
-              initialRating={3}
+              initialRating={item.rating}
               onRatingChange={handleRatingChange}
               starSize={20}
-              starColor={"#EB514E"}
+              starColor="#EB514E"
               style={{ flex: 1, justifyContent: 'flex-start' }}
-            />
+              />
           </View>
           <Text style={styles.reviewDescription}>
             Rating this product will help other NIMBLERS make the right choice in terms of gear.
           </Text>
         </View>
       </View>
-      <View style={[styles.mediaSection, isPortrait ? { flex: 0.6 } : { flex: 0.01 }]}></View>
-    </View>
-  )
-})
+    </ScrollView>
+  );
+});
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor:'#232324',
     paddingHorizontal: 50,
+    paddingBottom: 50
   },
   header: {
     flex: 0.5,

@@ -16,12 +16,14 @@ export interface DropDownPickerNwProps {
   setOpen: () => void,
   zIndex: number,
   zIndexInverse: number,
+  onItemSelect?: (item: { label: string; value: string }) => void;
 }
 
 /**
  * Describe your component here
  */
-export const DropDownPickerNw = observer(function DropDownPickerNw(props: DropDownPickerNwProps) {
+export const DropDownPickerNw = observer(
+  React.forwardRef((props: DropDownPickerNwProps, ref) => {
   const { style, data, placeholder, open, setOpen, zIndex, zIndexInverse } = props;
   const $styles = [$container, style]
 
@@ -40,10 +42,18 @@ export const DropDownPickerNw = observer(function DropDownPickerNw(props: DropDo
     console.log('dropdownData', dropdownData, ' data', data)
     setItems(dropdownData)
   },[data])
+
+  React.useImperativeHandle(ref, () => ({
+    getValue: () => {
+      const selectedItem = items.find((item) => item.value === value);
+      return selectedItem || null;
+    },
+  }));
   
   return (
     <View style={$styles}>
       <DropDownPicker
+        ref={ref}
         placeholder={placeholder}
         open={open}
         value={value}
@@ -71,7 +81,7 @@ export const DropDownPickerNw = observer(function DropDownPickerNw(props: DropDo
         />
     </View>
   )
-})
+}))
 
 const $container: ViewStyle = {
   justifyContent: "center",
