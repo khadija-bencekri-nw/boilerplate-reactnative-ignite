@@ -8,6 +8,7 @@ import { colors, spacing } from "../theme"
 import { api } from "app/services/api"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { saveString } from "app/utils/secureStorage"
+import GoogleSignIn from "app/components/GoogleSignIn"
 
 const { width } = Dimensions.get("window")
 const isTablet = width > 600
@@ -172,7 +173,16 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               textStyle={{color: '#000000'}}
               onPress={login}
             />
-            <Button
+            <GoogleSignIn 
+            testID="login-button-google"
+              tx="loginScreen.google"
+              style={$secondaryButton}
+              preset="reversed"
+              textStyle={{color: '#ffff'}}
+              onPress={login}
+              LeftAccessory={() => <Icon style={$buttonIcon} icon="google" />}
+            />
+            {/* <Button
               testID="login-button-google"
               tx="loginScreen.google"
               style={$secondaryButton}
@@ -180,7 +190,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               textStyle={{color: '#ffff'}}
               onPress={login}
               LeftAccessory={(props) => <Icon style={$buttonIcon} icon="google" />}
-            />
+            /> */}
             <Button
               testID="login-button-apple"
               tx="loginScreen.apple"

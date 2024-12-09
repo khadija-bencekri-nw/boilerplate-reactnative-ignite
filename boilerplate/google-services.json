@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "777558541856",
+    "project_id": "nw-dojo",
+    "storage_bucket": "nw-dojo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:777558541856:android:b968d80c22654ed41a1e45",
+        "android_client_info": {
+          "package_name": "com.nwdojo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "777558541856-f8qkjpt2ov22snpeubc0fr9f4prmph33.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nwdojo",
+            "certificate_hash": "0b9ac048617307d7496d1e1e1ff1a5a909c9d2f8"
+          }
+        },
+        {
+          "client_id": "777558541856-hqnk9hrj8m0ctntjtls6ioqi2cnr7diq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nwdojo",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "777558541856-ghcru6v9c4gi4mh5i6aj7jlk95vjb9ds.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8p6kkHJLZpxcOc6DS7xL8gVK7LISDaM8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "777558541856-ghcru6v9c4gi4mh5i6aj7jlk95vjb9ds.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
