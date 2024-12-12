@@ -28,14 +28,14 @@ export const ProductScreen: FC<ProductScreenProps> = observer(({ route }) => {
 
   const renderDetails = () =>
     [
-      { title: "Brand", value: item.brand },
-      { title: "Model", value: item.model },
-      { title: "Store", value: item.store },
-      { title: "Purchase Date", value: item.purchaseDate },
-      { title: "Price", value: `$${item.price}` },
+      { title: "brand", value: item.brand },
+      { title: "model", value: item.model },
+      { title: "store", value: item.store },
+      { title: "purchaseDate", value: item.purchaseDate },
+      { title: "price", value: `$${item.price}` },
     ].map(({ title, value }, index) => (
       <View key={index} style={styles.detailRow}>
-        <Text style={styles.detailTitle}>{title}</Text>
+        <Text style={styles.detailTitle} tx={"productScreen."+title} />
         <Text style={styles.detailValue}>{value}</Text>
       </View>
     ));
@@ -54,22 +54,22 @@ export const ProductScreen: FC<ProductScreenProps> = observer(({ route }) => {
     <ScrollView  contentContainerStyle={styles.container}>
       <View style={[styles.header, { flex: isPortrait ? 0.5 : 0.2 }]}>
         <TouchableOpacity style={styles.purchaseStatus}>
-          <Text style={styles.purchaseText}>✓ PURCHASED</Text>
+          <Text style={styles.purchaseText} tx={"productScreen.purchased"}/>
         </TouchableOpacity>
         <Text style={styles.productName}>{`${item.brand} ${item.model}`}</Text>
       </View>
 
       <View style={[styles.productDetails, { flex: 0.6, marginBottom: isPortrait ? 20 : 0 }]}>{renderDetails()}</View>
       <View style={[styles.mediaSection, isPortrait ? { flex: 0.6, paddingVertical: 10, marginBottom: 50 } : { flex: 0.5, marginVertical: 10 }]}>
-        <Text style={{ fontWeight: 'bold', color: colors.palette.neutral100, paddingTop: 20 }}>Invoice and media</Text>
+        <Text style={{ fontWeight: 'bold', color: colors.palette.neutral100, paddingTop: 20 }} tx="productScreen.invoiceMedia" />
         <View style={{ width: '100%', flexDirection: isPortrait ? 'row' : 'row', flexWrap: isPortrait ? 'wrap' : 'nowrap', justifyContent: "space-between", marginTop: 10 }}>{renderMedia()}</View>
       </View>
 
       <View style={[styles.reviewSection, { flex: isPortrait ? 0.6 : 0.4 }]}>
-        <Text style={{ fontWeight: 'bold', color: colors.palette.neutral100, paddingBottom: 10 }}>Review</Text>
+        <Text style={{ fontWeight: 'bold', color: colors.palette.neutral100, paddingBottom: 10 }} tx="productScreen.review" />
         <View style={{ flex: 1 }}>
           <View style={{ flex: 1, flexDirection: 'row' }}>
-            <Text style={styles.reviewTitle}>How would you rate this product?</Text>
+            <Text style={styles.reviewTitle} tx="productScreen.rateAction" />
             <Rating
               maxRating={5}
               initialRating={item.rating}
@@ -79,9 +79,7 @@ export const ProductScreen: FC<ProductScreenProps> = observer(({ route }) => {
               style={{ flex: 1, justifyContent: 'flex-start' }}
               />
           </View>
-          <Text style={styles.reviewDescription}>
-            Rating this product will help other NIMBLERS make the right choice in terms of gear.
-          </Text>
+          <Text style={styles.reviewDescription} tx="productScreen.rateText" />
         </View>
       </View>
     </ScrollView>

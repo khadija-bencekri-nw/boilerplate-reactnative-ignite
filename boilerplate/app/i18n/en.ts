@@ -2,8 +2,16 @@ const en = {
   common: {
     ok: "OK!",
     cancel: "Cancel",
+    confirm: "Confirm",
     back: "Back",
     logOut: "Log Out", // @demo remove-current-line
+    errorUnexpected: "An error has occured, please try again",
+    tryAgain: "Try again",
+    congrats: "Congratulations",
+    sessionExpired: "Session Expired",
+    sessionExpiredMsg: "Your session has expired. Please log in again.",
+    proceed: "Proceed",
+    permissionDenied: "Permission Denied"
   },
   welcomeScreen: {
     postscript:
@@ -42,14 +50,10 @@ const en = {
     hint: "Hint: you can use any email address and your favorite password :)",
     google: "Continue with Google",
     apple: "Continue with Apple",
-    joinSentence: "Don’t have an account? Sign up"
-  },
-  joinScreen: {
-    firstHeadline: "Curated tools",
-    secondHeadline: "to gear you up!",
-    subtitle: "Join Nimbleway’s worktools initiative to get you suited up for your daily tasks.",
-    join: "Join",
-    signIn: "Sign In",
+    joinSentence: "Don’t have an account? Sign up",
+    errors:{
+      authError: "Email or password is incorrect."
+    }
   },
   signUpScreen: {
     headline: "Account informations",
@@ -66,6 +70,50 @@ const en = {
     balance: "Available balance",
     create: "Create my account",
     back: "Back, my account informations",
+    firstHeadline: "Curated tools",
+    secondHeadline: "to gear you up!",
+    subtitle: "Join Nimbleway’s worktools initiative to get you suited up for your daily tasks.",
+    join: "Join",
+    signIn: "Sign In",
+    Errors: {
+      emailRequired: "Email is required.",
+      emailNotValid: "Enter a valid email address.",
+      pwdRequired: "Password is required.",
+      pwdNotValid: "Password must be at least 6 characters.",
+    },
+    selectRole: "Please select a role.",
+    pickDate: "Please pick a date.",
+    userExistsMsg: "An account with this email already exists. Please log in or use another email."
+  },
+  dashboardScreen:{
+    fetchUserError: "An error occurred while fetching user",
+    fetchPurchaseError: "An error occurred while fetching purchases",
+  },
+  productScreen: {
+    brand: "Brand",
+    model: "Model",
+    store: "Store",
+    purchaseDate: "Purchase Date",
+    price: "Price",
+    purchased: "✓ Purchased",
+    invoiceMedia: "Invoice and media",
+    review: "Review",
+    rateAction: "How would you rate this product?",
+    rateText: "Rating this product will help other Theodoers make the right choice in terms of gear."
+  },
+  profileScreen: {
+    userInfo: {
+      title: "Theodoer information",
+      email: "Email",
+      password: "Password",
+      role: "Role"
+    },
+    notification: {
+      title: "Notifications",
+      mail: "Mail notifications",
+      approval: "Approval/Refusal notifications",
+      actionCheck: "Tick this box if you wish to receive notifications about your order status"
+    }
   },   
   mainTabNavigator: {
     dashboardTab: "Dashboard",
@@ -73,85 +121,6 @@ const en = {
     getInspiredTab: "Get inspired",
     profileTab: "Profile",
   },
-  demoNavigator: {
-    componentsTab: "Components",
-    debugTab: "Debug",
-    communityTab: "Community",
-    podcastListTab: "Podcast",
-  },
-  demoCommunityScreen: {
-    title: "Connect with the community",
-    tagLine:
-      "Plug in to Infinite Red's community of React Native engineers and level up your app development with us!",
-    joinUsOnSlackTitle: "Join us on Slack",
-    joinUsOnSlack:
-      "Wish there was a place to connect with React Native engineers around the world? Join the conversation in the Infinite Red Community Slack! Our growing community is a safe space to ask questions, learn from others, and grow your network.",
-    joinSlackLink: "Join the Slack Community",
-    makeIgniteEvenBetterTitle: "Make Ignite even better",
-    makeIgniteEvenBetter:
-      "Have an idea to make Ignite even better? We're happy to hear that! We're always looking for others who want to help us build the best React Native tooling out there. Join us over on GitHub to join us in building the future of Ignite.",
-    contributeToIgniteLink: "Contribute to Ignite",
-    theLatestInReactNativeTitle: "The latest in React Native",
-    theLatestInReactNative: "We're here to keep you current on all React Native has to offer.",
-    reactNativeRadioLink: "React Native Radio",
-    reactNativeNewsletterLink: "React Native Newsletter",
-    reactNativeLiveLink: "React Native Live",
-    chainReactConferenceLink: "Chain React Conference",
-    hireUsTitle: "Hire Infinite Red for your next project",
-    hireUs:
-      "Whether it's running a full project or getting teams up to speed with our hands-on training, Infinite Red can help with just about any React Native project.",
-    hireUsLink: "Send us a message",
-  },
-  demoShowroomScreen: {
-    jumpStart: "Components to jump start your project!",
-    lorem2Sentences:
-      "Nulla cupidatat deserunt amet quis aliquip nostrud do adipisicing. Adipisicing excepteur elit laborum Lorem adipisicing do duis.",
-    demoHeaderTxExample: "Yay",
-    demoViaTxProp: "Via `tx` Prop",
-    demoViaSpecifiedTxProp: "Via `{{prop}}Tx` Prop",
-  },
-  demoDebugScreen: {
-    howTo: "HOW TO",
-    title: "Debug",
-    tagLine:
-      "Congratulations, you've got a very advanced React Native app template here.  Take advantage of this boilerplate!",
-    reactotron: "Send to Reactotron",
-    reportBugs: "Report Bugs",
-    demoList: "Demo List",
-    demoPodcastList: "Demo Podcast List",
-    androidReactotronHint:
-      "If this doesn't work, ensure the Reactotron desktop app is running, run adb reverse tcp:9090 tcp:9090 from your terminal, and reload the app.",
-    iosReactotronHint:
-      "If this doesn't work, ensure the Reactotron desktop app is running and reload app.",
-    macosReactotronHint:
-      "If this doesn't work, ensure the Reactotron desktop app is running and reload app.",
-    webReactotronHint:
-      "If this doesn't work, ensure the Reactotron desktop app is running and reload app.",
-    windowsReactotronHint:
-      "If this doesn't work, ensure the Reactotron desktop app is running and reload app.",
-  },
-  demoPodcastListScreen: {
-    title: "React Native Radio episodes",
-    onlyFavorites: "Only Show Favorites",
-    favoriteButton: "Favorite",
-    unfavoriteButton: "Unfavorite",
-    accessibility: {
-      cardHint:
-        "Double tap to listen to the episode. Double tap and hold to {{action}} this episode.",
-      switch: "Switch on to only show favorites",
-      favoriteAction: "Toggle Favorite",
-      favoriteIcon: "Episode not favorited",
-      unfavoriteIcon: "Episode favorited",
-      publishLabel: "Published {{date}}",
-      durationLabel: "Duration: {{hours}} hours {{minutes}} minutes {{seconds}} seconds",
-    },
-    noFavoritesEmptyState: {
-      heading: "This looks a bit empty",
-      content:
-        "No favorites have been added yet. Tap the heart on an episode to add it to your favorites!",
-    },
-  },
-  // @demo remove-block-end
 }
 
 export default en

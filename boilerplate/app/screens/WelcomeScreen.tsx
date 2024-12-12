@@ -64,13 +64,13 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
       <View style={$container}>
         <View style={$textContainer}>
           <Image source={logo} style={$logo} />
-          <Text testID="login-heading" tx="joinScreen.firstHeadline" preset="heading" style={$headline} />
-          <Text testID="join-heading-1" tx="joinScreen.secondHeadline" preset="heading" style={$headline} />
-          <Text testID="join-heading-2" tx="joinScreen.subtitle" preset="subheading" style={$subtitle} />
+          <Text testID="login-heading" tx="signUpScreen.firstHeadline" preset="heading" style={$headline} />
+          <Text testID="join-heading-1" tx="signUpScreen.secondHeadline" preset="heading" style={$headline} />
+          <Text testID="join-heading-2" tx="signUpScreen.subtitle" preset="subheading" style={$subtitle} />
         </View>
         <View style={isPortrait? $buttonContainerPortrait : $buttonContainerLandscape}>
-          <PrimaryButton text={"joinScreen.join"} onPress={handleJoin} />
-          <SecondaryButton text={"joinScreen.signIn"} onPress={handleSignIn} />
+          <PrimaryButton text={"signUpScreen.join"} onPress={handleJoin} />
+          <SecondaryButton text={"signUpScreen.signIn"} onPress={handleSignIn} />
         </View>
       </View>
     </ImageBackground>
