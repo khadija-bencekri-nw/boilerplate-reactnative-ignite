@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {forwardRef} from 'react';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { StyleSheet } from 'react-native';
 import { Button } from './Button';
@@ -11,6 +11,7 @@ type GoogleSignInProps = {
     textStyle?: object;
     onPress?: () => void;
     LeftAccessory?: () => void;
+    onSignInSuccess: (userInfo: any) => void;
 };
 
 const defaultProps: Partial<GoogleSignInProps> = {
@@ -22,7 +23,7 @@ const defaultProps: Partial<GoogleSignInProps> = {
     onPress: () => console.log("GoogleSignIn button pressed"),
     LeftAccessory: () => null,
 };
-const GoogleSignIn: React.FC<GoogleSignInProps> = (props) => {
+const GoogleSignIn= forwardRef<any, GoogleSignInProps>((props, ref) => {
     const {
         testID,
         tx,
@@ -31,6 +32,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = (props) => {
         textStyle,
         onPress,
         LeftAccessory,
+        onSignInSuccess
     } = { ...defaultProps, ...props }; 
 
     const signIn = async () => {
@@ -41,64 +43,28 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = (props) => {
             offlineAccess: true
         });
         try {
-                const sth = await GoogleSignin.hasPlayServices();
-                console.log('sth ' , sth )
+                await GoogleSignin.hasPlayServices();
                 const userInfo = await GoogleSignin.signIn();
-                console.log("userinfo", userInfo)
+                onSignInSuccess(userInfo);
             } catch (error) {
                 console.log("error : ",error)
         }
     };
 
-    // const signIn = async () => {
-    //     try {
-    //       await GoogleSignin.hasPlayServices();
-    //       const response = await GoogleSignin.signIn();
-    //       console.log('response', response)
-    //       if (isSuccessResponse(response)) {
-    //         console.log('response', response)
-    //         setState({ userInfo: response.data });
-    //       } else {
-    //         console.log("sign in canceled by user")
-    //         // sign in was cancelled by user
-    //       }
-    //     } catch (error) {
-    //       if (isErrorWithCode(error)) {
-    //         switch (error.code) {
-    //           case statusCodes.IN_PROGRESS:
-    //             console.error("operation (eg. sign in) already in progress")
-    //             // operation (eg. sign in) already in progress
-    //             break;
-    //           case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-    //             console.error("Android only, play services not available or outdated")
-    //             // Android only, play services not available or outdated
-    //             break;
-    //           case statusCodes.SIGN_IN_REQUIRED:
-    //             console.warn(" : ", error.code)
-    //             break;
-    //           default:
-    //             console.error("an error has occured", error)
-    //           // some other error happened
-    //         }
-    //       } else {
-    //         console.error(error)
-    //         // an error that's not related to google sign in occurred
-    //       }
-    //     }
-    // };
-
     return (
         <Button
-              testID={testID}
-              tx={tx}
-              style={style}
-              preset={preset}  
-              textStyle={textStyle}
-              onPress={() => signIn()}
-              LeftAccessory={LeftAccessory}
+            ref={ref}
+            testID={testID}
+            tx={tx}
+            style={style}
+            preset={preset}  
+            textStyle={textStyle}
+            onPress={() => signIn()}
+            LeftAccessory={LeftAccessory}
         />
     )
-}
+});
+
 export default GoogleSignIn;
 
 const styles = StyleSheet.create({

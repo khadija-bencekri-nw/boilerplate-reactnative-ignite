@@ -53,12 +53,13 @@ export class Api {
     });
   }
 
-  async login(email: string, password: string): Promise<{ kind: "ok"; authToken: string, user: object } | GeneralApiProblem> {
+  async login(loginRequest: FormData): Promise<{ kind: "ok"; authToken: string, user: object } | GeneralApiProblem> {
     this.apisauce.addRequestTransform((request) => {
       request.headers = request.headers || {};
       request.headers["Content-Type"] = "application/json";
+      request.headers.Authorization = null;
     })
-    const response: ApiResponse<{ token: string , user: object}> = await this.apisauce.post("auth/login", { email, password });
+    const response: ApiResponse<{ token: string , user: object}> = await this.apisauce.post("auth/login", loginRequest);
     if (!response.ok) {
       return getGeneralApiProblem(response);
     }
@@ -67,7 +68,7 @@ export class Api {
     return { kind: "ok", authToken: token };
   }
 
-  async signUp(data: { name: string; email: string; password: string; role: string; joiningDate: Date; amount: string }): Promise<{ kind: "ok"; message: string } | GeneralApiProblem> {
+  async signUp(data: { name: string; email: string; password: string; position: string; joiningDate: Date; amount: string }): Promise<{ kind: "ok"; message: string } | GeneralApiProblem> {
     
     const response: ApiResponse<{ message: string }> = await this.apisauce.post("auth/signup", data);
     
@@ -89,9 +90,51 @@ export class Api {
     return { kind: "ok", user: response.data};
   }
 
+  async updateUser(id:string , password: string, mailNotif: boolean, approvalNotif: boolean): Promise<{ kind: "ok"; user: User} | GeneralApiProblem> {
+    const request: object = {
+      password,
+      shouldReceiveMailNotifications: mailNotif,
+      shouldReceiveApprovalNotifications: approvalNotif
+    }
+    const response: ApiResponse<{user: User}> = await this.apisauce.put("users/"+id, request)
+    if(!response.ok)
+      return getGeneralApiProblem(response)
+
+    return { kind: "ok", user: response.data}
+  }
+
   async getPurchases(id: string): Promise<{ kind: "ok"; purchases: PurchaseSnapshotIn[] } | GeneralApiProblem> {
     // make the api call
     const response: ApiResponse<ApiFeedResponse> = await this.apisauce.get("purchases", {"userId": id})
+
+    // the typical ways to die when calling an api
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) return problem
+    }
+
+    // transform the data into the format we are expecting
+    try {
+      const rawData = response.data
+
+      // This is where we transform the data into the shape we expect for our MST model.
+      const purchases: PurchaseSnapshotIn[] =
+      response?.data.map((raw) => ({
+          ...raw,
+          images: Array.isArray(raw.images) && raw.images.length > 0 ? raw.images : [], // Ensure images is always an array
+        })) ?? []
+
+      return { kind: "ok", purchases }
+    } catch (e) {
+      if (__DEV__ && e instanceof Error) {
+        console.error(`Bad data: ${e.message}\n${response.data}`, e.stack)
+      }
+      return { kind: "bad-data" }
+    }
+  }
+
+  async getCoworkerPurchases(id: string): Promise<{ kind: "ok"; purchases: PurchaseSnapshotIn[] } | GeneralApiProblem> {
+    const response: ApiResponse<ApiFeedResponse> = await this.apisauce.get("purchases/coworker/"+id, {"userId": id})
 
     // the typical ways to die when calling an api
     if (!response.ok) {

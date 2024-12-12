@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite"
 import React, { ComponentType, FC, useEffect, useMemo, useRef, useState } from "react"
 import { ImageBackground, View, TextInput, TextStyle, ViewStyle, TouchableOpacity, Image, ImageStyle, Dimensions } from "react-native"
-import { Button, Icon, Loader, Screen, Text, TextField, TextFieldAccessoryProps } from "../components"
+import { AlertDialog, AlertDialogRef, Button, Icon, Loader, Screen, Text, TextField, TextFieldAccessoryProps } from "../components"
 import { useStores } from "../models"
 import { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
@@ -33,22 +33,35 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   const authPasswordInput = useRef<TextInput>(null)
 
   const [errorMessage, setErrorMessage] = useState("");
-  const [authPassword, setAuthPassword] = useState("password")
+  const [authPassword, setAuthPassword] = useState("")
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [userInfo, setUserInfo] = useState<typeof UserInfo>(null)
   const [attemptsCount, setAttemptsCount] = useState(0)
+  const buttonRef = useRef(null);
+  const alertRef = useRef<AlertDialogRef>(null)
+
   const {
-    authenticationStore: { authEmail, setAuthEmail, setAuthToken, validationError },
+    authenticationStore: { authEmail, setAuthEmail, setAuthToken, validationError, logout },
   } = useStores()
 
   useEffect(() => {
-    setAuthPassword("password")
-      setAuthEmail("khadija.bencekri@theodo.com")
+    //setAuthPassword("password")
+    //setAuthEmail("khadija.bencekri@theodo.com")
     return () => {
-      setAuthPassword("password")
-      setAuthEmail("khadija.bencekri@theodo.com")
+      //setAuthPassword("password")
+      //setAuthEmail("khadija.bencekri@theodo.com")
     }
   }, [])
+
+  useEffect(() => {
+    userInfo?.idToken && login();
+  }, [userInfo])
+
+  const handleSignInSuccess = (user: object) => {
+    //setAuthEmail(user?.user.email)
+    setUserInfo(user);
+  };
 
   const storeConnecteduser = async (user: object) => {
     const user_ = {name: user.name, username: user.username.value};
@@ -64,22 +77,51 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       });
   }
 
+  const showDialog = (title: string, message: string, redirectLabel?: string, onRedirect?: Function) => {
+    alertRef?.current.set({
+      title,
+      message,
+      closeLabel: "close",
+    })
+    alertRef.current?.show()
+  }
+
+  const validateMail = (mail: string) => {
+    return !/^[^\s@]+@theodo\.com$/.test(mail)
+  }
+
   const error = isSubmitted ? validationError : ""
 
   async function login() {
-    setIsSubmitted(true);
     setAttemptsCount(attemptsCount + 1);
-  
-    if (validationError) return;
     setLoading(true);
-    const result = await api.login(authEmail, authPassword);
+    let result = {kind: "", authToken: ""};
+    let body = new Object();
+    if(userInfo?.idToken) {
+      //if(validateMail(userInfo.user.email)) {
+      //  setLoading(false); 
+      //  const title= "Mail not valid";
+      //  const message= "The mail you are trying to connect with is not valid, please make sure your mail ends with @theodo.com";
+      //  showDialog(title,message)
+      //  return;
+      //}
+      body.idToken = userInfo.idToken
+      result = await api.login(body);
+    }
+    else { 
+      setIsSubmitted(true);
+      if (validationError) {setLoading(false) ; return;} 
+      body.email=authEmail;
+      body.password= authPassword;
+      result = await api.login(body);
+    }
   
     if (result.kind === "ok") {
       setAuthToken(result.authToken);
       setAuthEmail("");
       setAuthPassword("");
       await saveString("token", result.authToken).then(
-        _props.navigation.navigate("Main", { screen: "MainTabNavigator"})
+        _props.navigation.navigate("Main", {logout})
       ).catch(
         console.log("token not saved")
       )
@@ -129,7 +171,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             <Text testID="login-heading" text="Welcome Back" preset="heading" style={$headline} />
           </View>
             <TextField
-              value={"khadija.bencekri@theodo.com"}
+              value={authEmail}
               //value={authEmail}
               onChangeText={setAuthEmail}
               containerStyle={$textField}
@@ -173,14 +215,16 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               textStyle={{color: '#000000'}}
               onPress={login}
             />
-            <GoogleSignIn 
-            testID="login-button-google"
+            <GoogleSignIn
+              ref={buttonRef} 
+              testID="login-button-google"
               tx="loginScreen.google"
               style={$secondaryButton}
               preset="reversed"
               textStyle={{color: '#ffff'}}
               onPress={login}
               LeftAccessory={() => <Icon style={$buttonIcon} icon="google" />}
+              onSignInSuccess={handleSignInSuccess}
             />
             {/* <Button
               testID="login-button-google"
@@ -205,9 +249,9 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             </TouchableOpacity>
           </View>
       </View>
-      {loading && (
-        <Loader loading={loading} />
-      )}
+      <Loader loading={loading} />
+      <AlertDialog  ref={alertRef}/>
+      
     </Screen>
   )
 })

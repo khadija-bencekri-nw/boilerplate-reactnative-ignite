@@ -5,6 +5,7 @@ interface User {
   name: string
   email: string
   role: string
+  position: string
   employementDate: Date
   shouldReceiveMailNotifications: boolean
   shouldReceiveApprovalNotifications: boolean
@@ -25,8 +26,10 @@ export const AuthenticationStoreModel = types
     get validationError() {
       if (store.authEmail.length === 0) return "can't be blank"
       if (store.authEmail.length < 6) return "must be at least 6 characters"
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(store.authEmail))
-        return "must be a valid email address"
+      // if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(store.authEmail))
+      //   return "must be a valid email address"
+      if(!/^[^\s@]+@theodo\.com$/.test(store.authEmail))
+        return "must be a valid email address: test@theodo.com"
       return ""
     },
   }))
@@ -43,6 +46,7 @@ export const AuthenticationStoreModel = types
     logout() {
       store.authToken = undefined
       store.authEmail = ""
+      store.user = null
     },
   }))
 
