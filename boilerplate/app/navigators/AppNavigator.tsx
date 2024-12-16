@@ -12,14 +12,13 @@ import {
   useNavigation,
 } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItem, DrawerItemList } from "@react-navigation/drawer";
 import { observer } from "mobx-react-lite"
 import React from "react"
-import { Linking, SafeAreaView, ScrollView, ScrollViewProps, useColorScheme } from "react-native"
+import { SafeAreaView, useColorScheme } from "react-native"
 import * as Screens from "app/screens"
 import Config from "../config"
 import { useStores } from "../models" // @demo remove-current-line
-import { DemoNavigator, DemoTabParamList } from "./DemoNavigator"
 import { MainTabNavigator, MainTabParamList } from "./MainTabNavigator"
 import { navigationRef, useBackButtonHandler } from "./navigationUtilities"
 import { colors } from "app/theme"
@@ -71,7 +70,6 @@ const AppStack = observer(function AppStack() {
     authenticationStore: { isAuthenticated },
   } = useStores()
 
-
   // @demo remove-block-end
   return (
     <Stack.Navigator
@@ -81,7 +79,7 @@ const AppStack = observer(function AppStack() {
       {/* @demo remove-block-start */}
       {isAuthenticated ? (
         <>
-          <Stack.Screen name="Main" component={DrawerNavigator} options={{headerShown: false}}/>
+          <Stack.Screen name="Main" component={DrawerNavigator} options={{headerShown: false}} />
           <Stack.Screen name="Product" component={Screens.ProductScreen} 
             options={{header: ({ navigation }) => <CustomHeader navigation={navigation} source={"Product"} />}}/>
           <Stack.Screen name="AddProduct" component={Screens.AddProductScreen} options={{header: ({ navigation }) => 
@@ -99,28 +97,49 @@ const AppStack = observer(function AppStack() {
   )
 })
 
-function CustomDrawerContent(props) {
+const DrawerNavigator = ({ route, navigation }) => {
+  const logout = route?.params?.logout;
+  console.log('route', route)
+
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <Drawer.Navigator 
+        screenOptions={{ 
+          drawerStyle: {
+              backgroundColor: '#232324',
+            },
+          drawerLabelStyle: {
+            color: 'white',
+          },
+          }}
+          drawerContent={(props) => <CustomDrawerContent {...props} onLogout={logout} />}
+        >
+        <Drawer.Screen name="MainTabNavigator" component={MainTabNavigator} options={{header: ({ navigation }) => 
+          <CustomHeader onDrawerToggle={() => navigation.toggleDrawer()} navigation={navigation} source={"dashboard"} />}}/>
+        <Drawer.Screen name="Help" component={Screens.HelpScreen} options={{header: ({ navigation }) => 
+          <CustomHeader onDrawerToggle={() => navigation.toggleDrawer()} navigation={navigation}  source={"help"}/>}}/>
+      </Drawer.Navigator>
+    </SafeAreaView>
+  )
+};
+
+const CustomDrawerContent = ({onLogout, ...props}) => {
+
+  const handleLogout = () => {
+    onLogout()
+  }
+
   return (
     <DrawerContentScrollView {...props}>
+      <DrawerItemList {...props} />
       <DrawerItem
-        label="Help"
-        onPress={() => Linking.openURL('https://google.com')}
+        labelStyle={{color: "white"}}
+        label="Log out"
+        onPress={handleLogout}
       />
     </DrawerContentScrollView>
   );
 }
-
-const DrawerNavigator = () => (
-  <SafeAreaView style={{ flex: 1 }}>
-    <Drawer.Navigator >
-      <Drawer.Screen name="MainTabNavigator" component={MainTabNavigator} options={{header: ({ navigation }) => 
-        <CustomHeader onDrawerToggle={() => navigation.toggleDrawer()} navigation={navigation} source={"dashboard"} />}}/>
-      <Drawer.Screen name="Help" component={Screens.HelpScreen} options={{header: ({ navigation }) => 
-        <CustomHeader onDrawerToggle={() => navigation.toggleDrawer()} navigation={navigation}  source={"help"}/>}}/>
-    </Drawer.Navigator>
-  </SafeAreaView>
-  
-);
 
 export interface NavigationProps
   extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
