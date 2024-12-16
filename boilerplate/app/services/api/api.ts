@@ -53,7 +53,7 @@ export class Api {
     });
   }
 
-  async login(loginRequest: FormData): Promise<{ kind: "ok"; authToken: string, user: object } | GeneralApiProblem> {
+  async login(loginRequest: {mail?: string, password?: string, idToken?: string}): Promise<{ kind: "ok"; authToken: string, user: object } | GeneralApiProblem> {
     this.apisauce.addRequestTransform((request) => {
       request.headers = request.headers || {};
       request.headers["Content-Type"] = "application/json";

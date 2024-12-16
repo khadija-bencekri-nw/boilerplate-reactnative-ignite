@@ -20,6 +20,7 @@ export interface User {
   name: string
   email: string
   role: string
+  position: string, 
   employmentDate: Date
   shouldReceiveMailNotifications: boolean 
   shouldReceiveApprovalNotifications: boolean 
