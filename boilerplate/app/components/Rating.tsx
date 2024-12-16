@@ -12,6 +12,8 @@ export interface RatingProps {
    */
   style?: StyleProp<ViewStyle>
 
+  starsContainerStyle?: StyleProp<ViewStyle>
+
   /**
    * Maximum number of stars.
    */
@@ -36,6 +38,8 @@ export interface RatingProps {
    * Color of the stars.
    */
   starColor?: string
+
+  disabled?: boolean
 }
 
 /**
@@ -49,6 +53,8 @@ export const Rating = observer(function Rating(props: RatingProps) {
     onRatingChange,
     starSize = 20,
     starColor = colors.palette.primary300,
+    starsContainerStyle,
+    disabled = false
   } = props
   const [rating, setRating] = useState(initialRating)
 
@@ -61,10 +67,11 @@ export const Rating = observer(function Rating(props: RatingProps) {
 
   return (
     <View style={[$container, style]}>
-      <View style={$starsContainer}>
+      <View style={[$starsContainer, starsContainerStyle]}>
         {Array.from({ length: maxRating }, (_, index) => (
           <TouchableOpacity
             key={index}
+            disabled={disabled}
             onPress={() => handleRatingPress(index + 1)}
           >
             <FontAwesome
@@ -86,6 +93,6 @@ const $container: ViewStyle = {
 
 const $starsContainer: ViewStyle = {
   flexDirection: "row",
-  justifyContent: "center",
+  justifyContent: "flex-end",
   alignItems: "center",
 }
