@@ -39,7 +39,6 @@ const GoogleSignIn= forwardRef<any, GoogleSignInProps>((props, ref) => {
         GoogleSignin.configure({
             scopes: ['https://www.googleapis.com/auth/drive.readonly'],
             webClientId: '777558541856-ghcru6v9c4gi4mh5i6aj7jlk95vjb9ds.apps.googleusercontent.com',
-            //androidClientId: 'AIzaSyB8p6kkHJLZpxcOc6DS7xL8gVK7LISDaM8',
             offlineAccess: true
         });
         try {
