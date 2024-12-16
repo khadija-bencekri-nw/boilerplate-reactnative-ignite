@@ -11,7 +11,9 @@ const en = {
     sessionExpired: "Session Expired",
     sessionExpiredMsg: "Your session has expired. Please log in again.",
     proceed: "Proceed",
-    permissionDenied: "Permission Denied"
+    permissionDenied: "Permission Denied",
+    close: "Close",
+    loginAgain: "Login again"
   },
   welcomeScreen: {
     postscript:
@@ -47,12 +49,14 @@ const en = {
     emailFieldPlaceholder: "Enter your email address",
     passwordFieldPlaceholder: "Super secret password here",
     tapToSignIn: "Tap to sign in!",
-    hint: "Hint: you can use any email address and your favorite password :)",
+    hint: "Hint: you can use your theodo email address and your favorite password :)",
     google: "Continue with Google",
     apple: "Continue with Apple",
     joinSentence: "Don’t have an account? Sign up",
     errors:{
-      authError: "Email or password is incorrect."
+      authError: "Email or password is incorrect.",
+      mailError: "Mail not valid",
+      mailErrorDesc: "The mail you are trying to connect with is not valid, please make sure your mail ends with @theodo.com"
     }
   },
   signUpScreen: {
@@ -88,6 +92,9 @@ const en = {
   dashboardScreen:{
     fetchUserError: "An error occurred while fetching user",
     fetchPurchaseError: "An error occurred while fetching purchases",
+    purchasesListTitle: "Purchases",
+    purchased: "Purchased",
+    noPurchases: "No purchases for this account"
   },
   productScreen: {
     brand: "Brand",
