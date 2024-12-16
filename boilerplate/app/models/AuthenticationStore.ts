@@ -43,6 +43,9 @@ export const AuthenticationStoreModel = types
     setUser(value?: User) {
       store.user = value
     },
+    getUser() {
+      return store.user
+    },
     logout() {
       store.authToken = undefined
       store.authEmail = ""
