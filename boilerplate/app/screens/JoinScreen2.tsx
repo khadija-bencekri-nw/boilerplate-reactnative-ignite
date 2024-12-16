@@ -73,9 +73,10 @@ export const JoinScreen2: FC<JoinScreen2Props> = observer(function JoinScreen2(_
       name: signUpStore.name,
       email: signUpStore.email,
       password: signUpStore.password,
-      role: signUpStore.role,
+      position: signUpStore.role,
       employmentDate: signUpStore.joiningDate,
       amount: signUpStore.amount,
+      joiningDate: signUpStore.joiningDate,
     };
 
     const result = await api.signUp(signUpData)
