@@ -6,7 +6,7 @@ interface User {
   email: string
   role: string
   position: string
-  employementDate: Date
+  employmentDate: Date
   shouldReceiveMailNotifications: boolean
   shouldReceiveApprovalNotifications: boolean
 }
