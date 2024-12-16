@@ -4,7 +4,7 @@ const en = {
     cancel: "Cancel",
     confirm: "Confirm",
     back: "Back",
-    logOut: "Log Out", // @demo remove-current-line
+    logOut: "Log Out",
     errorUnexpected: "An error has occured, please try again",
     tryAgain: "Try again",
     congrats: "Congratulations",
@@ -13,21 +13,21 @@ const en = {
     proceed: "Proceed",
     permissionDenied: "Permission Denied",
     close: "Close",
-    loginAgain: "Login again"
+    loginAgain: "Login again",
   },
   welcomeScreen: {
     postscript:
       "psst  — This probably isn't what your app looks like. (Unless your designer handed you these screens, and in that case, ship it!)",
     readyForLaunch: "Your app, almost ready for launch!",
     exciting: "(ohh, this is exciting!)",
-    letsGo: "Let's go!", // @demo remove-current-line
+    letsGo: "Let's go!",
   },
   errorScreen: {
     title: "Something went wrong!",
     friendlySubtitle:
       "This is the screen that your users will see in production when an error is thrown. You'll want to customize this message (located in `app/i18n/en.ts`) and probably the layout as well (`app/screens/ErrorScreen`). If you want to remove this entirely, check `app/app.tsx` for the <ErrorBoundary> component.",
     reset: "RESET APP",
-    traceTitle: "Error from %{name} stack", // @demo remove-current-line
+    traceTitle: "Error from %{name} stack",
   },
   emptyStateComponent: {
     generic: {
@@ -36,7 +36,6 @@ const en = {
       button: "Let's try this again",
     },
   },
-  // @demo remove-block-start
   errors: {
     invalidEmail: "Invalid email address.",
   },
@@ -53,11 +52,12 @@ const en = {
     google: "Continue with Google",
     apple: "Continue with Apple",
     joinSentence: "Don’t have an account? Sign up",
-    errors:{
+    errors: {
       authError: "Email or password is incorrect.",
       mailError: "Mail not valid",
-      mailErrorDesc: "The mail you are trying to connect with is not valid, please make sure your mail ends with @theodo.com"
-    }
+      mailErrorDesc:
+        "The mail you are trying to connect with is not valid, please make sure your mail ends with @theodo.com",
+    },
   },
   signUpScreen: {
     headline: "Account informations",
@@ -89,12 +89,12 @@ const en = {
     pickDate: "Please pick a date.",
     userExistsMsg: "An account with this email already exists. Please log in or use another email."
   },
-  dashboardScreen:{
+  dashboardScreen: {
     fetchUserError: "An error occurred while fetching user",
     fetchPurchaseError: "An error occurred while fetching purchases",
     purchasesListTitle: "Purchases",
     purchased: "Purchased",
-    noPurchases: "No purchases for this account"
+    noPurchases: "No purchases for this account",
   },
   addProductScreen: {
     congrats: "Congratulations",
@@ -104,7 +104,8 @@ const en = {
     invalidTypesDesc: "Only JPEG and PNG are supported.",
     backToForm: "Go back to my form",
     multipleImages: "Add multiple photos",
-    qualityNote: "Adding more high-resolution photos will help the platform stay consistent and evolve in terms of products imagery."
+    qualityNote:
+      "Adding more high-resolution photos will help the platform stay consistent and evolve in terms of products imagery.",
   },
   productScreen: {
     brand: "Brand",
@@ -116,22 +117,23 @@ const en = {
     invoiceMedia: "Invoice and media",
     review: "Review",
     rateAction: "How would you rate this product?",
-    rateText: "Rating this product will help other Theodoers make the right choice in terms of gear."
+    rateText:
+      "Rating this product will help other Theodoers make the right choice in terms of gear.",
   },
   profileScreen: {
     userInfo: {
       title: "Theodoer information",
       email: "Email",
       password: "Password",
-      role: "Role"
+      role: "Role",
     },
     notification: {
       title: "Notifications",
       mail: "Mail notifications",
       approval: "Approval/Refusal notifications",
       actionCheck: "Tick this box if you wish to receive notifications about your order status"
-    }
-  },   
+    },
+  },
   mainTabNavigator: {
     dashboardTab: "Dashboard",
     coworkersTab: "Coworkers",
