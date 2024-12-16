@@ -9,6 +9,7 @@ import { api } from "app/services/api"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { saveString } from "app/utils/secureStorage"
 import GoogleSignIn from "app/components/GoogleSignIn"
+import { TxKeyPath } from "app/i18n"
 
 const { width } = Dimensions.get("window")
 const isTablet = width > 600
@@ -63,31 +64,29 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     setUserInfo(user);
   };
 
-  const storeConnecteduser = async (user: object) => {
-    const user_ = {name: user.name, username: user.username.value};
-    AsyncStorage.removeItem("LAST_CONNECTED_USER");
-    AsyncStorage.setItem("LAST_CONNECTED_USER", JSON.stringify(user_), (err)=> {
-      if(err){
-          console.log("an error");
-          throw err;
-      }
+  const storeConnectedUser = async (user: {name: string, username: {value: string}}) => {
+    try {
+      const user_ = { name: user.name, username: user.username.value };
+      await AsyncStorage.removeItem("LAST_CONNECTED_USER");
+      await AsyncStorage.setItem("LAST_CONNECTED_USER", JSON.stringify(user_));
       console.log("success");
-      }).catch((err)=> {
-          console.log("error is: " + err);
-      });
+    } catch (err) {
+      console.error("Error saving user:", err);
+    }
   }
 
-  const showDialog = (title: string, message: string, redirectLabel?: string, onRedirect?: Function) => {
-    alertRef?.current.set({
+  const showDialog = (title: TxKeyPath, message: TxKeyPath, redirectLabel?: TxKeyPath, onRedirect?: Function) => {
+    alertRef?.current?.set({
       title,
       message,
-      closeLabel: "close",
+      closeLabel: "common.close",
     })
     alertRef.current?.show()
   }
 
-  const validateMail = (mail: string) => {
-    return !/^[^\s@]+@theodo\.com$/.test(mail)
+  const validateMail = (mail: string, domain: string = "theodo.com") => {
+    const regex = new RegExp(`^[^\\s@]+@${domain}$`);
+    return !regex.test(mail);
   }
 
   const error = isSubmitted ? validationError : ""
@@ -95,48 +94,60 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   async function login() {
     setAttemptsCount(attemptsCount + 1);
     setLoading(true);
-    let result = {kind: "", authToken: ""};
-    let body = new Object();
-    if(userInfo?.idToken) {
-      //if(validateMail(userInfo.user.email)) {
-      //  setLoading(false); 
-      //  const title= "Mail not valid";
-      //  const message= "The mail you are trying to connect with is not valid, please make sure your mail ends with @theodo.com";
-      //  showDialog(title,message)
-      //  return;
-      //}
-      body.idToken = userInfo.idToken
-      result = await api.login(body);
-    }
-    else { 
-      setIsSubmitted(true);
-      if (validationError) {setLoading(false) ; return;} 
-      body.email=authEmail;
-      body.password= authPassword;
-      result = await api.login(body);
-    }
   
+    const body: { idToken?: string; email?: string; password?: string } = {};
+  
+    try {
+      if (userInfo?.idToken) {
+        if (validateMail(userInfo.user.email)) {
+          setLoading(false);
+          showDialog("loginScreen.errors.mailError", "loginScreen.errors.mailErrorDesc");
+          setUserInfo("");
+          return;
+        }
+        body.idToken = userInfo.idToken;
+      } else {
+        setIsSubmitted(true);
+        if (validationError) {
+          return;
+        }
+        body.email = authEmail;
+        body.password = authPassword;
+      }
+  
+      const result = await api.login(body);
+      handleLoginResult(result);
+    } catch (error) {
+      console.error("Login error:", error);
+      setErrorMessage("common.errorUnexpected");
+    } finally {
+      setLoading(false);
+    }
+  }
+  
+  function handleLoginResult(result: { kind: string; authToken: string , user: object}) {
     if (result.kind === "ok") {
       setAuthToken(result.authToken);
       setAuthEmail("");
       setAuthPassword("");
-      await saveString("token", result.authToken).then(
-        _props.navigation.navigate("Main", {logout})
-      ).catch(
-        console.log("token not saved")
-      )
-
+      saveString("token", result.authToken)
+        .then(() => _props.navigation.navigate("Main", { logout }))
+        .catch(() => console.error("Failed to save token"));
     } else {
-      if (result.kind === "not-found") {
-        setErrorMessage("No user is signed up with this email. Please sign up.");
-      } else if (result.kind === "unauthorized") {
-        setErrorMessage("Email or password is incorrect.");
-      } else {
-        setErrorMessage("An unexpected error occurred. Please try again.");
-      }
+      setErrorMessage(getErrorMessage(result.kind));
     }
-    setLoading(false);
   }
+  
+  function getErrorMessage(kind: string) {
+    switch (kind) {
+      case "not-found":
+      case "unauthorized":
+        return "loginScreen.errors.authError";
+      default:
+        return "commons.errorUnexpected";
+    }
+  }
+  
 
   const PasswordRightAccessory: ComponentType<TextFieldAccessoryProps> = useMemo(
     () =>
@@ -172,14 +183,12 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
           </View>
             <TextField
               value={authEmail}
-              //value={authEmail}
               onChangeText={setAuthEmail}
               containerStyle={$textField}
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect={false}
               keyboardType="email-address"
-              //labelTx="loginScreen.emailFieldLabel"
               placeholderTx="loginScreen.emailFieldPlaceholder"
               helper={error}
               status={error ? "error" : undefined}
@@ -195,7 +204,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               autoComplete="password"
               autoCorrect={false}
               secureTextEntry={isAuthPasswordHidden}
-              //labelTx="loginScreen.passwordFieldLabel"
               placeholderTx="loginScreen.passwordFieldPlaceholder"
               onSubmitEditing={login}
               RightAccessory={PasswordRightAccessory}
@@ -226,15 +234,6 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               LeftAccessory={() => <Icon style={$buttonIcon} icon="google" />}
               onSignInSuccess={handleSignInSuccess}
             />
-            {/* <Button
-              testID="login-button-google"
-              tx="loginScreen.google"
-              style={$secondaryButton}
-              preset="reversed"
-              textStyle={{color: '#ffff'}}
-              onPress={login}
-              LeftAccessory={(props) => <Icon style={$buttonIcon} icon="google" />}
-            /> */}
             <Button
               testID="login-button-apple"
               tx="loginScreen.apple"
@@ -242,6 +241,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
               preset="reversed"
               textStyle={{color: '#ffff'}}
               onPress={login}
+              disabled={loading}
               LeftAccessory={(props) => <Icon style={$buttonIcon} icon="apple" />}
             />
             <TouchableOpacity onPress={() => {_props.navigation.navigate("Join");}} style={{alignItems: 'center', marginTop: 20}}>
