@@ -4,6 +4,7 @@ import { ScrollView, View, StyleSheet, TouchableOpacity, Image, Dimensions } fro
 import { AppStackScreenProps } from "app/navigators"
 import { Rating, Screen, Text } from "app/components"
 import { colors } from "app/theme"
+import { api } from "app/services/api"
 
 const { width, height } = Dimensions.get("window")
 const isTablet = width > 600
@@ -23,6 +24,8 @@ export const ProductScreen: FC<ProductScreenProps> = observer(({ route }) => {
   }, [onChange]);
 
   const handleRatingChange = (rating: number) => {
+    const response = api.ratePurchase(rating, item.id);
+    console.log('response', response)
     console.log("Selected Rating:", rating);
   };
 
@@ -59,16 +62,17 @@ export const ProductScreen: FC<ProductScreenProps> = observer(({ route }) => {
         <Text style={styles.productName}>{`${item.brand} ${item.model}`}</Text>
       </View>
 
-      <View style={[styles.productDetails, { flex: 0.6, marginBottom: isPortrait ? 20 : 0 }]}>{renderDetails()}</View>
-      <View style={[styles.mediaSection, isPortrait ? { flex: 0.6, paddingVertical: 10, marginBottom: 50 } : { flex: 0.5, marginVertical: 10 }]}>
-        <Text style={{ fontWeight: 'bold', color: colors.palette.neutral100, paddingTop: 20 }} tx="productScreen.invoiceMedia" />
+      <View style={[styles.productDetails, { flex: 0.6 }]}>{renderDetails()}</View>
+
+      <View style={[styles.mediaSection, isPortrait ? { flex: 0.2, paddingVertical: 10, marginBottom: 30 } : { flex: 0.5, marginVertical: 10 }]}>
+        <Text style={{ fontWeight: 'bold', color: colors.palette.neutral100}} tx="productScreen.invoiceMedia" />
         <View style={{ width: '100%', flexDirection: isPortrait ? 'row' : 'row', flexWrap: isPortrait ? 'wrap' : 'nowrap', justifyContent: "space-between", marginTop: 10 }}>{renderMedia()}</View>
       </View>
 
-      <View style={[styles.reviewSection, { flex: isPortrait ? 0.6 : 0.4 }]}>
+      <View style={[styles.reviewSection, { flex: isPortrait ? 0.5 : 0.4 }]}>
         <Text style={{ fontWeight: 'bold', color: colors.palette.neutral100, paddingBottom: 10 }} tx="productScreen.review" />
         <View style={{ flex: 1 }}>
-          <View style={{ flex: 1, flexDirection: 'row' }}>
+          <View style={{ flexDirection: 'row' , justifyContent: "space-between"}}>
             <Text style={styles.reviewTitle} tx="productScreen.rateAction" />
             <Rating
               maxRating={5}
@@ -76,7 +80,8 @@ export const ProductScreen: FC<ProductScreenProps> = observer(({ route }) => {
               onRatingChange={handleRatingChange}
               starSize={20}
               starColor="#EB514E"
-              style={{ flex: 1, justifyContent: 'flex-start' }}
+              style={{alignItems: 'flex-end', maxHeight: 30}}
+              starsContainerStyle = {{justifyContent: 'flex-end'}}
               />
           </View>
           <Text style={styles.reviewDescription} tx="productScreen.rateText" />
@@ -91,12 +96,12 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor:'#232324',
     paddingHorizontal: 50,
-    paddingBottom: 50
+    paddingVertical: 50
   },
   header: {
     flex: 0.5,
     alignItems: "flex-start",
-    marginVertical: 25,
+    marginTop: 25,
   },
   purchaseStatus: {
     paddingVertical: 5,
@@ -105,6 +110,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingBottom: 5,
+    marginBottom: 10,
   },
   purchaseText: {
     color: "#fff",
@@ -119,7 +125,7 @@ const styles = StyleSheet.create({
   },
   productDetails: {
     flex: 2,
-    marginTop: 30,
+    paddingTop: 20,
     paddingHorizontal: 20,
     backgroundColor: '#212121',
     borderColor: '#393939',
@@ -127,6 +133,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   detailRow: {
+    flex:1,
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 10,

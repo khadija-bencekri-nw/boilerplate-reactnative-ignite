@@ -180,6 +180,23 @@ export class Api {
 
   }
 
+  async ratePurchase(rating: number, id: string, comment?: string): Promise<{ kind: "ok"; purchase: Purchase } | GeneralApiProblem> {
+    const request: object = {
+      rating,
+      comment
+    }
+
+    const response: ApiResponse<ApiFeedResponse> = await this.apisauce.put("purchases/"+id, request)
+
+    if (!response.ok) {
+      const problem = getGeneralApiProblem(response)
+      if (problem) return problem
+    }
+    const purchaseResp: Purchase = response;
+
+    return { kind: "ok", purchase: purchaseResp }
+  }
+
   async getFormData(): Promise<{ kind: "ok"; data} | GeneralApiProblem> {
     
     const response: ApiResponse<{ data }> = await this.apisauce.get("purchases/form-data");

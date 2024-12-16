@@ -9,6 +9,7 @@ export interface PurchaseItem {
   price: number
   purchaseDate: Date
   rating: number
+  model: string
   //rating: { scheme: string; value: string }
   userId: string
   images: string[]

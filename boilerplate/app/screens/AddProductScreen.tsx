@@ -106,7 +106,6 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
 
     try {
       const response = await api.savePurchase(body);
-      console.log('response.kind', response.kind)
       if (response.kind == "ok") {
         setLoading(false);
         const title= "Congratulations";
