@@ -1,15 +1,13 @@
 import * as React from "react"
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import { observer } from "mobx-react-lite"
-import { colors, typography } from "app/theme"
-import { Text } from "app/components/Text"
 import DropDownPicker from "react-native-dropdown-picker"
 
 export interface DropDownPickerNwProps {
   /**
    * An optional style override useful for padding & margin.
    */
-  data: Array<{}>,
+  data: Array<{name: string, id:string}>,
   placeholder: string,
   style?: StyleProp<ViewStyle>,
   open: boolean
@@ -19,18 +17,21 @@ export interface DropDownPickerNwProps {
   onItemSelect?: (item: { label: string; value: string }) => void;
 }
 
+export interface DropDownPickerNwRef {
+  getValue?: () => {label: string, value: string}
+}
 /**
  * Describe your component here
  */
 export const DropDownPickerNw = observer(
-  React.forwardRef((props: DropDownPickerNwProps, ref) => {
+  React.forwardRef<DropDownPickerNwRef,DropDownPickerNwProps >((props: DropDownPickerNwProps, ref) => {
   const { style, data, placeholder, open, setOpen, zIndex, zIndexInverse } = props;
   const $styles = [$container, style]
 
   const [value, setValue] = React.useState(null);
-  const [items, setItems] = React.useState([]);
+  const [items, setItems] = React.useState(Array<{label: string, value:string}>);
 
-  function transformBrandsData(array: Array<object>) {
+  function transformBrandsData(array: Array<{name: string, id:string}>) {
     return array.map(item => ({
         label: item.name,
         value: item.id
@@ -39,13 +40,12 @@ export const DropDownPickerNw = observer(
 
   React.useEffect(() => {
     const dropdownData = transformBrandsData(data)
-    console.log('dropdownData', dropdownData, ' data', data)
     setItems(dropdownData)
   },[data])
 
   React.useImperativeHandle(ref, () => ({
     getValue: () => {
-      const selectedItem = items.find((item) => item.value === value);
+      const selectedItem = items.find(item => item.value === value);
       return selectedItem || null;
     },
   }));
@@ -53,7 +53,7 @@ export const DropDownPickerNw = observer(
   return (
     <View style={$styles}>
       <DropDownPicker
-        ref={ref}
+        //ref={ref}
         placeholder={placeholder}
         open={open}
         value={value}
