@@ -1,13 +1,14 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { View, TextInput, Dimensions, Text, TouchableOpacity, Alert, StyleSheet, Image } from "react-native";
-import { AlertDialog, AlertDialogRef, DropDownPickerNw, Icon, Loader } from "app/components";
+import { View, TextInput, Dimensions, TouchableOpacity, Alert, StyleSheet, Image } from "react-native";
+import { AlertDialog, AlertDialogRef, DropDownPickerNw, Icon, Loader , Text} from "app/components";
 import * as ImagePicker from "expo-image-picker";
 import { StackActions } from '@react-navigation/native';
 import { AppStackScreenProps } from "app/navigators";
 import { api } from "app/services/api";
 import { runInAction } from "mobx";
 import { useStores } from "app/models";
+import { TxKeyPath } from "app/i18n";
 
 const { width } = Dimensions.get("window");
 const isTablet = width > 600;
@@ -84,9 +85,9 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
     var body = new FormData();
  
     const data={
-      brand: brandRef.current.getValue()?.label,
+      brand: brandRef?.current?.getValue()?.label,
       model: model,
-      store: storeRef.current.getValue()?.label,
+      store: storeRef?.current?.getValue()?.label,
       price: price,
       userId: user.id,
     }
@@ -108,32 +109,31 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
       const response = await api.savePurchase(body);
       if (response.kind == "ok") {
         setLoading(false);
-        const title= "Congratulations";
-        const message= "Your purchase has been added successfully.";
-        const   redirectLabel= "Go to product List";
+        const title= "addProductScreen.congrats";
+        const message= "addProductScreen.congratsMsg";
+        const   redirectLabel= "addProductScreen.goToList";
         const   onRedirect= () => props.navigation.navigate("Main", { screen: "MainTabNavigator"});
         showDialog(title, message, redirectLabel, onRedirect);
       } else {
         setLoading(false);
         if(response.kind == "forbidden" || response.kind == "unauthorized") {
-          const title= "Session expired";
-          const message= "Your session has expired. Please log in again.";
-          const   redirectLabel= "Login again";
+          const title= "common.sessionExpired";
+          const message= "common.sessionExpiredMsg";
+          const   redirectLabel= "common.loginAgain";
           const   onRedirect= () => logout();
           showDialog(title, message, redirectLabel, onRedirect);
         } else if(response.kind == "bad-data") {
-          const title= "Invalid file type";
-          const message= "Only JPEG and PNG are supported.";
-          const   redirectLabel= "Go back to my form";
+          const title= "addProductScreen.invalidTypes";
+          const message= "addProductScreen.invalidTypesDesc";
+          const   redirectLabel= "addProductScreen.backToForm";
           const   onRedirect= () => alertRef.current?.hide();
           showDialog(title, message, redirectLabel, onRedirect);
         }
          else {
-          const title= "";
-          const message= "Une erreur est survenue, veuillez réessayer";
-          const   redirectLabel= "try again";
+          const message= "common.errorUnexpected";
+          const   redirectLabel= "common.tryAgain";
           const   onRedirect= () => saveProduct();
-          showDialog(title, message, redirectLabel, onRedirect);
+          showDialog(undefined, message, redirectLabel, onRedirect);
         }
       }
     } catch (error) {
@@ -155,8 +155,8 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
     }
   };
 
-  const showDialog = (title: string, message: string, redirectLabel: string, onRedirect: Function) => {
-    alertRef?.current.set({
+  const showDialog = (title: TxKeyPath|undefined, message: TxKeyPath, redirectLabel: TxKeyPath, onRedirect: Function) => {
+    alertRef?.current?.set({
       title,
       message,
       redirectLabel,
@@ -210,7 +210,7 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
           zIndexInverse={2000}
         />
         <View style={[styles.invoiceSection, isPortrait ? styles.invoiceSectionPortrait : styles.invoiceSectionLandscape]}>
-          <Text style={styles.sectionHeader}>INVOICE AND MEDIA</Text>
+          <Text style={styles.sectionHeader} tx="productScreen.invoiceMedia" />
           <View style={[styles.mediaContainer, isPortrait ? null : styles.mediaContainerLandscape]}>
             {[1, 2,].map((_, index) => (
               <TouchableOpacity key={index} style={[styles.pickPicture, !isPortrait ? styles.pickPictureLandscape : null]} onPress={() => pickImage(false)}>
@@ -226,22 +226,20 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
           </View>
           <TouchableOpacity onPress={() => pickImage(true)} style={styles.button}>
             <Icon icon="add" size={30} style={styles.addIcon} />
-            <Text style={styles.buttonText}>Add multiple photos</Text>
+            <Text style={styles.buttonText} tx="addProductScreen.multipleImages" />
           </TouchableOpacity>
           <View style={[styles.infoRow, isPortrait ? styles.infoRowPortrait : styles.infoRowLandscape]}>
             <Icon icon="info" color="#515151" style={styles.infoIcon} />
-            <Text style={[styles.infoText, isPortrait ? styles.infoTextPortrait : styles.infoTextLandscape]}>
-              Adding more high-resolution photos will help the platform stay consistent and evolve in terms of products imagery.
-            </Text>
+            <Text style={[styles.infoText, isPortrait ? styles.infoTextPortrait : styles.infoTextLandscape]} tx="addProductScreen.qualityNote" />
           </View>
         </View>
       </View>
       <View style={[isPortrait ? styles.footerPortrait : styles.footerLandscape]}>
         <TouchableOpacity style={styles.cancelButton} onPress={() => props.navigation?.dispatch(StackActions.pop(1))}>
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={styles.cancelText} tx="common.cancel" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.confirmButton} onPress={saveProduct}>
-          <Text style={styles.confirmText}>Confirm</Text>
+          <Text style={styles.confirmText} tx="common.confirm" />
         </TouchableOpacity>
       </View>
       <AlertDialog ref={alertRef} />

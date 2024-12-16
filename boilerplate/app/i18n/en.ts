@@ -96,6 +96,16 @@ const en = {
     purchased: "Purchased",
     noPurchases: "No purchases for this account"
   },
+  addProductScreen: {
+    congrats: "Congratulations",
+    congratsMsg: "Your purchase has been added successfully.",
+    goToList: "Go to product List",
+    invalidTypes: "Invalid file type",
+    invalidTypesDesc: "Only JPEG and PNG are supported.",
+    backToForm: "Go back to my form",
+    multipleImages: "Add multiple photos",
+    qualityNote: "Adding more high-resolution photos will help the platform stay consistent and evolve in terms of products imagery."
+  },
   productScreen: {
     brand: "Brand",
     model: "Model",
