@@ -3,11 +3,13 @@ import React, { useState, forwardRef, useImperativeHandle } from "react"
 import {
   Modal,
   View,
-  Text,
   TouchableOpacity,
   ViewStyle,
   TextStyle,
 } from "react-native"
+
+import { Text } from "./Text"
+import { TxKeyPath } from "app/i18n"
 
 export interface AlertDialogProps {
   defaultTitle?: string
@@ -20,10 +22,10 @@ export interface AlertDialogRef {
   show: () => void
   hide: () => void
   set: (options: {
-    title?: string
-    message?: string
-    redirectLabel?: string
-    closeLabel?: string
+    title?: TxKeyPath
+    message?: TxKeyPath
+    redirectLabel?: TxKeyPath
+    closeLabel?: TxKeyPath
     onRedirect?: () => void
     onClose?: () => void
   }) => void
@@ -34,8 +36,8 @@ export const AlertDialog = forwardRef<AlertDialogRef, AlertDialogProps>(
     const [visible, setVisible] = useState(false)
     const [title, setTitle] = useState(defaultTitle || "")
     const [message, setMessage] = useState(defaultMessage || "")
-    const [redirectLabel, setRedirectLabel] = useState(defaultRedirectLabel || "OK")
-    //const [closeLabel, setCloseLabel] = useState(defaultCloseLabel || "Cancel")
+    const [redirectLabel, setRedirectLabel] = useState(defaultRedirectLabel)
+    const [closeLabel, setCloseLabel] = useState(undefined)
     const [onRedirect, setOnRedirect] = useState<() => void>(() => {})
     const [onClose, setOnClose] = useState<() => void>(() => {})
 
@@ -69,21 +71,21 @@ export const AlertDialog = forwardRef<AlertDialogRef, AlertDialogProps>(
       >
         <View style={$overlay}>
           <View style={$container}>
-            <Text style={$title}>{title}</Text>
-            <Text style={$message}>{message}</Text>
+            <Text style={$title} tx={title} />
+            <Text style={$message} tx={message}/>
             {/* Actions */}
             <View style={$actionsContainer}>
-              {/* {closeLabel && (
+              {closeLabel && (
                 <TouchableOpacity
                   style={$button}
                   onPress={() => {
-                    onClose()
+                    onClose && onClose()
                     setVisible(false)
                   }}
                 >
-                  <Text style={$buttonText}>{closeLabel}</Text>
+                  <Text style={$buttonText} tx={closeLabel} />
                 </TouchableOpacity>
-              )} */}
+              )}
               {redirectLabel && (
                 <TouchableOpacity
                   style={$button}
@@ -92,7 +94,7 @@ export const AlertDialog = forwardRef<AlertDialogRef, AlertDialogProps>(
                     setVisible(false)
                   }}
                 >
-                  <Text style={$buttonText}>{redirectLabel}</Text>
+                  <Text style={$buttonText} tx={redirectLabel} />
                 </TouchableOpacity>
               )}
             </View>
