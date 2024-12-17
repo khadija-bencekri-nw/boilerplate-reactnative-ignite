@@ -7,7 +7,6 @@ import { useStores } from "../models"
 import type { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import GoogleSignIn from "app/components/GoogleSignIn"
 import type { TxKeyPath } from "app/i18n"
 import { api } from "app/services/api"
@@ -33,8 +32,11 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   }
 
   useEffect(() => {
+    setAuthEmail(_props.route.params.username)
     const subscription = Dimensions.addEventListener("change", onChange)
-    return () => subscription?.remove()
+    return () => {
+      subscription.remove()
+    }
   }, [])
 
   const authPasswordInput = useRef<TextInput>(null)
@@ -43,13 +45,14 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   const [authPassword, setAuthPassword] = useState("")
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
   const [isSubmitted, setIsSubmitted] = useState(false)
-  const [userInfo, setUserInfo] = useState<typeof UserInfo>(null)
+  const [userInfo, setUserInfo] = useState<object>()
+  const [userLasr, setUserLast] = useState<object>()
   const [attemptsCount, setAttemptsCount] = useState(0)
   const buttonRef = useRef(null)
   const alertRef = useRef<AlertDialogRef>(null)
 
   const {
-    authenticationStore: { authEmail, setAuthEmail, setAuthToken, validationError, logout },
+    authenticationStore: { authEmail, setAuthEmail, setAuthToken, validationError },
   } = useStores()
 
   useEffect(() => {
@@ -66,19 +69,8 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   }, [userInfo])
 
   const handleSignInSuccess = (user: object) => {
-    //setAuthEmail(user?.user.email)
+    // setAuthEmail(user?.user.email)
     setUserInfo(user)
-  }
-
-  const storeConnectedUser = async (user: { name: string; username: { value: string } }) => {
-    try {
-      const user_ = { name: user.name, username: user.username.value }
-      await AsyncStorage.removeItem("LAST_CONNECTED_USER")
-      await AsyncStorage.setItem("LAST_CONNECTED_USER", JSON.stringify(user_))
-      console.log("success")
-    } catch (err) {
-      console.error("Error saving user:", err)
-    }
   }
 
   const showDialog = (
@@ -87,7 +79,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     redirectLabel?: TxKeyPath,
     onRedirect?: Function,
   ) => {
-    alertRef?.current?.set({
+    alertRef.current?.set({
       title,
       message,
       closeLabel: "common.close",
@@ -127,7 +119,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       }
 
       const result = await api.login(body)
-      handleLoginResult(result)
+      await handleLoginResult(result)
     } catch (error) {
       console.error("Login error:", error)
       setErrorMessage("common.errorUnexpected")
@@ -136,14 +128,26 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     }
   }
 
-  function handleLoginResult(result: { kind: string; authToken: string; user: object }) {
+  const goToMain = () => {
+    _props.navigation.navigate("Main")
+  }
+
+  async function handleLoginResult(result: {
+    kind: string
+    authToken: string
+    user: { name: string; username: { value: string } }
+  }) {
     if (result.kind === "ok") {
       setAuthToken(result.authToken)
       setAuthEmail("")
       setAuthPassword("")
       saveString("token", result.authToken)
-        .then(() => _props.navigation.navigate("Main", { logout }))
-        .catch(() => { console.error("Failed to save token"); })
+        .then(() => {
+          goToMain(result.user)
+        })
+        .catch(() => {
+          console.error("Failed to save token")
+        })
     } else {
       setErrorMessage(getErrorMessage(result.kind))
     }
@@ -168,7 +172,9 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             color={colors.palette.neutral100}
             containerStyle={props.style}
             size={20}
-            onPress={() => { setIsAuthPasswordHidden(!isAuthPasswordHidden); }}
+            onPress={() => {
+              setIsAuthPasswordHidden(!isAuthPasswordHidden)
+            }}
           />
         )
       },
@@ -182,8 +188,12 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       safeAreaEdges={["top", "bottom"]}
     >
       {isTablet && <ImageBackground source={backgroundImage} style={{ flex: 1 }} />}
-      <View style={[$contentContainer]}>
-        <BackButton onPress={() => { _props.navigation.goBack(); }} />
+      <View style={$contentContainer}>
+        <BackButton
+          onPress={() => {
+            _props.navigation.goBack()
+          }}
+        />
         <View style={$mainContent}>
           <View style={$textContainer}>
             <Image source={logo} style={$logo} />
@@ -256,7 +266,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             }}
             style={{ alignItems: "center", marginTop: 20 }}
           >
-            <Text tx="loginScreen.joinSentence" style={[$sideButtonText]} />
+            <Text tx="loginScreen.joinSentence" style={$sideButtonText} />
           </TouchableOpacity>
         </View>
       </View>

@@ -10,6 +10,7 @@ import type { AppStackScreenProps } from "app/navigators"
 import type { User } from "app/services/api"
 import { api } from "app/services/api"
 import { colors } from "app/theme"
+import { remove, save } from "app/utils/storage"
 import { runInAction } from "mobx"
 import { observer } from "mobx-react-lite"
 import type { FC } from "react"
@@ -61,12 +62,23 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
     }
   }
 
+  const storeConnectedUser = async (user: User) => {
+    try {
+      const userToStore = { name: user.name, username: user.email }
+      await remove("LAST_CONNECTED_USER")
+      await save("LAST_CONNECTED_USER", userToStore)
+    } catch (err) {
+      console.error("Error saving user:", err)
+    }
+  }
+
   const fetchUser = async () => {
     setLoading(true)
     try {
       const response = await api.getUser()
       if (response.kind === "ok") {
         runInAction(() => {
+          storeConnectedUser(response.user)
           setUserState(response.user)
           setUser(response.user)
           fetchPurchases(response.user.id)
