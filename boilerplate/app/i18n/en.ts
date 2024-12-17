@@ -95,6 +95,7 @@ const en = {
     purchasesListTitle: "Purchases",
     purchased: "Purchased",
     noPurchases: "No purchases for this account",
+    purchases: "Purchases",
   },
   addProductScreen: {
     congrats: "Congratulations",

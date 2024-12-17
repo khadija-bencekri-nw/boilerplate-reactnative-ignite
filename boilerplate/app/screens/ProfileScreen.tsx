@@ -151,7 +151,7 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
         {renderCheckView("profileScreen.notification.approval", "approval")}
       </View>
       <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-        <Button style={[$button, {backgroundColor: '#232324'}]} textStyle={{color: colors.palette.neutral100}} tx="common.cancel"  onPress={() => {}} />
+        <Button style={[$button, {backgroundColor: colors.background}]} textStyle={{color: colors.palette.neutral100}} tx="common.cancel"  onPress={() => {}} />
         <Button style={[$button, {width: 250}]} tx="common.confirm" onPress={updateUser} />
       </View>
       <AlertDialog ref={alertRef} />
@@ -162,12 +162,12 @@ export const ProfileScreen: FC<ProfileScreenProps> = observer(function ProfileSc
 
 const $root: ViewStyle = {
   flexGrow: 1,
-  backgroundColor:'#232324',
+  backgroundColor: colors.background,
   padding: 30,
 }
 const $textField: ViewStyle = {
   marginHorizontal: 10,
-  flex:1,
+  flex: 1,
   borderColor: 'grey',
 }
 
@@ -176,6 +176,6 @@ const $button: ViewStyle = {
   width: 120,
   borderRadius: 40,
   marginHorizontal: 20,
-  borderWidth:1,
+  borderWidth: 1,
   borderColor: colors.palette.neutral100,
 }

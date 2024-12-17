@@ -2,6 +2,7 @@ import * as React from "react"
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native"
 import { observer } from "mobx-react-lite"
 import DropDownPicker from "react-native-dropdown-picker"
+import { colors } from "app/theme"
 
 export interface DropDownPickerNwProps {
   /**
@@ -65,7 +66,7 @@ export const DropDownPickerNw = observer(
           color: "white",
         }}
         labelStyle={{color: "white"}}
-        style={{backgroundColor:'#232323',  borderWidth: 0, borderBottomWidth:1, borderColor: "#404040"}}
+        style={{backgroundColor:'#232323',  borderWidth: 0, borderBottomWidth:1, borderColor: colors.palette.neutral600P}}
         listItemContainerStyle={{
           backgroundColor:'#2E2E2E',
           borderColor: "#fff",
@@ -81,7 +82,9 @@ export const DropDownPickerNw = observer(
         />
     </View>
   )
-}))
+    },
+  ),
+)
 
 const $container: ViewStyle = {
   justifyContent: "center",

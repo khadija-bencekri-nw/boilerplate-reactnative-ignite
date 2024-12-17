@@ -245,8 +245,8 @@ const DatePicker_: FC<{ label: string; selectedDate?: Date }> = ({ label, select
 
 const $screenContentContainer: ViewStyle = {
   flex: 1,
-  flexDirection: 'row',
-  backgroundColor: '#232324',
+  flexDirection: "row",
+  backgroundColor: colors.background,
 }
 
 const $backgroundImage: ViewStyle = {
@@ -267,14 +267,14 @@ const $mainContent: ViewStyle = {
 }
 
 const $errorText: TextStyle = {
-  color: 'red', 
+  color: "red",
   marginBottom: spacing.sm,
-  textAlign: 'center', 
-};
+  textAlign: "center",
+}
 
 const $enterDetails: TextStyle = {
-  color: colors.palette.neutral100
-  //marginBottom: spacing.sm,
+  color: colors.palette.neutral100,
+  // marginBottom: spacing.sm,
 }
 
 const $sideButtonContainer: ViewStyle = {
@@ -284,14 +284,14 @@ const $sideButtonContainer: ViewStyle = {
 
 const $sideButtonText: TextStyle = {
   color: colors.palette.neutral100,
-  alignSelf: 'center',
-  fontSize: isTablet ? 20 : 12
+  alignSelf: "center",
+  fontSize: isTablet ? 20 : 12,
 }
 
 const $sideButtonTextPortrait: TextStyle = {
   color: colors.palette.neutral100,
-  alignSelf: 'center',
-  fontSize: isTablet ? 16 : 12
+  alignSelf: "center",
+  fontSize: isTablet ? 16 : 12,
 }
 
 const $darkText: TextStyle = {
@@ -357,32 +357,3 @@ const $secondaryButton: ViewStyle = {
 const $loader: ViewStyle = {
   marginTop: 20,
 }
-
-const $modalOverlay: ViewStyle = {
-  flex: 1,
-  justifyContent: "center",
-  alignItems: "center",
-  backgroundColor: "rgba(0, 0, 0, 0.7)", // Darker semi-transparent background
-};
-
-const $modalContainer: ViewStyle = {
-  width: '80%', // Width of the modal card
-  padding: 20,
-  backgroundColor: "#1E1E1E", // Dark background for the card
-  borderRadius: 15, // Rounded corners
-  shadowColor: "#000", // Shadow for the card
-  shadowOffset: {
-    width: 0,
-    height: 2,
-  },
-  shadowOpacity: 0.25,
-  shadowRadius: 4,
-  elevation: 5, // Elevation for Android
-};
-
-const $modalText: TextStyle = {
-  fontSize: 20,
-  marginBottom: 20,
-  color: "#ffffff", // White text color for contrast
-  textAlign: "center", // Center the text
-};

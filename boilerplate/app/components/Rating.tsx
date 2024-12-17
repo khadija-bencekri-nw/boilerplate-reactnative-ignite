@@ -1,10 +1,11 @@
 import * as React from "react"
 import { useState } from "react"
-import { StyleProp, ViewStyle, View, TouchableOpacity } from "react-native"
-import { observer } from "mobx-react-lite"
-import { colors } from "app/theme"
-import { Text } from "app/components/Text"
+
 import { FontAwesome } from "@expo/vector-icons"
+import { colors } from "app/theme"
+import { observer } from "mobx-react-lite"
+import type { StyleProp, ViewStyle } from "react-native"
+import { TouchableOpacity, View } from "react-native"
 
 export interface RatingProps {
   /**
@@ -54,13 +55,13 @@ export const Rating = observer(function Rating(props: RatingProps) {
     starSize = 20,
     starColor = colors.palette.primary300,
     starsContainerStyle,
-    disabled = false
+    disabled = false,
   } = props
   const [rating, setRating] = useState(initialRating)
 
   const handleRatingPress = (rate: number) => {
     setRating(rate)
-    if (onRatingChange) {
+    if (onRatingChange != null) {
       onRatingChange(rate)
     }
   }
@@ -72,7 +73,9 @@ export const Rating = observer(function Rating(props: RatingProps) {
           <TouchableOpacity
             key={index}
             disabled={disabled}
-            onPress={() => handleRatingPress(index + 1)}
+            onPress={() => {
+              handleRatingPress(index + 1)
+            }}
           >
             <FontAwesome
               name={rating > index ? "star" : "star-o"}

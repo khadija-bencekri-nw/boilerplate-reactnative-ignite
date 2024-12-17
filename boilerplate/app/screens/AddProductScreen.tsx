@@ -9,6 +9,7 @@ import { api } from "app/services/api";
 import { runInAction } from "mobx";
 import { useStores } from "app/models";
 import { TxKeyPath } from "app/i18n";
+import { colors } from "app/theme";
 
 const { width } = Dimensions.get("window");
 const isTablet = width > 600;
@@ -37,12 +38,22 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
   const [storeOpen, setStoreOpen] = useState(false);
   const brandRef = useRef<AlertDialogRef>(null)
   const storeRef = useRef<AlertDialogRef>(null)
-  
 
   const onChange = ({ window: { width, height } }: any) => {
     setScreenWidth(width);
     setIsPortrait(height >= width);
   };
+
+  const handleApiError = (response: { kind: string }, mainAction: Function) => {
+    const isSessionError = response.kind === "forbidden" || response.kind === "unauthorized"
+    alertRef.current?.set({
+      title: isSessionError ? "common.sessionExpired" : undefined,
+      message: isSessionError ? "common.sessionExpiredMsg" : "common.errorUnexpected",
+      redirectLabel: isSessionError ? "common.proceed" : "common.tryAgain",
+      onRedirect: isSessionError ? logout : mainAction,
+    })
+    alertRef.current?.show()
+  }
 
   const getFormData = async () => {
     setLoading(true);
@@ -53,23 +64,11 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
         setBrands(response.data.brands)
         setStores(response.data.stores)
       } else {
-        setLoading(false);
-        if(response.kind == "forbidden" || response.kind == "unauthorized") {
-          const title= "Session expired";
-          const message= "Your session has expired. Please log in again.";
-          const   redirectLabel= "Login again";
-          const   onRedirect= () => logout();
-          showDialog(title, message, redirectLabel, onRedirect);
-        } else {
-          const title= "";
-          const message= "Une erreur est survenue, veuillez réessayer.";
-          const   redirectLabel= "Réessayer";
-          const   onRedirect= () => getFormData();
-          showDialog(title, message, redirectLabel, onRedirect);
-        }
+        setLoading(false)
+        handleApiError(response, getFormData)
       }
     } catch (error) {
-      setLoading(false);
+      setLoading(false)
       console.error("An error occurred while fetching purchases:", error);
     }
   }
@@ -218,7 +217,7 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
                   {file ? (
                     <Image source={{ uri: file }} style={isPortrait ? styles.image : styles.imageLandscape} />
                   ) : (
-                    <Icon icon="add" color="#404040" style={{flex:1}} />
+                    <Icon icon="add" color={colors.palette.neutral600P} style={{flex:1}} />
                   )}
                 </View>
               </TouchableOpacity>
@@ -251,27 +250,27 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#232324",
+    backgroundColor: colors.background,
   },
   rootPortrait: {
     padding: 50,
   },
   rootLandscape: {
+    marginBottom: 50,
     paddingHorizontal: 50,
     paddingTop: 15,
-    marginBottom: 50,
   },
   formContainer: {
-    flex: 2,
     alignContent: "center",
+    flex: 2,
   },
   textInput: {
-    borderBottomWidth: 1,
-    borderColor: "#404040",
-    color: "white",
-    borderRadius: 5,
-    paddingHorizontal: 5,
     alignSelf: "center",
+    borderBottomWidth: 1,
+    borderColor: colors.palette.neutral600P,
+    borderRadius: 5,
+    color: colors.palette.neutral100,
+    paddingHorizontal: 5,
   },
   textInputPortrait: {
     marginVertical: 30,
@@ -304,7 +303,7 @@ const styles = StyleSheet.create({
   },
   pickPicture: {
     backgroundColor: "#2E2E2E",
-    borderColor: "#404040",
+    borderColor: colors.palette.neutral600P,
     borderRadius: 8,
     borderStyle: "dashed",
     borderWidth: 1,
@@ -407,7 +406,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   confirmText: {
-    color: "#404040",
+    color: colors.palette.neutral600P,
     fontWeight: "bold",
     fontSize: 18,
   },

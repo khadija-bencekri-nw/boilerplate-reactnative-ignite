@@ -62,7 +62,7 @@ const $header: ViewStyle = {
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
-  backgroundColor: '#232324',
+  backgroundColor: colors.background,
   borderBottomWidth: 1,
   borderBottomColor: colors.palette.neutral600,
   paddingTop: 20,

@@ -7,7 +7,7 @@ import { useStores } from "app/models"
 import type { Purchase } from "app/models/Purchase"
 import type { AppStackScreenProps } from "app/navigators"
 import { api } from "app/services/api"
-import { spacing } from "app/theme"
+import { colors, spacing } from "app/theme"
 import { observer } from "mobx-react-lite"
 import type { FC } from "react"
 import type { ViewStyle } from "react-native"
@@ -84,7 +84,7 @@ export const CoworkersScreen: FC<CoworkersScreenProps> = observer(function Cowor
 
 const $root: ViewStyle = {
   flex: 1,
-  backgroundColor: "#232324",
+  backgroundColor: colors.background,
   paddingHorizontal: spacing.lg,
   paddingTop: spacing.lg + spacing.xl,
   paddingBottom: spacing.lg,

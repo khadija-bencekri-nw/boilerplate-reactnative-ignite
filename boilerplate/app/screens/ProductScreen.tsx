@@ -93,34 +93,34 @@ export const ProductScreen: FC<ProductScreenProps> = observer(({ route }) => {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: colors.background,
     flexGrow: 1,
-    backgroundColor:'#232324',
     paddingHorizontal: 50,
-    paddingVertical: 50
+    paddingVertical: 50,
   },
   header: {
-    flex: 0.5,
     alignItems: "flex-start",
+    flex: 0.5,
     marginTop: 25,
   },
   purchaseStatus: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
     borderColor: "grey",
-    borderWidth: 1,
     borderRadius: 5,
-    paddingBottom: 5,
+    borderWidth: 1,
     marginBottom: 10,
+    paddingBottom: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
   purchaseText: {
-    color: "#fff",
+    color: colors.palette.neutral100,
     fontWeight: "bold",
     marginBottom: 5,
   },
   productName: {
     fontSize: 40,
     fontWeight: "bold",
-    color: "#fff",
+    color: colors.palette.neutral100,
     paddingTop: 25,
   },
   productDetails: {
@@ -143,19 +143,19 @@ const styles = StyleSheet.create({
     color: "#bbb",
   },
   detailValue: {
+    color: colors.palette.neutral100,
     fontSize: 16,
-    color: "#fff",
   },
   mediaSection: {
+    alignItems: "flex-start",
     flex: 1.5,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    marginTop: 20,
+    justifyContent: "center",
     marginBottom: 30,
+    marginTop: 20,
   },
   productImage: {
-    height: 150,
     borderRadius: 10,
+    height: 150,
     marginHorizontal: 5,
   },
   reviewSection: {
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   },
   reviewTitle: {
     fontSize: 18,
-    color: "#fff",
+    color: colors.palette.neutral100,
     marginBottom: 10,
   },
   rating: {

@@ -246,12 +246,11 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             />
             <TouchableOpacity onPress={() => {_props.navigation.navigate("Join");}} style={{alignItems: 'center', marginTop: 20}}>
               <Text tx="loginScreen.joinSentence" style={[$sideButtonText]} />
-            </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
+        </View>
       </View>
       <Loader loading={loading} />
-      <AlertDialog  ref={alertRef}/>
-      
+      <AlertDialog ref={alertRef} />
     </Screen>
   )
 })
@@ -266,16 +265,16 @@ const BackButton: FC<{ onPress: () => void }> = ({ onPress }) => (
 )
 
 const $screenContentContainer: ViewStyle = {
-  flex:1,
-  flexDirection: 'row',
-  backgroundColor: '#232324',
+  flex: 1,
+  flexDirection: "row",
+  backgroundColor: colors.background,
 }
 
 const $contentContainer: ViewStyle = {
-  flex:1,
-  flexDirection: 'row',
+  flex: 1,
+  flexDirection: "row",
   paddingTop: spacing.md,
-  justifyContent: 'center',
+  justifyContent: "center",
   marginTop: 10,
   paddingBottom: spacing.xxxl,
 }
@@ -283,7 +282,7 @@ const $contentContainer: ViewStyle = {
 const $mainContent: ViewStyle = {
   flex: 1,
   marginBottom: spacing.xxl,
-  marginRight: isTablet? 100 : 50,
+  marginRight: isTablet ? 100 : 50,
   marginTop: 10,
 }
 
@@ -294,20 +293,6 @@ const $sideButtonContainer: ViewStyle = {
 
 const $sideButtonText: TextStyle = {
   color: colors.palette.neutral100,
-}
-
-
-const $signIn: TextStyle = {
-  marginBottom: spacing.sm,
-}
-
-const $enterDetails: TextStyle = {
-  marginBottom: spacing.lg,
-}
-
-const $hint: TextStyle = {
-  color: colors.tint,
-  marginBottom: spacing.md,
 }
 
 const $textField: ViewStyle = {
@@ -324,13 +309,13 @@ const $textContainer: ViewStyle = {
   justifyContent: "center",
   alignItems: "center",
   paddingBottom: spacing.xl,
-  paddingTop: spacing.xxxl
+  paddingTop: spacing.xxxl,
 }
 
 const $logo: ImageStyle = {
   width: isTablet ? width * 0.05 : 80,
   height: isTablet ? width * 0.05 : 80,
-  //marginBottom: spacing.xs,
+  // marginBottom: spacing.xs,
 }
 
 const $headline: TextStyle = {
@@ -353,5 +338,5 @@ const $secondaryButton: ViewStyle = {
 const $buttonIcon: ImageStyle = {
   width: 12,
   height: 12,
-  paddingRight: 30
+  paddingRight: 30,
 }

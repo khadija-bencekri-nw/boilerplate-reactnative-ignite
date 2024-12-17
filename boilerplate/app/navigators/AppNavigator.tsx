@@ -104,10 +104,10 @@ const DrawerNavigator = ({ route, navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Drawer.Navigator 
-        screenOptions={{ 
+        screenOptions={{
           drawerStyle: {
-              backgroundColor: '#232324',
-            },
+            backgroundColor: colors.background,
+          },
           drawerLabelStyle: {
             color: 'white',
           },
