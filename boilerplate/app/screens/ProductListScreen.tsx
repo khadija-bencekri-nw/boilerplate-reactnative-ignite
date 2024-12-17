@@ -51,7 +51,7 @@ export const ProductListScreen: FC<ProductListScreenProps> = observer(
               initialRating={item.rating}
               onRatingChange={() => {}}
               starSize={20}
-              starColor={"#646464"}
+              starColor={colors.palette.neutral400}
               disabled={true}
             />
             <View style={styles.purchasedBadge}>
@@ -91,7 +91,7 @@ export const ProductListScreen: FC<ProductListScreenProps> = observer(
                 initialRating={item.rating}
                 disabled={true}
                 starSize={20}
-                starColor={"#646464"}
+                starColor={colors.palette.neutral400}
               />
               <View style={styles.purchasedBadge}>
                 <Icon

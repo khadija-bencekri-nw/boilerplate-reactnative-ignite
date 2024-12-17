@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+/* import React, { useState } from "react"
 
 import { Icon, Rating, Text } from "../components"
 
@@ -87,7 +87,7 @@ const PurchaseListScreen: FC<ProductListScreenProps> = observer(function Product
           initialRating={3}
           onRatingChange={handleRatingChange}
           starSize={20}
-          starColor={"#646464"}
+          starColor={colors.palette.neutral400}
           disabled={true}
         />
         <View style={styles.purchasedBadgeStyle}>
@@ -111,7 +111,7 @@ const PurchaseListScreen: FC<ProductListScreenProps> = observer(function Product
             initialRating={3}
             onRatingChange={handleRatingChange}
             starSize={20}
-            starColor={"#646464"}
+            starColor={colors.palette.neutral400}
             disabled={true}
           />
           <View style={styles.purchasedTickStyle}>
@@ -132,7 +132,7 @@ const PurchaseListScreen: FC<ProductListScreenProps> = observer(function Product
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ fontSize: 12, fontWeight: "bold", color: "#ffffff" }}>2022</Text>
+          <Text style={{ fontSize: 12, fontWeight: "bold", color: colors.palette.neutral100 }}>2022</Text>
           <Icon icon={"arrowDown"} size={5} style={{ paddingLeft: 20, alignItems: "flex-end" }} />
         </TouchableOpacity>
         <TouchableOpacity style={{ flexDirection: "row" }} onPress={toggleView}>
@@ -266,3 +266,4 @@ const styles = StyleSheet.create({
 })
 
 export default PurchaseListScreen
+ */

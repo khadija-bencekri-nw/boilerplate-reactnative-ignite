@@ -1,5 +1,7 @@
 // TODO: write documentation for colors and palette in own markdown file and add links from here
 
+import { t } from "i18n-js"
+
 const palette = {
   neutral100: "#FFFFFF",
   neutral200: "#F4F2F1",
@@ -10,6 +12,9 @@ const palette = {
   neutral600: "#564E4A",
   neutral600P: "#404040",
   neutral700: "#3C3836",
+  neutral710: "#393939",
+  neutral750: "#2E2E2E",
+  neutral760: "#2E2E30",
   neutral800: "#191015",
   neutral900: "#000000",
 
@@ -31,6 +36,7 @@ const palette = {
   accent300: "#FDD495",
   accent400: "#FBC878",
   accent500: "#FFBB50",
+  accent600: "#FFD700",
 
   angry100: "#F2D6CD",
   angry500: "#C03403",
@@ -39,7 +45,10 @@ const palette = {
   overlay50: "rgba(25, 16, 21, 0.5)",
 
   backgroundColor: "#232324",
+  subbackgroundColor: "#232323",
+  subbackgroundColor1: "#212121",
   tabColor: "#373737",
+  nwColor: "#EB514E",
 } as const
 
 export const colors = {

@@ -343,9 +343,9 @@ const $pickRole: TextStyle = {
 }
 
 const $selectionContainer: ViewStyle = {
-  backgroundColor: "#2E2E30",
+  backgroundColor: colors.palette.neutral760,
   borderWidth: 1,
-  borderColor: "#393939",
+  borderColor: colors.palette.neutral710,
   marginBottom: 10,
   borderRadius: 5,
   flexDirection: "row",

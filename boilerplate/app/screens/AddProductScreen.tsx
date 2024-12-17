@@ -22,7 +22,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native"
-import { MIMEType } from "util"
+import type { MIMEType } from "util"
 
 const { width } = Dimensions.get("window")
 // const isTablet = width > 600
@@ -82,9 +82,9 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
         setLoading(false)
         handleApiError(response, getFormData)
       }
-    } catch (error) {
+    } catch (error_) {
       setLoading(false)
-      console.error("An error occurred while fetching purchases:", error)
+      console.error("An error occurred while fetching purchases:", error_)
     }
   }
 
@@ -170,9 +170,9 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
           showDialog(undefined, message, redirectLabel, onRedirect)
         }
       }
-    } catch (errorsave) {
+    } catch (error_) {
       setLoading(false)
-      console.error("An error occurred while fetching purchases:", errorsave)
+      console.error("An error occurred while fetching purchases:", error_)
     }
   }
 
@@ -306,12 +306,7 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
             />
           </View>
         </View>
-        {error && (
-          <Text
-            style={styles.errorMessage}
-            tx="addProductScreen.fillForm"
-          />
-        )}
+        {error && <Text style={styles.errorMessage} tx="addProductScreen.fillForm" />}
       </View>
       <View style={isPortrait ? styles.footerPortrait : styles.footerLandscape}>
         <TouchableOpacity
@@ -454,7 +449,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 30,
   },
   pickPicture: {
-    backgroundColor: "#2E2E2E",
+    backgroundColor: colors.palette.neutral750,
     borderColor: colors.palette.neutral600P,
     borderRadius: 8,
     borderStyle: "dashed",

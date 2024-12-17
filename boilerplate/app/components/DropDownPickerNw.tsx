@@ -90,13 +90,13 @@ const $placeHolderStyle: TextStyle = {
 const $labelStyle: TextStyle = { color: "white" }
 
 const $style: ViewStyle = {
-  backgroundColor: "#232323",
+  backgroundColor: colors.palette.subbackgroundColor,
   borderWidth: 0,
   borderBottomWidth: 1,
   borderColor: colors.palette.neutral600P,
 }
 const $listItemContainerStyle: ViewStyle = {
-  backgroundColor: "#2E2E2E",
+  backgroundColor: colors.palette.neutral750,
   borderColor: colors.palette.neutral100,
   borderWidth: 1,
   zIndex: 1,

@@ -1,12 +1,14 @@
 import * as React from "react"
-import { StyleProp, TextStyle, View, ViewStyle } from "react-native"
-import { observer } from "mobx-react-lite"
-import styled from 'styled-components/native';
+
 import { BaseButton } from "./BaseButton"
 
+import { observer } from "mobx-react-lite"
+import type { StyleProp, ViewStyle } from "react-native"
+import styled from "styled-components/native"
+
 export interface PrimaryButtonProps {
-  text: string;
-  onPress: () => void;
+  text: string
+  onPress: () => void
   style?: StyleProp<ViewStyle>
 }
 
@@ -16,12 +18,10 @@ const StyledPrimaryButton = styled(BaseButton)`
   border-radius: 50px;
   border-width: 1px;
   border-color: #ffffff;
-`;
+`
 
 export const PrimaryButton = observer(function PrimaryButton(props: PrimaryButtonProps) {
-  const {  text, onPress } = props
+  const { text, onPress } = props
 
-  return (
-    <StyledPrimaryButton onPress={onPress} text={text} primary={true}/>
-  )
+  return <StyledPrimaryButton onPress={onPress} text={text} primary={true} />
 })

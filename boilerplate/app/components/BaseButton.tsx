@@ -28,11 +28,11 @@ export const BaseButton = observer(function BaseButton(props: BaseButtonProps) {
 
   const backgroundColor = primary
     ? (pressed: boolean) => (pressed ? colors.background : "transparent")
-    : (pressed: boolean) => (pressed ? "#EB514E" : colors.palette.neutral100)
+    : (pressed: boolean) => (pressed ? colors.palette.nwColor : colors.palette.neutral100)
   const borderColor = primary
     ? (pressed: boolean) => (pressed ? colors.background : colors.palette.neutral100)
-    : (pressed: boolean) => (pressed ? "#EB514E" : colors.palette.neutral100)
-  const textColor = primary ? "white" : "black"
+    : (pressed: boolean) => (pressed ? colors.palette.nwColor : colors.palette.neutral100)
+  const textColor = primary ? colors.palette.neutral100 : colors.palette.neutral900
 
   return (
     <SafeAreaView style={$container}>
