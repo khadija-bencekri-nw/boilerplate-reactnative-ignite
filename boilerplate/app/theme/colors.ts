@@ -35,6 +35,9 @@ const palette = {
 
   overlay20: "rgba(25, 16, 21, 0.2)",
   overlay50: "rgba(25, 16, 21, 0.5)",
+
+  backgroundColor: "#232324",
+  tabColor: "#373737",
 } as const
 
 export const colors = {
@@ -59,7 +62,11 @@ export const colors = {
   /**
    * The default color of the screen background.
    */
-  background: palette.neutral200,
+  background: palette.backgroundColor,
+  /**
+   * The default color of the tab background.
+   */
+  tabColor: palette.tabColor,
   /**
    * The default border color.
    */

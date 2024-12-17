@@ -1,20 +1,24 @@
-import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { CompositeScreenProps } from "@react-navigation/native";
-import React from "react";
-import { TextStyle, ViewStyle } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Icon } from "../components";
-import { translate } from "../i18n"; // Ensure translation is correctly imported
-import { DashboardScreen, CoworkersScreen, ProfileScreen } from "../screens"; // Import your actual screens
-import { colors, spacing, typography } from "../theme";
-import { AppStackParamList, AppStackScreenProps } from "./AppNavigator";
+import React from "react"
+
+import { Icon } from "../components"
+import { translate } from "../i18n" // Ensure translation is correctly imported
+import { CoworkersScreen, DashboardScreen, ProfileScreen } from "../screens" // Import your actual screens
+import { colors, spacing, typography } from "../theme"
+
+import type { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
+
+import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import type { CompositeScreenProps } from "@react-navigation/native"
+import type { TextStyle, ViewStyle } from "react-native"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 export type MainTabParamList = {
-  Dashboard: undefined;
-  Coworkers: undefined;
-  GetInspired: undefined;
-  Profile: undefined;
-};
+  Dashboard: undefined
+  Coworkers: undefined
+  GetInspired: undefined
+  Profile: undefined
+}
 
 /**
  * Helper for automatically generating navigation prop types for each route.
@@ -24,9 +28,9 @@ export type MainTabParamList = {
 export type MainTabScreenProps<T extends keyof MainTabParamList> = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, T>,
   AppStackScreenProps<keyof AppStackParamList>
->;
+>
 
-const Tab = createBottomTabNavigator<MainTabParamList>();
+const Tab = createBottomTabNavigator<MainTabParamList>()
 
 /**
  * This is the main navigator for the app with a bottom tab bar.
@@ -36,7 +40,7 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
  * @returns {JSX.Element} The rendered `MainTabNavigator`.
  */
 export function MainTabNavigator() {
-  const { bottom } = useSafeAreaInsets();
+  const { bottom } = useSafeAreaInsets()
 
   return (
     <Tab.Navigator
@@ -56,7 +60,11 @@ export function MainTabNavigator() {
         options={{
           tabBarLabel: translate("mainTabNavigator.dashboardTab"), // Adjust translation keys as needed
           tabBarIcon: ({ focused }) => (
-            <Icon icon="dashboard" color={focused ? colors.tint : colors.palette.neutral100} size={20} />
+            <Icon
+              icon="dashboard"
+              color={focused ? colors.tint : colors.palette.neutral100}
+              size={20}
+            />
           ),
         }}
       />
@@ -67,7 +75,11 @@ export function MainTabNavigator() {
         options={{
           tabBarLabel: translate("mainTabNavigator.coworkersTab"),
           tabBarIcon: ({ focused }) => (
-            <Icon icon="coworker" color={focused ? colors.tint : colors.palette.neutral100} size={20} />
+            <Icon
+              icon="coworker"
+              color={focused ? colors.tint : colors.palette.neutral100}
+              size={20}
+            />
           ),
         }}
       />
@@ -95,20 +107,20 @@ export function MainTabNavigator() {
         }}
       />
     </Tab.Navigator>
-  );
+  )
 }
 
 const $tabBar: ViewStyle = {
-  backgroundColor: "#373737",
+  backgroundColor: colors.tabColor,
   borderTopColor: colors.transparent,
-};
+}
 
 const $tabBarItem: ViewStyle = {
   paddingTop: spacing.md,
-};
+}
 
 const $tabBarLabel: TextStyle = {
   fontSize: 12,
   fontFamily: typography.primary.medium,
   lineHeight: 16,
-};
+}
