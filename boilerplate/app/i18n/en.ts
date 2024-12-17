@@ -107,6 +107,7 @@ const en = {
     multipleImages: "Add multiple photos",
     qualityNote:
       "Adding more high-resolution photos will help the platform stay consistent and evolve in terms of products imagery.",
+    fillForm: "Fill the form before submitting",
   },
   productScreen: {
     brand: "Brand",

@@ -4,7 +4,7 @@ import { ProductListScreen } from "./ProductListScreen"
 
 import { useIsFocused } from "@react-navigation/native"
 import type { AlertDialogRef } from "app/components"
-import { AlertDialog, Icon, Loader, Rating, Text } from "app/components"
+import { AlertDialog, Icon, Loader, Text } from "app/components"
 import { useStores } from "app/models"
 import type { AppStackScreenProps } from "app/navigators"
 import type { User } from "app/services/api"
@@ -13,16 +13,7 @@ import { colors } from "app/theme"
 import { runInAction } from "mobx"
 import { observer } from "mobx-react-lite"
 import type { FC } from "react"
-import {
-  FlatList,
-  Image,
-  ImageBackground,
-  StyleSheet,
-  TextStyle,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from "react-native"
+import { StyleSheet, TouchableOpacity, View } from "react-native"
 
 interface DashboardScreenProps extends AppStackScreenProps<"Dashboard"> {}
 
@@ -39,15 +30,6 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
 
   const isFocused = useIsFocused()
 
-  useEffect(() => {
-    setLoading(true)
-    fetchUser()
-  }, [])
-
-  useEffect(() => {
-    isFocused && fetchUser()
-  }, [isFocused])
-
   const handleApiError = (response: { kind: string }, mainAction: Function) => {
     const isSessionError = response.kind === "forbidden" || response.kind === "unauthorized"
     alertRef.current?.set({
@@ -59,30 +41,12 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
     alertRef.current?.show()
   }
 
-  const fetchUser = async () => {
-    setLoading(true)
-    try {
-      const response = await api.getUser()
-      if (response.kind == "ok") {
-        runInAction(() => {
-          setUserState(response.user)
-          setUser(response.user)
-          fetchPurchases(response.user.id)
-        })
-      } else {
-        handleApiError(response, fetchUser)
-      }
-    } catch (error) {
-      console.error("An error occurred while fetching purchases:", error)
-    }
-  }
-
   const fetchPurchases = async (id: string) => {
     const user = getUser()
     setLoading(true)
     try {
       const response = await api.getPurchases(id)
-      if (response.kind == "ok") {
+      if (response.kind === "ok") {
         setLoading(false)
         runInAction(() => {
           setPurchases(response.purchases)
@@ -97,6 +61,33 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
     }
   }
 
+  const fetchUser = async () => {
+    setLoading(true)
+    try {
+      const response = await api.getUser()
+      if (response.kind === "ok") {
+        runInAction(() => {
+          setUserState(response.user)
+          setUser(response.user)
+          fetchPurchases(response.user.id)
+        })
+      } else {
+        handleApiError(response, fetchUser)
+      }
+    } catch (error) {
+      console.error("An error occurred while fetching purchases:", error)
+    }
+  }
+
+  useEffect(() => {
+    setLoading(true)
+    fetchUser()
+  }, [])
+
+  useEffect(() => {
+    isFocused && fetchUser()
+  }, [isFocused])
+
   const toggleView = () => {
     setIsGridView((prev) => !prev)
   }
@@ -108,16 +99,16 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ fontSize: 12, fontWeight: "bold", color: "#ffffff" }}>2022</Text>
-          <Icon icon={"arrowDown"} size={5} style={{ paddingLeft: 20, alignItems: "flex-end" }} />
+        <TouchableOpacity style={styles.yearFilterContainer}>
+          <Text style={styles.yearTextStyle}>2022</Text>
+          <Icon icon={"arrowDown"} size={5} style={styles.yearIcon} />
         </TouchableOpacity>
-        <TouchableOpacity style={{ flexDirection: "row" }} onPress={toggleView}>
+        <TouchableOpacity style={styles.toggleViewStyle} onPress={toggleView}>
           <Icon
             icon={"list"}
             size={20}
             color={isGridView ? "grey" : "white"}
-            style={{ paddingRight: 50 }}
+            style={styles.iconStyle}
           />
           <Icon icon={"grid"} size={20} color={isGridView ? "white" : "grey"} />
         </TouchableOpacity>
@@ -158,6 +149,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
+  iconStyle: {
+    paddingRight: 50,
+  },
   listItem: {
     backgroundColor: colors.tabColor,
     borderRadius: 10,
@@ -168,5 +162,21 @@ const styles = StyleSheet.create({
   price: {
     color: colors.palette.neutral100,
     marginTop: 5,
+  },
+  toggleViewStyle: {
+    flexDirection: "row",
+  },
+  yearFilterContainer: {
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  yearIcon: {
+    alignItems: "flex-end",
+    paddingLeft: 20,
+  },
+  yearTextStyle: {
+    color: colors.palette.neutral100,
+    fontSize: 12,
+    fontWeight: "bold",
   },
 })

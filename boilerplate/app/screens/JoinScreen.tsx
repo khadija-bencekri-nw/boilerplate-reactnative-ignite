@@ -8,7 +8,7 @@ import { colors, spacing } from "../theme"
 
 import { observer } from "mobx-react-lite"
 import type { ComponentType, FC } from "react"
-import type { TextInput, TextStyle, ViewStyle } from "react-native"
+import type { ImageStyle, TextInput, TextStyle, ViewStyle } from "react-native"
 import { Dimensions, ImageBackground, TouchableOpacity, View } from "react-native"
 
 const { width } = Dimensions.get("window")
@@ -120,7 +120,7 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
       contentContainerStyle={$screenContentContainer}
       safeAreaEdges={["top", "bottom"]}
     >
-      {isTablet && <ImageBackground source={backgroundImage} style={{ flex: 1 }} />}
+      {isTablet && <ImageBackground source={backgroundImage} style={$imageBackgroundStyle} />}
       <View style={$contentContainer}>
         <View style={$mainContent}>
           <Text tx="signUpScreen.step1" preset="subheading" style={$enterDetails} />
@@ -203,7 +203,7 @@ const CloseButton: FC<{ onPress: () => void; isPortrait: boolean }> = ({ onPress
     <TouchableOpacity onPress={onPress}>
       <Icon
         icon="close"
-        style={{ alignSelf: "center" }}
+        style={$iconStyle}
         color={colors.palette.neutral100}
         size={isTablet && !isPortrait ? 35 : 20}
       />
@@ -224,6 +224,10 @@ const $contentContainer: ViewStyle = {
   paddingVertical: spacing.xxl,
   marginLeft: 20,
   justifyContent: "center",
+}
+
+const $imageBackgroundStyle: ViewStyle = {
+  flex: 1,
 }
 
 const $mainContent: ViewStyle = {
@@ -265,7 +269,12 @@ const $sideButtonText: TextStyle = {
   color: colors.palette.neutral100,
   fontSize: isTablet ? 20 : 12,
 }
+
 const $sideButtonTextPortrait: TextStyle = {
   color: colors.palette.neutral100,
   fontSize: isTablet ? 16 : 12,
+}
+
+const $iconStyle: ImageStyle = {
+  alignSelf: "center",
 }

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react"
 
-import PurchaseListScreen from "./PurchaseListScreen"
-
 import { MasonryFlashList } from "@shopify/flash-list"
 import { Icon, Rating, Text } from "app/components"
 import type { PurchaseItem } from "app/services/api"
@@ -15,6 +13,8 @@ interface ProductListScreenProps {
   goToProduct: (item: object) => void
   isGridView: boolean
 }
+
+const defaultImage = require("../../assets/images/backgroundLogin.png")
 
 export const ProductListScreen: FC<ProductListScreenProps> = observer(
   function ProductListScreen(props) {
@@ -37,11 +37,7 @@ export const ProductListScreen: FC<ProductListScreenProps> = observer(
         >
           <View style={styles.imageContainer}>
             <Image
-              source={
-                item.images.length > 0
-                  ? { uri: item.images[0] }
-                  : require("../../assets/images/backgroundLogin.png")
-              }
+              source={item.images.length > 0 ? { uri: item.images[0] } : defaultImage}
               style={styles.imageStyle}
             />
           </View>
@@ -49,14 +45,7 @@ export const ProductListScreen: FC<ProductListScreenProps> = observer(
             <Text style={styles.purchaseTitleStyle}>{`${item.brand} ${item.model}`}</Text>
             <Text style={styles.price}>{item.price}</Text>
           </View>
-          <View
-            style={{
-              flex: 1.5,
-              justifyContent: "flex-end",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
+          <View style={styles.ratingContainer}>
             <Rating
               maxRating={5}
               initialRating={item.rating}
@@ -64,29 +53,14 @@ export const ProductListScreen: FC<ProductListScreenProps> = observer(
               starSize={20}
               starColor={"#646464"}
             />
-            <View
-              style={{
-                width: 100,
-                height: 28,
-                backgroundColor: colors.palette.neutral600P,
-                marginLeft: 10,
-                borderRadius: 5,
-                justifyContent: "center",
-                paddingHorizontal: 2,
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
+            <View style={styles.purchasedBadge}>
               <Icon
                 icon="check"
                 size={10}
                 color={colors.palette.neutral100}
-                style={{ marginRight: 4 }}
+                style={styles.purchasedIcon}
               />
-              <Text
-                style={{ color: colors.palette.neutral100, fontSize: 10, fontWeight: "bold" }}
-                tx="dashboardScreen.purchased"
-              />
+              <Text style={styles.purchasedTextStyle} tx="dashboardScreen.purchased" />
             </View>
           </View>
         </TouchableOpacity>
@@ -103,13 +77,11 @@ export const ProductListScreen: FC<ProductListScreenProps> = observer(
           }}
         >
           <ImageBackground
-            source={{ uri: item.images[0] }}
-            style={[styles.gridItem, { alignItems: "flex-start", height: 200 }]}
+            source={item.images.length > 0 ? { uri: item.images[0] } : defaultImage}
+            style={styles.gridItem}
           >
-            <View style={{ flex: 3, width: "100%" }}>
-              <Text style={{ color: colors.palette.neutral100, fontSize: 16, fontWeight: "bold" }}>
-                {`${item.brand} ${item.model}`}
-              </Text>
+            <View style={styles.gridProductDescContainer}>
+              <Text style={styles.emptyListText}>{`${item.brand} ${item.model}`}</Text>
               <Text style={styles.price}>{item.price}</Text>
             </View>
             <View style={styles.ratingContainerGrid}>
@@ -120,29 +92,14 @@ export const ProductListScreen: FC<ProductListScreenProps> = observer(
                 starSize={20}
                 starColor={"#646464"}
               />
-              <View
-                style={{
-                  width: 100,
-                  height: 28,
-                  backgroundColor: colors.palette.neutral600P,
-                  marginLeft: 10,
-                  borderRadius: 5,
-                  justifyContent: "center",
-                  paddingHorizontal: 2,
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
+              <View style={styles.purchasedBadge}>
                 <Icon
                   icon="check"
                   size={10}
                   color={colors.palette.neutral100}
-                  style={{ marginRight: 4 }}
+                  style={styles.purchasedIcon}
                 />
-                <Text
-                  style={{ color: colors.palette.neutral100, fontSize: 10, fontWeight: "bold" }}
-                  tx="dashboardScreen.purchased"
-                />
+                <Text style={styles.purchasedTextStyle} tx="dashboardScreen.purchased" />
               </View>
             </View>
           </ImageBackground>
@@ -180,11 +137,6 @@ export const ProductListScreen: FC<ProductListScreenProps> = observer(
 )
 
 const styles = StyleSheet.create({
-  PurchaseTitleStyle: {
-    color: colors.palette.neutral100,
-    fontSize: 16,
-    fontWeight: "bold",
-  },
   columnWrapper: {
     justifyContent: "space-between",
   },
@@ -199,13 +151,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   gridItem: {
-    alignItems: "center",
+    alignItems: "flex-start",
     backgroundColor: colors.tabColor,
     borderRadius: 5,
     flex: 1,
+    height: 200,
     margin: 8,
     padding: 20,
   },
+  gridProductDescContainer: { flex: 3, width: "100%" },
   headerText: {
     color: colors.palette.neutral100,
     fontSize: 20,
@@ -234,6 +188,31 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   purchaseDescContainer: { flex: 3, marginHorizontal: 15 },
+  purchasedBadge: {
+    alignItems: "center",
+    backgroundColor: colors.palette.neutral600P,
+    borderRadius: 5,
+    flexDirection: "row",
+    height: 28,
+    justifyContent: "center",
+    marginLeft: 10,
+    paddingHorizontal: 2,
+    width: 100,
+  },
+  purchasedIcon: {
+    marginRight: 4,
+  },
+  purchasedTextStyle: {
+    color: colors.palette.neutral100,
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+  ratingContainer: {
+    alignItems: "center",
+    flex: 1.5,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
   ratingContainerGrid: {
     alignItems: "center",
     flex: 1,

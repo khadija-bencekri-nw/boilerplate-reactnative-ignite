@@ -1,15 +1,21 @@
-import { observer } from "mobx-react-lite"
-import React, { ComponentType, FC, useEffect, useMemo, useRef, useState } from "react"
-import { ImageBackground, View, TextInput, TextStyle, ViewStyle, TouchableOpacity, Image, ImageStyle, Dimensions } from "react-native"
-import { AlertDialog, AlertDialogRef, Button, Icon, Loader, Screen, Text, TextField, TextFieldAccessoryProps } from "../components"
+/* eslint-disable max-statements */
+import React, { useEffect, useMemo, useRef, useState } from "react"
+
+import type { AlertDialogRef, TextFieldAccessoryProps } from "../components"
+import { AlertDialog, Button, Icon, Loader, Screen, Text, TextField } from "../components"
 import { useStores } from "../models"
-import { AppStackScreenProps } from "../navigators"
+import type { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
-import { api } from "app/services/api"
+
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { saveString } from "app/utils/secureStorage"
 import GoogleSignIn from "app/components/GoogleSignIn"
-import { TxKeyPath } from "app/i18n"
+import type { TxKeyPath } from "app/i18n"
+import { api } from "app/services/api"
+import { saveString } from "app/utils/secureStorage"
+import { observer } from "mobx-react-lite"
+import type { ComponentType, FC } from "react"
+import type { ImageStyle, TextInput, TextStyle, ViewStyle } from "react-native"
+import { Dimensions, Image, ImageBackground, TouchableOpacity, View } from "react-native"
 
 const { width } = Dimensions.get("window")
 const isTablet = width > 600
@@ -19,27 +25,27 @@ const logo = require("../../assets/images/logo.png")
 interface LoginScreenProps extends AppStackScreenProps<"Login"> {}
 
 export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_props) {
-  const [isPortrait, setIsPortrait] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const onChange = ({ window: { width, height  } }) => {
-    setIsPortrait(height >= width);
-  };
+  const onChange = ({ window: { width, height } }) => {
+    setIsPortrait(height >= width)
+  }
 
   useEffect(() => {
-    const subscription = Dimensions.addEventListener('change', onChange);
-    return () => subscription?.remove();
-  }, []);
+    const subscription = Dimensions.addEventListener("change", onChange)
+    return () => subscription?.remove()
+  }, [])
 
   const authPasswordInput = useRef<TextInput>(null)
 
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState<TxKeyPath>()
   const [authPassword, setAuthPassword] = useState("")
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [userInfo, setUserInfo] = useState<typeof UserInfo>(null)
   const [attemptsCount, setAttemptsCount] = useState(0)
-  const buttonRef = useRef(null);
+  const buttonRef = useRef(null)
   const alertRef = useRef<AlertDialogRef>(null)
 
   const {
@@ -47,35 +53,40 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   } = useStores()
 
   useEffect(() => {
-    //setAuthPassword("password")
-    //setAuthEmail("khadija.bencekri@theodo.com")
+    // setAuthPassword("password")
+    // setAuthEmail("khadija.bencekri@theodo.com")
     return () => {
-      //setAuthPassword("password")
-      //setAuthEmail("khadija.bencekri@theodo.com")
+      // setAuthPassword("password")
+      // setAuthEmail("khadija.bencekri@theodo.com")
     }
   }, [])
 
   useEffect(() => {
-    userInfo?.idToken && login();
+    userInfo?.idToken && login()
   }, [userInfo])
 
   const handleSignInSuccess = (user: object) => {
     //setAuthEmail(user?.user.email)
-    setUserInfo(user);
-  };
+    setUserInfo(user)
+  }
 
-  const storeConnectedUser = async (user: {name: string, username: {value: string}}) => {
+  const storeConnectedUser = async (user: { name: string; username: { value: string } }) => {
     try {
-      const user_ = { name: user.name, username: user.username.value };
-      await AsyncStorage.removeItem("LAST_CONNECTED_USER");
-      await AsyncStorage.setItem("LAST_CONNECTED_USER", JSON.stringify(user_));
-      console.log("success");
+      const user_ = { name: user.name, username: user.username.value }
+      await AsyncStorage.removeItem("LAST_CONNECTED_USER")
+      await AsyncStorage.setItem("LAST_CONNECTED_USER", JSON.stringify(user_))
+      console.log("success")
     } catch (err) {
-      console.error("Error saving user:", err);
+      console.error("Error saving user:", err)
     }
   }
 
-  const showDialog = (title: TxKeyPath, message: TxKeyPath, redirectLabel?: TxKeyPath, onRedirect?: Function) => {
+  const showDialog = (
+    title: TxKeyPath,
+    message: TxKeyPath,
+    redirectLabel?: TxKeyPath,
+    onRedirect?: Function,
+  ) => {
     alertRef?.current?.set({
       title,
       message,
@@ -85,69 +96,68 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   }
 
   const validateMail = (mail: string, domain: string = "theodo.com") => {
-    const regex = new RegExp(`^[^\\s@]+@${domain}$`);
-    return !regex.test(mail);
+    const regex = new RegExp(`^[^\\s@]+@${domain}$`)
+    return !regex.test(mail)
   }
 
   const error = isSubmitted ? validationError : ""
 
   async function login() {
-    setAttemptsCount(attemptsCount + 1);
-    setLoading(true);
-  
-    const body: { idToken?: string; email?: string; password?: string } = {};
-  
+    setAttemptsCount(attemptsCount + 1)
+    setLoading(true)
+
+    const body: { idToken?: string; email?: string; password?: string } = {}
+
     try {
       if (userInfo?.idToken) {
         if (validateMail(userInfo.user.email)) {
-          setLoading(false);
-          showDialog("loginScreen.errors.mailError", "loginScreen.errors.mailErrorDesc");
-          setUserInfo("");
-          return;
+          setLoading(false)
+          showDialog("loginScreen.errors.mailError", "loginScreen.errors.mailErrorDesc")
+          setUserInfo("")
+          return
         }
-        body.idToken = userInfo.idToken;
+        body.idToken = userInfo.idToken
       } else {
-        setIsSubmitted(true);
+        setIsSubmitted(true)
         if (validationError) {
-          return;
+          return
         }
-        body.email = authEmail;
-        body.password = authPassword;
+        body.email = authEmail
+        body.password = authPassword
       }
-  
-      const result = await api.login(body);
-      handleLoginResult(result);
+
+      const result = await api.login(body)
+      handleLoginResult(result)
     } catch (error) {
-      console.error("Login error:", error);
-      setErrorMessage("common.errorUnexpected");
+      console.error("Login error:", error)
+      setErrorMessage("common.errorUnexpected")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
-  
-  function handleLoginResult(result: { kind: string; authToken: string , user: object}) {
+
+  function handleLoginResult(result: { kind: string; authToken: string; user: object }) {
     if (result.kind === "ok") {
-      setAuthToken(result.authToken);
-      setAuthEmail("");
-      setAuthPassword("");
+      setAuthToken(result.authToken)
+      setAuthEmail("")
+      setAuthPassword("")
       saveString("token", result.authToken)
         .then(() => _props.navigation.navigate("Main", { logout }))
-        .catch(() => console.error("Failed to save token"));
+        .catch(() => { console.error("Failed to save token"); })
     } else {
-      setErrorMessage(getErrorMessage(result.kind));
+      setErrorMessage(getErrorMessage(result.kind))
     }
   }
-  
+
   function getErrorMessage(kind: string) {
     switch (kind) {
       case "not-found":
       case "unauthorized":
-        return "loginScreen.errors.authError";
+        return "loginScreen.errors.authError"
       default:
-        return "commons.errorUnexpected";
+        return "common.errorUnexpected"
     }
   }
-  
 
   const PasswordRightAccessory: ComponentType<TextFieldAccessoryProps> = useMemo(
     () =>
@@ -158,7 +168,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
             color={colors.palette.neutral100}
             containerStyle={props.style}
             size={20}
-            onPress={() => setIsAuthPasswordHidden(!isAuthPasswordHidden)}
+            onPress={() => { setIsAuthPasswordHidden(!isAuthPasswordHidden); }}
           />
         )
       },
@@ -171,81 +181,82 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       contentContainerStyle={$screenContentContainer}
       safeAreaEdges={["top", "bottom"]}
     >
-      {isTablet && (
-        <ImageBackground  source={backgroundImage} style={{flex:1}}/>
-      )}
+      {isTablet && <ImageBackground source={backgroundImage} style={{ flex: 1 }} />}
       <View style={[$contentContainer]}>
-        <BackButton onPress={() => _props.navigation.goBack()} />
+        <BackButton onPress={() => { _props.navigation.goBack(); }} />
         <View style={$mainContent}>
           <View style={$textContainer}>
             <Image source={logo} style={$logo} />
             <Text testID="login-heading" text="Welcome Back" preset="heading" style={$headline} />
           </View>
-            <TextField
-              value={authEmail}
-              onChangeText={setAuthEmail}
-              containerStyle={$textField}
-              autoCapitalize="none"
-              autoComplete="email"
-              autoCorrect={false}
-              keyboardType="email-address"
-              placeholderTx="loginScreen.emailFieldPlaceholder"
-              helper={error}
-              status={error ? "error" : undefined}
-              onSubmitEditing={() => authPasswordInput.current?.focus()}
-            />
+          <TextField
+            value={authEmail}
+            onChangeText={setAuthEmail}
+            containerStyle={$textField}
+            autoCapitalize="none"
+            autoComplete="email"
+            autoCorrect={false}
+            keyboardType="email-address"
+            placeholderTx="loginScreen.emailFieldPlaceholder"
+            helper={error}
+            status={error ? "error" : undefined}
+            onSubmitEditing={() => authPasswordInput.current?.focus()}
+          />
 
-            <TextField
-              ref={authPasswordInput}
-              value={authPassword}
-              onChangeText={setAuthPassword}
-              containerStyle={$textField}
-              autoCapitalize="none"
-              autoComplete="password"
-              autoCorrect={false}
-              secureTextEntry={isAuthPasswordHidden}
-              placeholderTx="loginScreen.passwordFieldPlaceholder"
-              onSubmitEditing={login}
-              RightAccessory={PasswordRightAccessory}
-            />
+          <TextField
+            ref={authPasswordInput}
+            value={authPassword}
+            onChangeText={setAuthPassword}
+            containerStyle={$textField}
+            autoCapitalize="none"
+            autoComplete="password"
+            autoCorrect={false}
+            secureTextEntry={isAuthPasswordHidden}
+            placeholderTx="loginScreen.passwordFieldPlaceholder"
+            onSubmitEditing={login}
+            RightAccessory={PasswordRightAccessory}
+          />
 
-            {errorMessage ? (
-              <Text style={{ color: colors.error, marginBottom: spacing.md }}>
-                {errorMessage}
-              </Text>
-            ) : null}
+          {errorMessage ? (
+            <Text style={{ color: colors.error, marginBottom: spacing.md }} tx={errorMessage} />
+          ) : null}
 
-            <Button
-              testID="login-button"
-              tx="loginScreen.signIn"
-              style={$tapButton}
-              preset="reversed"
-              textStyle={{color: '#000000'}}
-              onPress={login}
-            />
-            <GoogleSignIn
-              ref={buttonRef} 
-              testID="login-button-google"
-              tx="loginScreen.google"
-              style={$secondaryButton}
-              preset="reversed"
-              textStyle={{color: '#ffff'}}
-              onPress={login}
-              LeftAccessory={() => <Icon style={$buttonIcon} icon="google" />}
-              onSignInSuccess={handleSignInSuccess}
-            />
-            <Button
-              testID="login-button-apple"
-              tx="loginScreen.apple"
-              style={$secondaryButton}
-              preset="reversed"
-              textStyle={{color: '#ffff'}}
-              onPress={login}
-              disabled={loading}
-              LeftAccessory={(props) => <Icon style={$buttonIcon} icon="apple" />}
-            />
-            <TouchableOpacity onPress={() => {_props.navigation.navigate("Join");}} style={{alignItems: 'center', marginTop: 20}}>
-              <Text tx="loginScreen.joinSentence" style={[$sideButtonText]} />
+          <Button
+            testID="login-button"
+            tx="loginScreen.signIn"
+            style={$tapButton}
+            preset="reversed"
+            textStyle={{ color: colors.palette.neutral900 }}
+            onPress={login}
+          />
+          <GoogleSignIn
+            ref={buttonRef}
+            testID="login-button-google"
+            tx="loginScreen.google"
+            style={$secondaryButton}
+            preset="reversed"
+            textStyle={{ color: colors.palette.neutral100 }}
+            onPress={login}
+            LeftAccessory={() => <Icon style={$buttonIcon} icon="google" />}
+            onSignInSuccess={handleSignInSuccess}
+          />
+          <Button
+            testID="login-button-apple"
+            tx="loginScreen.apple"
+            style={$secondaryButton}
+            preset="reversed"
+            textStyle={{ color: colors.palette.neutral100 }}
+            onPress={login}
+            disabled={loading}
+            LeftAccessory={(props) => <Icon style={$buttonIcon} icon="apple" />}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              _props.navigation.navigate("Join")
+            }}
+            style={{ alignItems: "center", marginTop: 20 }}
+          >
+            <Text tx="loginScreen.joinSentence" style={[$sideButtonText]} />
           </TouchableOpacity>
         </View>
       </View>
