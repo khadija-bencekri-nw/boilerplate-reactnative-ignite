@@ -4,7 +4,7 @@
  * Generally speaking, it will contain an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
-import React from "react"
+import React, {useState} from "react"
 
 import Config from "../config"
 import { useStores } from "../models" // @demo remove-current-line
@@ -28,6 +28,8 @@ import * as Screens from "app/screens"
 import { colors } from "app/theme"
 import { observer } from "mobx-react-lite"
 import { SafeAreaView, useColorScheme } from "react-native"
+import { UserInfo } from "os"
+import { User } from "app/services/api/api.types"
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
  * as well as what properties (if any) they might take when navigating to them.
@@ -72,14 +74,14 @@ const Drawer = createDrawerNavigator()
 const AppStack = observer(function AppStack() {
   // @demo remove-block-start
   const {
-    authenticationStore: { isAuthenticated },
+    authenticationStore: { isAuthenticated, user },
   } = useStores()
 
   // @demo remove-block-end
   return (
     <Stack.Navigator
       screenOptions={{ navigationBarColor: colors.background }}
-      initialRouteName={isAuthenticated ? "Main" : "Welcome"} // @demo remove-current-line
+      initialRouteName={isAuthenticated ? "Main" : "Welcome"}
     >
       {/* @demo remove-block-start */}
       {isAuthenticated ? (
@@ -90,7 +92,7 @@ const AppStack = observer(function AppStack() {
             component={Screens.ProductScreen}
             options={{
               header: ({ navigation }) => (
-                <CustomHeader navigation={navigation} source={"Product"} />
+                <CustomHeader navigation={navigation} source={"Product"} user={user} />
               ),
             }}
           />
@@ -99,7 +101,7 @@ const AppStack = observer(function AppStack() {
             component={Screens.AddProductScreen}
             options={{
               header: ({ navigation }) => (
-                <CustomHeader navigation={navigation} source="addProduct" />
+                <CustomHeader navigation={navigation} source="addProduct" user={user} />
               ),
             }}
           />
@@ -132,9 +134,10 @@ const AppStack = observer(function AppStack() {
   )
 })
 
-const DrawerNavigator = ({ route, navigation }) => {
-  const logout = route?.params?.logout
-  console.log("route", route)
+const DrawerNavigator = observer(function DrawerNavigator({ route, navigation }) {
+  const {
+    authenticationStore: { logout, user },
+  } = useStores()
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -160,6 +163,7 @@ const DrawerNavigator = ({ route, navigation }) => {
                 }}
                 navigation={navigation}
                 source={"dashboard"}
+                user={user}
               />
             ),
           }}
@@ -175,6 +179,7 @@ const DrawerNavigator = ({ route, navigation }) => {
                 }}
                 navigation={navigation}
                 source={"help"}
+                user={user}
               />
             ),
           }}
@@ -182,11 +187,11 @@ const DrawerNavigator = ({ route, navigation }) => {
       </Drawer.Navigator>
     </SafeAreaView>
   )
-}
+})
 
 const CustomDrawerContent = ({ onLogout, ...props }) => {
   const handleLogout = () => {
-    onLogout()
+    onLogout?.()
   }
 
   return (

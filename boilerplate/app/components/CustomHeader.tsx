@@ -1,22 +1,34 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 
-import { Icon } from "../components" // Adjust the import based on your icon component
+import { Icon, Text } from "../components" // Adjust the import based on your icon component
 import { colors } from "../theme"
 
 import type { DrawerNavigationProp } from "@react-navigation/drawer"
 import { StackActions } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import type { TextStyle, ViewStyle } from "react-native"
-import { Text, TouchableOpacity, View } from "react-native"
+import { TouchableOpacity, View } from "react-native"
 
 type CustomHeaderProps = {
   navigation?: DrawerNavigationProp<any> | NativeStackNavigationProp<any>
   source?: string
   onDrawerToggle?: () => void
+  user?: object
 }
 
-const CustomHeader: React.FC<CustomHeaderProps> = ({ onDrawerToggle, navigation, source }) => {
+const CustomHeader: React.FC<CustomHeaderProps> = ({
+  onDrawerToggle,
+  navigation,
+  source,
+  user,
+}) => {
   const sourceDashboard = source === "dashboard" || source === "help"
+
+  const [connectedUser, setConnectedUser] = useState({})
+
+  useEffect(() => {
+    setConnectedUser(user)
+  }, [user])
 
   return (
     <View style={$header}>
@@ -36,9 +48,9 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ onDrawerToggle, navigation,
         {sourceDashboard ? (
           <>
             <View style={$balanceContainer}>
-              <Text style={$balanceText}>6000,00</Text>
+              <Text style={$balanceText}>{connectedUser?.balance}</Text>
               <View style={$infoContainer}>
-                <Text style={$infoText}>Balance</Text>
+                <Text style={$infoText} tx="header.balance" />
                 <Icon
                   icon="info"
                   size={12}
@@ -48,9 +60,9 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ onDrawerToggle, navigation,
               </View>
             </View>
             <View style={$purchaseContainer}>
-              <Text style={$balanceText}>1</Text>
+              <Text style={$balanceText}>{connectedUser?.purchasesTotal}</Text>
               <View style={$infoContainer}>
-                <Text style={$infoText}>Total purchases</Text>
+                <Text style={$infoText} tx="header.total" />
                 <Icon
                   icon="info"
                   size={12}

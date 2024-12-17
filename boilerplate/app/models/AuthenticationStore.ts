@@ -1,4 +1,5 @@
-import { Instance, SnapshotOut, types } from "mobx-state-tree"
+import type { Instance, SnapshotOut } from "mobx-state-tree"
+import { types } from "mobx-state-tree"
 
 interface User {
   id: string
@@ -17,7 +18,6 @@ export const AuthenticationStoreModel = types
     authToken: types.maybe(types.string),
     authEmail: "",
     user: types.frozen<User>(),
-
   })
   .views((store) => ({
     get isAuthenticated() {
@@ -28,7 +28,7 @@ export const AuthenticationStoreModel = types
       if (store.authEmail.length < 6) return "must be at least 6 characters"
       // if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(store.authEmail))
       //   return "must be a valid email address"
-      if(!/^[^\s@]+@theodo\.com$/.test(store.authEmail))
+      if (!/^[^\s@]+@theodo\.com$/.test(store.authEmail))
         return "must be a valid email address: test@theodo.com"
       return ""
     },

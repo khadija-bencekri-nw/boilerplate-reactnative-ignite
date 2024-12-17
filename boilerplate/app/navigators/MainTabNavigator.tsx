@@ -1,23 +1,21 @@
-import React from "react"
-
-import { Icon } from "../components"
-import { translate } from "../i18n" // Ensure translation is correctly imported
-import { CoworkersScreen, DashboardScreen, ProfileScreen } from "../screens" // Import your actual screens
-import { colors, spacing, typography } from "../theme"
-
-import type { AppStackParamList, AppStackScreenProps } from "./AppNavigator"
-
-import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import type { CompositeScreenProps } from "@react-navigation/native"
-import type { TextStyle, ViewStyle } from "react-native"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
+import { BottomTabScreenProps, createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { CompositeScreenProps } from "@react-navigation/native";
+import React from "react";
+import { TextStyle, ViewStyle } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Icon } from "../components";
+import { translate } from "../i18n"; // Ensure translation is correctly imported
+import { DashboardScreen, CoworkersScreen, ProfileScreen } from "../screens"; // Import your actual screens
+import { colors, spacing, typography } from "../theme";
+import { AppStackParamList, AppStackScreenProps } from "./AppNavigator";
 
 export type MainTabParamList = {
   Dashboard: undefined
   Coworkers: undefined
   GetInspired: undefined
   Profile: undefined
+  logout: () => void
+  user?: object
 }
 
 /**
@@ -28,9 +26,9 @@ export type MainTabParamList = {
 export type MainTabScreenProps<T extends keyof MainTabParamList> = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, T>,
   AppStackScreenProps<keyof AppStackParamList>
->
+>;
 
-const Tab = createBottomTabNavigator<MainTabParamList>()
+const Tab = createBottomTabNavigator<MainTabParamList>();
 
 /**
  * This is the main navigator for the app with a bottom tab bar.
@@ -40,7 +38,7 @@ const Tab = createBottomTabNavigator<MainTabParamList>()
  * @returns {JSX.Element} The rendered `MainTabNavigator`.
  */
 export function MainTabNavigator() {
-  const { bottom } = useSafeAreaInsets()
+  const { bottom } = useSafeAreaInsets();
 
   return (
     <Tab.Navigator
