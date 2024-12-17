@@ -24,7 +24,7 @@ export const ProductListScreen: FC<ProductListScreenProps> = observer(
       setIsGridView(props.isGridView)
     }, [props.isGridView])
 
-    const noItems = props.purchases.length === 0
+    const noItems = props.purchases?.length === 0
 
     const renderItem = (param: { item: PurchaseItem; index: number }) => {
       const { item } = param
@@ -52,6 +52,7 @@ export const ProductListScreen: FC<ProductListScreenProps> = observer(
               onRatingChange={() => {}}
               starSize={20}
               starColor={"#646464"}
+              disabled={true}
             />
             <View style={styles.purchasedBadge}>
               <Icon

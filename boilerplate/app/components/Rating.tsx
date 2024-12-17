@@ -55,7 +55,7 @@ export const Rating = observer(function Rating(props: RatingProps) {
     starSize = 20,
     starColor = colors.palette.primary300,
     starsContainerStyle,
-    disabled = false,
+    disabled,
   } = props
   const [rating, setRating] = useState(initialRating)
 
