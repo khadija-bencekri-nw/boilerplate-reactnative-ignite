@@ -73,34 +73,39 @@ export const ProductListScreen: FC<ProductListScreenProps> = observer(
 
       return (
         <TouchableOpacity
+          style={styles.gridItem}
           onPress={() => {
             props.goToProduct(item)
           }}
         >
           <ImageBackground
             source={item.images.length > 0 ? { uri: item.images[0] } : defaultImage}
-            style={styles.gridItem}
+            resizeMode={"cover"}
+            style={styles.gridImage}
+            imageStyle={styles.gridImage}
           >
-            <View style={styles.gridProductDescContainer}>
-              <Text style={styles.emptyListText}>{`${item.brand} ${item.model}`}</Text>
-              <Text style={styles.price}>{item.price}</Text>
-            </View>
-            <View style={styles.ratingContainerGrid}>
-              <Rating
-                maxRating={5}
-                initialRating={item.rating}
-                disabled={true}
-                starSize={20}
-                starColor={colors.palette.neutral400}
-              />
-              <View style={styles.purchasedBadge}>
-                <Icon
-                  icon="check"
-                  size={10}
-                  color={colors.palette.neutral100}
-                  style={styles.purchasedIcon}
+            <View style={styles.overlay}>
+              <View style={styles.gridProductDescContainer}>
+                <Text style={styles.emptyListText}>{`${item.brand} ${item.model}`}</Text>
+                <Text style={styles.price}>{item.price}</Text>
+              </View>
+              <View style={styles.ratingContainerGrid}>
+                <Rating
+                  maxRating={5}
+                  initialRating={item.rating}
+                  disabled={true}
+                  starSize={20}
+                  starColor={colors.palette.neutral400}
                 />
-                <Text style={styles.purchasedTextStyle} tx="dashboardScreen.purchased" />
+                <View style={styles.purchasedBadge}>
+                  <Icon
+                    icon="check"
+                    size={10}
+                    color={colors.palette.neutral100}
+                    style={styles.purchasedIcon}
+                  />
+                  <Text style={styles.purchasedTextStyle} tx="dashboardScreen.purchased" />
+                </View>
               </View>
             </View>
           </ImageBackground>
@@ -151,13 +156,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  gridItem: {
+  gridImage: {
     alignItems: "flex-start",
     backgroundColor: colors.tabColor,
     borderRadius: 5,
     flex: 1,
+  },
+  gridItem: {
     height: 200,
-    margin: 8,
+    margin: 2,
     padding: 20,
   },
   gridProductDescContainer: { flex: 3, width: "100%" },
@@ -183,6 +190,12 @@ const styles = StyleSheet.create({
     height: 120,
     margin: 10,
     padding: 10,
+  },
+  overlay: {
+    backgroundColor: colors.palette.overlay50,
+    height: "100%",
+    padding: 15,
+    width: "100%",
   },
   price: {
     color: colors.palette.neutral300,
