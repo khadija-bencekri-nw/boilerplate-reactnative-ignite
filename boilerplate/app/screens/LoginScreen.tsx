@@ -32,7 +32,10 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   }
 
   useEffect(() => {
-    setAuthEmail(_props.route.params.username)
+    const username = _props.route.params?.username
+    if (username !== null) {
+      setAuthEmail(username)
+    }
     const subscription = Dimensions.addEventListener("change", onChange)
     return () => {
       subscription.remove()
@@ -73,12 +76,7 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
     setUserInfo(user)
   }
 
-  const showDialog = (
-    title: TxKeyPath,
-    message: TxKeyPath,
-    redirectLabel?: TxKeyPath,
-    onRedirect?: Function,
-  ) => {
+  const showDialog = (title: TxKeyPath, message: TxKeyPath) => {
     alertRef.current?.set({
       title,
       message,
@@ -141,9 +139,9 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
       setAuthToken(result.authToken)
       setAuthEmail("")
       setAuthPassword("")
-      saveString("token", result.authToken)
+      await saveString("token", result.authToken)
         .then(() => {
-          goToMain(result.user)
+          goToMain()
         })
         .catch(() => {
           console.error("Failed to save token")

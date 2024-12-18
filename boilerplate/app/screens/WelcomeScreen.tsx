@@ -54,8 +54,8 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
     navigation.navigate("Join")
   }
 
-  function handleSignIn(username?: string) {
-    username ? navigation.navigate("Login", {username}) : navigation.navigate("Login")
+  function handleSignIn(usernameParam?: string) {
+    usernameParam ? navigation.navigate("Login", {usernameParam}) : navigation.navigate("Login")
   }
 
   return (
@@ -96,7 +96,7 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
         </View>
         <View style={isPortrait ? $buttonContainerPortrait : $buttonContainerLandscape}>
           <PrimaryButton text={"signUpScreen.join"} onPress={handleJoin} />
-          <SecondaryButton text={"signUpScreen.signIn"} onPress={handleSignIn} />
+          <SecondaryButton text={"signUpScreen.signIn"} onPress={() => handleSignIn()} />
         </View>
       </View>
     </ImageBackground>

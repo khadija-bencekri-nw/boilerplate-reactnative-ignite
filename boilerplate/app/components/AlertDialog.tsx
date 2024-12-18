@@ -25,7 +25,7 @@ export interface AlertDialogRef {
     closeLabel?: TxKeyPath
     onRedirect?: () => void
     onClose?: () => void
-    messageOptions: I18n.TranslateOptions
+    messageOptions?: I18n.TranslateOptions
   }) => void
 }
 
