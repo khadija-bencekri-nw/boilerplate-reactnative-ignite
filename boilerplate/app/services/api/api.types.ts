@@ -10,22 +10,23 @@ export interface PurchaseItem {
   purchaseDate: Date
   rating: number
   model: string
-  //rating: { scheme: string; value: string }
+  // rating: { scheme: string; value: string }
   userId: string
   images: string[]
 }
 
 export interface User {
-  id: string 
+  id: string
   name: string
   email: string
   role: string
-  position: string, 
+  position: string
   employmentDate: Date
-  shouldReceiveMailNotifications: boolean 
-  shouldReceiveApprovalNotifications: boolean 
+  shouldReceiveMailNotifications: boolean
+  shouldReceiveApprovalNotifications: boolean
+  balance: number
+  purchasesTotal: number
 }
-
 
 export interface ApiFeedResponse {
   status: string

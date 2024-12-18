@@ -18,6 +18,9 @@ const en = {
   header: {
     balance: "Balance",
     total: "Total purchases",
+    balanceInfo:
+      "This is your remaining balance, balance is automatically renewed every 6 months, yours will be renewed in %{days} days.",
+    totalInfo: "Here is the total number of purchases you have made.",
   },
   welcomeScreen: {
     postscript:
@@ -92,7 +95,7 @@ const en = {
     },
     selectRole: "Please select a role.",
     pickDate: "Please pick a date.",
-    userExistsMsg: "An account with this email already exists. Please log in or use another email."
+    userExistsMsg: "An account with this email already exists. Please log in or use another email.",
   },
   dashboardScreen: {
     fetchUserError: "An error occurred while fetching user",
@@ -138,7 +141,7 @@ const en = {
       title: "Notifications",
       mail: "Mail notifications",
       approval: "Approval/Refusal notifications",
-      actionCheck: "Tick this box if you wish to receive notifications about your order status"
+      actionCheck: "Tick this box if you wish to receive notifications about your order status",
     },
   },
   mainTabNavigator: {

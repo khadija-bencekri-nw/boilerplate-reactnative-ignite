@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
-import { Icon, Text } from "../components" // Adjust the import based on your icon component
+import { AlertDialog, Icon, Text } from "../components"
 import { colors } from "../theme"
 
 import type { DrawerNavigationProp } from "@react-navigation/drawer"
 import { StackActions } from "@react-navigation/native"
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import type { User } from "app/services/api"
 import type { TextStyle, ViewStyle } from "react-native"
 import { TouchableOpacity, View } from "react-native"
 
@@ -13,7 +14,7 @@ type CustomHeaderProps = {
   navigation?: DrawerNavigationProp<any> | NativeStackNavigationProp<any>
   source?: string
   onDrawerToggle?: () => void
-  user?: object
+  user?: User | null | undefined
 }
 
 const CustomHeader: React.FC<CustomHeaderProps> = ({
@@ -24,11 +25,34 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
 }) => {
   const sourceDashboard = source === "dashboard" || source === "help"
 
-  const [connectedUser, setConnectedUser] = useState({})
+  const [connectedUser, setConnectedUser] = useState<User>()
+  const [initials, setInitials] = useState("")
+
+  const getInitials = (fullName: string) => {
+    return fullName
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
+  }
 
   useEffect(() => {
-    setConnectedUser(user)
+    user !== null && user !== undefined && setConnectedUser(user)
+    user !== null && user !== undefined && setInitials(getInitials(user.name))
   }, [user])
+
+  const alertRef = useRef(null)
+
+  const handleIconPress = (sourceIcon: string) => {
+    const isBalance = sourceIcon === "balance"
+    alertRef.current?.set({
+      message: isBalance ? "header.balanceInfo" : "header.totalInfo",
+      messageOptions: isBalance ? { days: "62" } : undefined,
+      closeLabel: "common.close",
+    })
+    alertRef.current.show()
+  }
 
   return (
     <View style={$header}>
@@ -51,24 +75,36 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
               <Text style={$balanceText}>{connectedUser?.balance}</Text>
               <View style={$infoContainer}>
                 <Text style={$infoText} tx="header.balance" />
-                <Icon
-                  icon="info"
-                  size={12}
-                  color={colors.palette.neutral400}
-                  containerStyle={$infoIcon}
-                />
+                <TouchableOpacity
+                  onPress={() => {
+                    handleIconPress("balance")
+                  }}
+                >
+                  <Icon
+                    icon="info"
+                    size={12}
+                    color={colors.palette.neutral400}
+                    containerStyle={$infoIcon}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
             <View style={$purchaseContainer}>
               <Text style={$balanceText}>{connectedUser?.purchasesTotal}</Text>
               <View style={$infoContainer}>
                 <Text style={$infoText} tx="header.total" />
-                <Icon
-                  icon="info"
-                  size={12}
-                  color={colors.palette.neutral400}
-                  containerStyle={$infoIcon}
-                />
+                <TouchableOpacity
+                  onPress={() => {
+                    handleIconPress("total")
+                  }}
+                >
+                  <Icon
+                    icon="info"
+                    size={12}
+                    color={colors.palette.neutral400}
+                    containerStyle={$infoIcon}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
           </>
@@ -83,9 +119,10 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
           <Icon icon="add" size={30} containerStyle={[$circle, $transparentBackground]} />
         </TouchableOpacity>
         <View style={$circle}>
-          <Text style={$initials}>KB</Text>
+          <Text style={$initials}>{initials}</Text>
         </View>
       </View>
+      <AlertDialog ref={alertRef} />
     </View>
   )
 }
@@ -157,6 +194,7 @@ const $circle: ViewStyle = {
   justifyContent: "center",
   alignItems: "center",
   marginTop: 5,
+  paddingTop: 5,
 }
 
 const $transparentBackground: ViewStyle = {

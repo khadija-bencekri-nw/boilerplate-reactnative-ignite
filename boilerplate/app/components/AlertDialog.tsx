@@ -12,6 +12,7 @@ export interface AlertDialogProps {
   defaultMessage?: TxKeyPath
   defaultRedirectLabel?: TxKeyPath
   defaultCloseLabel?: TxKeyPath
+  defaultMessageOptions?: I18n.TranslateOptions
 }
 
 export interface AlertDialogRef {
@@ -24,6 +25,7 @@ export interface AlertDialogRef {
     closeLabel?: TxKeyPath
     onRedirect?: () => void
     onClose?: () => void
+    messageOptions: I18n.TranslateOptions
   }) => void
 }
 
@@ -34,6 +36,7 @@ export const AlertDialog = forwardRef<AlertDialogRef, AlertDialogProps>(function
   const [visible, setVisible] = useState(false)
   const [title, setTitle] = useState(defaultTitle)
   const [message, setMessage] = useState(defaultMessage)
+  const [messageOptions, setMessageOptions] = useState<I18n.TranslateOptions>({})
   const [redirectLabel, setRedirectLabel] = useState(defaultRedirectLabel)
   const [closeLabel, setCloseLabel] = useState(defaultCloseLabel)
   const [onRedirect, setOnRedirect] = useState<() => void>(() => {})
@@ -46,9 +49,10 @@ export const AlertDialog = forwardRef<AlertDialogRef, AlertDialogProps>(function
     hide: () => {
       setVisible(false)
     },
-    set: ({ title, message, redirectLabel, closeLabel, onRedirect, onClose }) => {
+    set: ({ title, message, messageOptions, redirectLabel, closeLabel, onRedirect, onClose }) => {
       if (title !== undefined) setTitle(title)
       if (message !== undefined) setMessage(message)
+      if (messageOptions !== undefined) setMessageOptions(messageOptions)
       if (redirectLabel !== undefined) setRedirectLabel(redirectLabel)
       if (closeLabel !== undefined) setCloseLabel(closeLabel)
       if (onRedirect !== undefined) setOnRedirect(() => onRedirect)
@@ -67,8 +71,8 @@ export const AlertDialog = forwardRef<AlertDialogRef, AlertDialogProps>(function
     >
       <View style={$overlay}>
         <View style={$container}>
-          <Text style={$title} tx={title} />
-          <Text style={$message} tx={message} />
+          {title && <Text style={$title} tx={title} />}
+          <Text style={$message} tx={message} txOptions={messageOptions} />
           {/* Actions */}
           <View style={$actionsContainer}>
             {closeLabel && (
