@@ -6,6 +6,41 @@ import type { StyleProp, TextStyle, ViewStyle } from "react-native"
 import { View } from "react-native"
 import DropDownPicker from "react-native-dropdown-picker"
 
+// STYLE
+const $container: ViewStyle = {
+  justifyContent: "center",
+}
+
+const $placeHolderStyle: TextStyle = {
+  color: colors.palette.neutral100,
+}
+
+const $disabledPlaceHolderStyle: TextStyle = {
+  color: colors.palette.neutral500,
+}
+
+const $labelStyle: TextStyle = { color: colors.palette.neutral100 }
+
+const $disabledLabelStyle: TextStyle = { color: colors.palette.neutral500 }
+
+const $style: ViewStyle = {
+  backgroundColor: colors.palette.subbackgroundColor,
+  borderWidth: 0,
+  borderBottomWidth: 1,
+  borderColor: colors.palette.neutral500,
+}
+const $listItemContainerStyle: ViewStyle = {
+  backgroundColor: colors.palette.neutral750,
+  borderColor: colors.palette.neutral100,
+  borderWidth: 1,
+  zIndex: 1,
+}
+const $listItemLabelStyle: TextStyle = {
+  color: colors.palette.neutral100,
+}
+
+// COMPONENT
+
 export interface DropDownPickerNwProps {
   /**
    * An optional style override useful for padding & margin.
@@ -18,10 +53,12 @@ export interface DropDownPickerNwProps {
   zIndex: number
   zIndexInverse: number
   onItemSelect?: (item: { label: string; value: string }) => void
+  disabled?: boolean
 }
 
 export interface DropDownPickerNwRef {
-  getValue?: () => { label: string; value: string }
+  getValue?: () => { label: string; value: string } | undefined
+  setUserValue?: (param: string) => void
 }
 
 export const DropDownPickerNw = observer(
@@ -29,11 +66,11 @@ export const DropDownPickerNw = observer(
     props: DropDownPickerNwProps,
     ref,
   ) {
-    const { style, data, placeholder, open, setOpen, zIndex, zIndexInverse } = props
+    const { style, data, placeholder, open, setOpen, zIndex, zIndexInverse, disabled } = props
     const $styles = [$container, style]
 
-    const [value, setValue] = React.useState(null)
-    const [items, setItems] = React.useState(Array<{ label: string; value: string }>)
+    const [items, setItems] = React.useState<Array<{ label: string; value: string }>>([])
+    const [value, setValue] = React.useState<string>("")
 
     function transformBrandsData(array: Array<{ name: string; id: string }>) {
       return array.map((item) => ({
@@ -47,17 +84,20 @@ export const DropDownPickerNw = observer(
       setItems(dropdownData)
     }, [data])
 
+    function findSelectedItem() {
+      return items.find((item) => item.value === value)
+    }
+
     React.useImperativeHandle(ref, () => ({
-      getValue: () => {
-        const selectedItem = items.find((item) => item.value === value)
-        return selectedItem
+      getValue: () => findSelectedItem(),
+      setUserValue: (userValue: string) => {
+        setValue(userValue)
       },
     }))
 
     return (
       <View style={$styles}>
         <DropDownPicker
-          // ref={ref}
           placeholder={placeholder}
           open={open}
           value={value}
@@ -65,42 +105,17 @@ export const DropDownPickerNw = observer(
           setOpen={setOpen}
           setValue={setValue}
           setItems={setItems}
-          placeholderStyle={$placeHolderStyle}
-          labelStyle={$labelStyle}
+          placeholderStyle={disabled === true ? $disabledPlaceHolderStyle : $placeHolderStyle}
+          labelStyle={disabled === true ? $disabledLabelStyle : $labelStyle}
           style={$style}
           listItemContainerStyle={$listItemContainerStyle}
           listItemLabelStyle={$listItemLabelStyle}
           theme="DARK"
           zIndex={zIndex}
           zIndexInverse={zIndexInverse}
+          disabled={disabled}
         />
       </View>
     )
   }),
 )
-
-const $container: ViewStyle = {
-  justifyContent: "center",
-}
-
-const $placeHolderStyle: TextStyle = {
-  color: "white",
-}
-
-const $labelStyle: TextStyle = { color: "white" }
-
-const $style: ViewStyle = {
-  backgroundColor: colors.palette.subbackgroundColor,
-  borderWidth: 0,
-  borderBottomWidth: 1,
-  borderColor: colors.palette.neutral600P,
-}
-const $listItemContainerStyle: ViewStyle = {
-  backgroundColor: colors.palette.neutral750,
-  borderColor: colors.palette.neutral100,
-  borderWidth: 1,
-  zIndex: 1,
-}
-const $listItemLabelStyle: TextStyle = {
-  color: colors.palette.neutral100,
-}
