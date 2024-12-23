@@ -5,6 +5,7 @@ const en = {
     confirm: "Confirm",
     back: "Back",
     logOut: "Log Out",
+    errorUnexpectedTitle: "Unexpected error",
     errorUnexpected: "An error has occured, please try again",
     tryAgain: "Try again",
     congrats: "Congratulations",
@@ -143,6 +144,7 @@ const en = {
       approval: "Approval/Refusal notifications",
       actionCheck: "Tick this box if you wish to receive notifications about your order status",
     },
+    editInfo: "Edit your info",
   },
   mainTabNavigator: {
     dashboardTab: "Dashboard",
