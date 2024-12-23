@@ -1,15 +1,64 @@
 import * as React from "react"
-import { ComponentType } from "react"
-import {
-  Image,
+
+import Icons from "assets/icons"
+import type { ComponentType } from "react"
+import type {
+  ImageSourcePropType,
   ImageStyle,
   StyleProp,
-  TouchableOpacity,
   TouchableOpacityProps,
-  View,
   ViewProps,
   ViewStyle,
 } from "react-native"
+import { Image, TouchableOpacity, View } from "react-native"
+
+export const iconRegistry: Record<string, ImageSourcePropType> = {
+  add: Icons.add,
+  apple: Icons.apple,
+  arrowDown: Icons.arrowDown,
+  arrowLeft: Icons.arrowLeft,
+  back: Icons.back,
+  bell: Icons.bell,
+  calendar: Icons.calendar,
+  caretLeft: Icons.caretLeft,
+  caretRight: Icons.caretRight,
+  check: Icons.check,
+  clap: Icons.clap,
+  close: Icons.close,
+  code: Icons.code,
+  community: Icons.community,
+  components: Icons.components,
+  coworker: Icons.coworker,
+  dashboard: Icons.dashboard,
+  debug: Icons.debug,
+  github: Icons.github,
+  google: Icons.google,
+  grid: Icons.grid,
+  heart: Icons.heart,
+  hidden: Icons.hidden,
+  info: Icons.info,
+  inspo: Icons.inspo,
+  ladybug: Icons.ladybug,
+  list: Icons.list,
+  lock: Icons.lock,
+  menu: Icons.menu,
+  more: Icons.more,
+  nw: Icons.nw,
+  nwDark: Icons.nwDark,
+  pin: Icons.pin,
+  podcast: Icons.podcast,
+  settings: Icons.settings,
+  slack: Icons.slack,
+  tl: Icons.tl,
+  user: Icons.user,
+  userFilled: Icons.userFilled,
+  view: Icons.view,
+  closeX: Icons.x,
+}
+
+const $imageStyleBase: ImageStyle = {
+  resizeMode: "contain",
+}
 
 export type IconTypes = keyof typeof iconRegistry
 
@@ -45,6 +94,12 @@ interface IconProps extends TouchableOpacityProps {
   onPress?: TouchableOpacityProps["onPress"]
 }
 
+const isView = (event: TouchableOpacityProps["onPress"]) => {
+  if (event !== undefined) {
+    return TouchableOpacity
+  }
+  return View
+}
 /**
  * A component to render a registered icon.
  * It is wrapped in a <TouchableOpacity /> if `onPress` is provided, otherwise a <View />.
@@ -62,10 +117,8 @@ export function Icon(props: IconProps) {
     ...WrapperProps
   } = props
 
-  const isPressable = !!WrapperProps.onPress
-  const Wrapper = (WrapperProps?.onPress ? TouchableOpacity : View) as ComponentType<
-    TouchableOpacityProps | ViewProps
-  >
+  const isPressable = Boolean(WrapperProps.onPress)
+  const Wrapper = isView(WrapperProps.onPress) as ComponentType<TouchableOpacityProps | ViewProps>
 
   const $imageStyle: StyleProp<ImageStyle> = [
     $imageStyleBase,
@@ -83,52 +136,4 @@ export function Icon(props: IconProps) {
       <Image style={$imageStyle} source={iconRegistry[icon]} />
     </Wrapper>
   )
-}
-
-export const iconRegistry = {
-  back: require("../../assets/icons/back.png"),
-  bell: require("../../assets/icons/bell.png"),
-  caretLeft: require("../../assets/icons/caretLeft.png"),
-  caretRight: require("../../assets/icons/caretRight.png"),
-  check: require("../../assets/icons/check.png"),
-  clap: require("../../assets/icons/demo/clap.png"), // @demo remove-current-line
-  community: require("../../assets/icons/demo/community.png"), // @demo remove-current-line
-  components: require("../../assets/icons/demo/components.png"), // @demo remove-current-line
-  debug: require("../../assets/icons/demo/debug.png"), // @demo remove-current-line
-  github: require("../../assets/icons/demo/github.png"), // @demo remove-current-line
-  heart: require("../../assets/icons/demo/heart.png"), // @demo remove-current-line
-  hidden: require("../../assets/icons/hidden.png"),
-  ladybug: require("../../assets/icons/ladybug.png"),
-  lock: require("../../assets/icons/lock.png"),
-  menu: require("../../assets/icons/menu.png"),
-  more: require("../../assets/icons/more.png"),
-  pin: require("../../assets/icons/demo/pin.png"), // @demo remove-current-line
-  podcast: require("../../assets/icons/demo/podcast.png"), // @demo remove-current-line
-  settings: require("../../assets/icons/settings.png"),
-  slack: require("../../assets/icons/demo/slack.png"), // @demo remove-current-line
-  view: require("../../assets/icons/view.png"),
-  x: require("../../assets/icons/x.png"),
-  arrowleft: require("../../assets/icons/arrow-left.png"),
-  calendar: require("../../assets/icons/calendar.png"),
-  close: require("../../assets/icons/close.png"),
-  code: require("../../assets/icons/fullstack-dev.png"),
-  info: require("../../assets/icons/info.png"),
-  tl: require("../../assets/icons/techlead.png"),
-  userFilled: require("../../assets/icons/userFilled.png"),
-  apple: require("../../assets/icons/apple.png"),
-  google: require("../../assets/icons/google.png"),
-  nw: require("../../assets/icons/nw.png"),
-  add: require("../../assets/icons/add.png"),
-  nwDark: require("../../assets/icons/nwDark.png"),
-  list: require("../../assets/icons/list.png"),
-  grid: require("../../assets/icons/layout.png"),
-  arrowDown: require("../../assets/icons/arrowDown.png"),
-  inspo: require("../../assets/icons/inspiration.png"),
-  dashboard: require("../../assets/icons/dashboard.png"),
-  coworker: require("../../assets/icons/community.png"),
-  user: require("../../assets/icons/user.png"),
-}
-
-const $imageStyleBase: ImageStyle = {
-  resizeMode: "contain",
 }
