@@ -1,18 +1,17 @@
-import { useState, useEffect, useRef } from "react"
-import { BackHandler, Platform } from "react-native"
-import {
-  NavigationState,
-  PartialState,
-  createNavigationContainerRef,
-} from "@react-navigation/native"
+import { useEffect, useRef, useState } from "react"
+
 import Config from "../config"
 import type { PersistNavigationConfig } from "../config/config.base"
+import type * as storage_ from "../utils/storage"
 import { useIsMounted } from "../utils/useIsMounted"
+
 import type { AppStackParamList, NavigationProps } from "./AppNavigator"
 
-import * as storage from "../utils/storage"
+import type { NavigationState, PartialState } from "@react-navigation/native"
+import { createNavigationContainerRef } from "@react-navigation/native"
+import { BackHandler, Platform } from "react-native"
 
-type Storage = typeof storage
+type Storage = typeof storage_
 
 /**
  * Reference to the root App Navigator.
@@ -90,7 +89,9 @@ export function useBackButtonHandler(canExit: (routeName: string) => boolean) {
     BackHandler.addEventListener("hardwareBackPress", onBackPress)
 
     // Unsubscribe when we're done
-    return () => BackHandler.removeEventListener("hardwareBackPress", onBackPress)
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", onBackPress)
+    }
   }, [])
 }
 
@@ -125,7 +126,7 @@ export function useNavigationPersistence(storage: Storage, persistenceKey: strin
 
   const routeNameRef = useRef<keyof AppStackParamList | undefined>()
 
-  const onNavigationStateChange = (state: NavigationState | undefined) => {
+  const onNavigationStateChange = async (state: NavigationState | undefined) => {
     const previousRouteName = routeNameRef.current
     if (state !== undefined) {
       const currentRouteName = getActiveRouteName(state)
@@ -141,7 +142,7 @@ export function useNavigationPersistence(storage: Storage, persistenceKey: strin
       routeNameRef.current = currentRouteName as keyof AppStackParamList
 
       // Persist state to storage
-      storage.save(persistenceKey, state)
+      await storage.save(persistenceKey, state)
     }
   }
 

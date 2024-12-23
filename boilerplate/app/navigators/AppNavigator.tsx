@@ -4,7 +4,7 @@
  * Generally speaking, it will contain an auth flow (registration, login, forgot password)
  * and a "main" flow which the user will use once logged in.
  */
-import React, {useState} from "react"
+import React from "react"
 
 import Config from "../config"
 import { useStores } from "../models" // @demo remove-current-line
@@ -19,7 +19,15 @@ import {
   DrawerItem,
   DrawerItemList,
 } from "@react-navigation/drawer"
-import type { NavigatorScreenParams } from "@react-navigation/native"
+import type {
+  DrawerDescriptorMap,
+  DrawerNavigationHelpers,
+} from "@react-navigation/drawer/lib/typescript/src/types"
+import type {
+  DrawerNavigationState,
+  NavigatorScreenParams,
+  ParamListBase,
+} from "@react-navigation/native"
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
@@ -27,9 +35,21 @@ import CustomHeader from "app/components/CustomHeader"
 import * as Screens from "app/screens"
 import { colors } from "app/theme"
 import { observer } from "mobx-react-lite"
+import type { TextStyle, ViewStyle } from "react-native"
 import { SafeAreaView, useColorScheme } from "react-native"
-import { UserInfo } from "os"
-import { User } from "app/services/api/api.types"
+
+/* 
+STYLES
+*/
+
+const $root: ViewStyle = {
+  flex: 1,
+}
+
+const $labelStyle: TextStyle = {
+  color: "white",
+}
+
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
  * as well as what properties (if any) they might take when navigating to them.
@@ -54,6 +74,14 @@ export type AppStackParamList = {
   Product: undefined
   AddProduct: undefined
   Main: NavigatorScreenParams<MainTabParamList>
+  Help: undefined
+}
+
+type DrawerItemListProps = {
+  state: DrawerNavigationState<ParamListBase>
+  navigation: DrawerNavigationHelpers
+  descriptors: DrawerDescriptorMap
+  onLogout?: () => void
 }
 
 /**
@@ -71,19 +99,84 @@ export type AppStackScreenProps<T extends keyof AppStackParamList> = NativeStack
 const Stack = createNativeStackNavigator<AppStackParamList>()
 const Drawer = createDrawerNavigator()
 
+const CustomDrawerContent = (props: DrawerItemListProps) => {
+  const handleLogout = () => {
+    if (props.onLogout !== undefined) props.onLogout()
+  }
+
+  return (
+    <DrawerContentScrollView {...props}>
+      <DrawerItemList {...props} />
+      <DrawerItem labelStyle={$labelStyle} label="Log out" onPress={handleLogout} />
+    </DrawerContentScrollView>
+  )
+}
+
+const DrawerNavigator = observer(function DrawerNavigator() {
+  const {
+    authenticationStore: { logout, user },
+  } = useStores()
+
+  return (
+    <SafeAreaView style={$root}>
+      <Drawer.Navigator
+        screenOptions={{
+          drawerStyle: {
+            backgroundColor: colors.background,
+          },
+          drawerLabelStyle: {
+            color: "white",
+          },
+        }}
+        drawerContent={(props) => <CustomDrawerContent {...props} onLogout={logout} />}
+      >
+        <Drawer.Screen
+          name="MainTabNavigator"
+          component={MainTabNavigator}
+          options={{
+            header: ({ navigation }) => (
+              <CustomHeader
+                onDrawerToggle={() => {
+                  navigation.toggleDrawer()
+                }}
+                navigation={navigation}
+                source={"dashboard"}
+                user={user}
+              />
+            ),
+          }}
+        />
+        <Drawer.Screen
+          name="Help"
+          component={Screens.HelpScreen}
+          options={{
+            header: ({ navigation }) => (
+              <CustomHeader
+                onDrawerToggle={() => {
+                  navigation.toggleDrawer()
+                }}
+                navigation={navigation}
+                source={"help"}
+                user={user}
+              />
+            ),
+          }}
+        />
+      </Drawer.Navigator>
+    </SafeAreaView>
+  )
+})
+
 const AppStack = observer(function AppStack() {
-  // @demo remove-block-start
   const {
     authenticationStore: { isAuthenticated, user },
   } = useStores()
 
-  // @demo remove-block-end
   return (
     <Stack.Navigator
       screenOptions={{ navigationBarColor: colors.background }}
       initialRouteName={isAuthenticated ? "Main" : "Welcome"}
     >
-      {/* @demo remove-block-start */}
       {isAuthenticated ? (
         <>
           <Stack.Screen name="Main" component={DrawerNavigator} options={{ headerShown: false }} />
@@ -133,74 +226,6 @@ const AppStack = observer(function AppStack() {
     </Stack.Navigator>
   )
 })
-
-const DrawerNavigator = observer(function DrawerNavigator({ route, navigation }) {
-  const {
-    authenticationStore: { logout, user },
-  } = useStores()
-
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Drawer.Navigator
-        screenOptions={{
-          drawerStyle: {
-            backgroundColor: colors.background,
-          },
-          drawerLabelStyle: {
-            color: "white",
-          },
-        }}
-        drawerContent={(props) => <CustomDrawerContent {...props} onLogout={logout} />}
-      >
-        <Drawer.Screen
-          name="MainTabNavigator"
-          component={MainTabNavigator}
-          options={{
-            header: ({ navigation }) => (
-              <CustomHeader
-                onDrawerToggle={() => {
-                  navigation.toggleDrawer()
-                }}
-                navigation={navigation}
-                source={"dashboard"}
-                user={user}
-              />
-            ),
-          }}
-        />
-        <Drawer.Screen
-          name="Help"
-          component={Screens.HelpScreen}
-          options={{
-            header: ({ navigation }) => (
-              <CustomHeader
-                onDrawerToggle={() => {
-                  navigation.toggleDrawer()
-                }}
-                navigation={navigation}
-                source={"help"}
-                user={user}
-              />
-            ),
-          }}
-        />
-      </Drawer.Navigator>
-    </SafeAreaView>
-  )
-})
-
-const CustomDrawerContent = ({ onLogout, ...props }) => {
-  const handleLogout = () => {
-    onLogout?.()
-  }
-
-  return (
-    <DrawerContentScrollView {...props}>
-      <DrawerItemList state={undefined} navigation={undefined} descriptors={undefined} {...props} />
-      <DrawerItem labelStyle={{ color: "white" }} label="Log out" onPress={handleLogout} />
-    </DrawerContentScrollView>
-  )
-}
 
 export interface NavigationProps
   extends Partial<React.ComponentProps<typeof NavigationContainer>> {}
