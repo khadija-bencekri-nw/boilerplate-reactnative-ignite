@@ -1,18 +1,24 @@
 import React, { forwardRef, useImperativeHandle, useState } from "react"
 
+import {
+  $actionsContainer,
+  $button,
+  $buttonText,
+  $container,
+  $message,
+  $overlay,
+  $title,
+} from "./AlertDialog.style"
 import { Text } from "./Text"
 
 import type { TxKeyPath } from "app/i18n"
-import { colors, typography } from "app/theme"
-import type { TextStyle, ViewStyle } from "react-native"
 import { Modal, TouchableOpacity, View } from "react-native"
 
 export interface AlertDialogProps {
-  defaultTitle?: TxKeyPath
+  // defaultTitle?: TxKeyPath
   defaultMessage?: TxKeyPath
   defaultRedirectLabel?: TxKeyPath
   defaultCloseLabel?: TxKeyPath
-  defaultMessageOptions?: I18n.TranslateOptions
 }
 
 export interface AlertDialogRef {
@@ -30,17 +36,17 @@ export interface AlertDialogRef {
 }
 
 export const AlertDialog = forwardRef<AlertDialogRef, AlertDialogProps>(function AlertDialog(
-  { defaultTitle, defaultMessage, defaultRedirectLabel, defaultCloseLabel },
+  { defaultMessage, defaultRedirectLabel, defaultCloseLabel },
   ref,
 ) {
   const [visible, setVisible] = useState(false)
-  const [title, setTitle] = useState(defaultTitle)
-  const [message, setMessage] = useState(defaultMessage)
-  const [messageOptions, setMessageOptions] = useState<I18n.TranslateOptions>({})
-  const [redirectLabel, setRedirectLabel] = useState(defaultRedirectLabel)
-  const [closeLabel, setCloseLabel] = useState(defaultCloseLabel)
-  const [onRedirect, setOnRedirect] = useState<() => void>(() => {})
-  const [onClose, setOnClose] = useState<() => void>(() => {})
+  const [title_, setTitle_] = useState<TxKeyPath>()
+  const [message_, setMessage_] = useState(defaultMessage)
+  const [messageOptions_, setMessageOptions_] = useState<I18n.TranslateOptions>({})
+  const [redirectLabel_, setRedirectLabel_] = useState(defaultRedirectLabel)
+  const [closeLabel_, setCloseLabel_] = useState(defaultCloseLabel)
+  const [onRedirect_, setOnRedirect_] = useState<() => void>()
+  const [onClose_, setOnClose_] = useState<() => void>()
 
   useImperativeHandle(ref, () => ({
     show: () => {
@@ -50,15 +56,47 @@ export const AlertDialog = forwardRef<AlertDialogRef, AlertDialogProps>(function
       setVisible(false)
     },
     set: ({ title, message, messageOptions, redirectLabel, closeLabel, onRedirect, onClose }) => {
-      if (title !== undefined) setTitle(title)
-      if (message !== undefined) setMessage(message)
-      if (messageOptions !== undefined) setMessageOptions(messageOptions)
-      if (redirectLabel !== undefined) setRedirectLabel(redirectLabel)
-      if (closeLabel !== undefined) setCloseLabel(closeLabel)
-      if (onRedirect !== undefined) setOnRedirect(() => onRedirect)
-      if (onClose !== undefined) setOnClose(() => onClose)
+      if (title !== undefined) setTitle_(title)
+      if (message !== undefined) setMessage_(message)
+      if (messageOptions !== undefined) setMessageOptions_(messageOptions)
+      if (redirectLabel !== undefined) setRedirectLabel_(redirectLabel)
+      if (closeLabel !== undefined) setCloseLabel_(closeLabel)
+      if (onRedirect !== undefined) setOnRedirect_(() => onRedirect)
+      if (onClose !== undefined) setOnClose_(() => onClose)
     },
   }))
+
+  const renderTitle = (param: TxKeyPath | undefined) => {
+    if (param !== undefined) {
+      return <Text style={$title} tx={param} />
+    }
+    return null
+  }
+
+  const dialogAction = (type: string) => {
+    if (type === "close" && onClose_ !== undefined) {
+      onClose_()
+    } else if (type === "redirect" && onRedirect_ !== undefined) {
+      onRedirect_()
+    }
+    setVisible(false)
+  }
+
+  const renderLabel = (type: string, param: TxKeyPath | undefined) => {
+    if (param !== undefined) {
+      return (
+        <TouchableOpacity
+          style={$button}
+          onPress={() => {
+            type === "close" ? dialogAction("close") : dialogAction(type)
+          }}
+        >
+          <Text style={$buttonText} tx={param} />
+        </TouchableOpacity>
+      )
+    }
+    return null
+  }
 
   return (
     <Modal
@@ -71,87 +109,15 @@ export const AlertDialog = forwardRef<AlertDialogRef, AlertDialogProps>(function
     >
       <View style={$overlay}>
         <View style={$container}>
-          {title && <Text style={$title} tx={title} />}
-          <Text style={$message} tx={message} txOptions={messageOptions} />
+          {renderTitle(title_)}
+          <Text style={$message} tx={message_} txOptions={messageOptions_} />
           {/* Actions */}
           <View style={$actionsContainer}>
-            {closeLabel && (
-              <TouchableOpacity
-                style={$button}
-                onPress={() => {
-                  onClose && onClose()
-                  setVisible(false)
-                }}
-              >
-                <Text style={$buttonText} tx={closeLabel} />
-              </TouchableOpacity>
-            )}
-            {redirectLabel && (
-              <TouchableOpacity
-                style={$button}
-                onPress={() => {
-                  onRedirect()
-                  setVisible(false)
-                }}
-              >
-                <Text style={$buttonText} tx={redirectLabel} />
-              </TouchableOpacity>
-            )}
+            {renderLabel("close", closeLabel_)}
+            {renderLabel("redirect", redirectLabel_)}
           </View>
         </View>
       </View>
     </Modal>
   )
 })
-
-const $overlay: ViewStyle = {
-  flex: 1,
-  justifyContent: "center",
-  alignItems: "center",
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
-}
-
-const $container: ViewStyle = {
-  padding: 20,
-  backgroundColor: colors.palette.neutral100,
-  borderRadius: 10,
-  shadowColor: colors.palette.neutral900,
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.2,
-  shadowRadius: 4,
-  elevation: 5,
-}
-
-const $title: TextStyle = {
-  alignSelf: "center",
-  fontFamily: typography.primary.bold,
-  fontSize: 18,
-  fontWeight: "bold",
-  marginBottom: 20,
-  color: colors.palette.primary500,
-}
-
-const $message: TextStyle = {
-  fontSize: 14,
-  textAlign: "center",
-  color: "black",
-}
-
-const $actionsContainer: ViewStyle = {
-  marginTop: 20,
-  flexDirection: "row",
-  justifyContent: "center",
-}
-
-const $button: ViewStyle = {
-  padding: 10,
-  backgroundColor: colors.palette.primary500,
-  borderRadius: 5,
-  alignItems: "center",
-}
-
-const $buttonText: TextStyle = {
-  fontFamily: typography.primary.normal,
-  fontSize: 14,
-  color: colors.palette.neutral100,
-}
