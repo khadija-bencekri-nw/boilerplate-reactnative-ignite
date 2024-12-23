@@ -10,7 +10,6 @@ export interface PurchaseItem {
   purchaseDate: Date
   rating: number
   model: string
-  // rating: { scheme: string; value: string }
   userId: string
   images: string[]
 }
@@ -28,16 +27,33 @@ export interface User {
   purchasesTotal: number
 }
 
-export interface ApiFeedResponse {
+export interface Brand {
+  id: number
+  name: string
+  description: string
+  logoUrl: string
+}
+
+export interface Store {
+  id: number
+  name: string
+  address: string
+  city: string
+  websiteUrl: string
+}
+
+export interface FormData {
+  brands: Brand[]
+  stores: Store[]
+}
+
+export interface ApiSaveResponse {
   status: string
-  feed: {
-    url: string
-    title: string
-    link: string
-    author: string
-    description: string
-    image: string
-  }
+  item: PurchaseItem
+}
+
+export interface ApiGetPurchaseResponse {
+  status: string
   items: PurchaseItem[]
 }
 
