@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useEffect, useMemo, useRef, useState } from "react"
 
 import type { TextFieldAccessoryProps } from "../components"
@@ -6,14 +7,14 @@ import { useStores } from "../models"
 import type { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 
+import Images from "assets/images"
 import { observer } from "mobx-react-lite"
 import type { ComponentType, FC } from "react"
-import type { ImageStyle, TextInput, TextStyle, ViewStyle } from "react-native"
+import type { ImageStyle, ScaledSize, TextInput, TextStyle, ViewStyle } from "react-native"
 import { Dimensions, ImageBackground, TouchableOpacity, View } from "react-native"
 
 const { width } = Dimensions.get("window")
 const isTablet = width > 600
-const backgroundImage = require("../../assets/images/signup-background-img.jpeg")
 
 interface JoinScreenProps extends AppStackScreenProps<"Join"> {}
 
@@ -23,7 +24,7 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
   const authPasswordInput = useRef<TextInput>(null)
 
   const [isAuthPasswordHidden, setIsAuthPasswordHidden] = useState(true)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  // const [isSubmitted, setIsSubmitted] = useState(false)
   const [isPortrait, setIsPortrait] = useState(false)
 
   // Error states
@@ -33,19 +34,22 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
     password: "",
   })
 
-  const onChange = ({ window: { width, height } }) => {
-    setIsPortrait(height >= width)
+  const onChange = (window: ScaledSize) => {
+    setIsPortrait(window.height >= window.width)
   }
 
   useEffect(() => {
-    const subscription = Dimensions.addEventListener("change", onChange)
+    const subscription = Dimensions.addEventListener("change", ({ window }) => {
+      onChange(window)
+    })
     return () => {
       subscription.remove()
+      signUpStore.resetStore()
     }
   }, [])
 
   const validateName = () => {
-    if (!signUpStore.name.trim()) {
+    if (signUpStore.name === "") {
       setErrors((prevErrors) => ({ ...prevErrors, name: "Name is required." }))
       return false
     }
@@ -54,8 +58,8 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
   }
 
   const validateEmail = () => {
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/
-    if (!signUpStore.email.trim()) {
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/u
+    if (signUpStore.email === "") {
       setErrors((prevErrors) => ({ ...prevErrors, email: "Email is required." }))
       return false
     }
@@ -68,7 +72,7 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
   }
 
   const validatePassword = () => {
-    if (!signUpStore.password.trim()) {
+    if (signUpStore.password === "") {
       setErrors((prevErrors) => ({ ...prevErrors, password: "Password is required." }))
       return false
     }
@@ -84,7 +88,7 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
   }
 
   const handleJoin = () => {
-    setIsSubmitted(true)
+    // setIsSubmitted(true)
 
     // Validate all fields when the submit button is pressed
     const isNameValid = validateName()
@@ -96,14 +100,14 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
     }
   }
 
-  const PasswordRightAccessory: ComponentType<TextFieldAccessoryProps> = useMemo(
+  const PasswordRightAccessoryMemo: ComponentType<TextFieldAccessoryProps> = useMemo(
     () =>
       function PasswordRightAccessory(props: TextFieldAccessoryProps) {
         return (
           <Icon
             icon={isAuthPasswordHidden ? "view" : "hidden"}
             color={colors.palette.neutral100}
-            containerStyle={props.style}
+            containerStyle={props.style as ViewStyle}
             size={20}
             onPress={() => {
               setIsAuthPasswordHidden(!isAuthPasswordHidden)
@@ -120,7 +124,9 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
       contentContainerStyle={$screenContentContainer}
       safeAreaEdges={["top", "bottom"]}
     >
-      {isTablet && <ImageBackground source={backgroundImage} style={$imageBackgroundStyle} />}
+      {isTablet && (
+        <ImageBackground source={Images.backgroundImage} style={$imageBackgroundStyle} />
+      )}
       <View style={$contentContainer}>
         <View style={$mainContent}>
           <Text tx="signUpScreen.step1" preset="subheading" style={$enterDetails} />
@@ -133,22 +139,26 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
 
           <TextField
             value={signUpStore.name}
-            onChangeText={signUpStore.setName}
+            onChangeText={(value) => {
+              signUpStore.setName(value)
+            }}
             containerStyle={$textField}
             autoCapitalize="none"
             autoComplete="username"
             autoCorrect={false}
             keyboardType="default"
             placeholderTx="signUpScreen.fullName"
-            onSubmitEditing={() => {}}
+            // onSubmitEditing={() => {}}
             helper={errors.name}
-            status={errors.name ? "error" : undefined}
+            status={errors.name.length > 0 ? "error" : undefined}
             onEndEditing={validateName}
           />
 
           <TextField
             value={signUpStore.email}
-            onChangeText={signUpStore.setEmail}
+            onChangeText={(value) => {
+              signUpStore.setEmail(value)
+            }}
             containerStyle={$textField}
             autoCapitalize="none"
             autoComplete="email"
@@ -156,15 +166,16 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
             keyboardType="email-address"
             placeholderTx="loginScreen.emailFieldPlaceholder"
             helper={errors.email}
-            status={errors.email ? "error" : undefined}
-            onSubmitEditing={() => {}}
+            status={errors.email.length > 0 ? "error" : undefined}
             onEndEditing={validateEmail}
           />
 
           <TextField
             ref={authPasswordInput}
             value={signUpStore.password}
-            onChangeText={signUpStore.setPassword}
+            onChangeText={(value) => {
+              signUpStore.setPassword(value)
+            }}
             containerStyle={$textField}
             autoCapitalize="none"
             autoComplete="password"
@@ -172,9 +183,9 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
             secureTextEntry={isAuthPasswordHidden}
             placeholderTx="loginScreen.passwordFieldPlaceholder"
             onSubmitEditing={() => authPasswordInput.current?.focus()}
-            RightAccessory={PasswordRightAccessory}
+            RightAccessory={PasswordRightAccessoryMemo}
             helper={errors.password}
-            status={errors.password ? "error" : undefined}
+            status={errors.password.length > 0 ? "error" : undefined}
             onEndEditing={validatePassword}
           />
 

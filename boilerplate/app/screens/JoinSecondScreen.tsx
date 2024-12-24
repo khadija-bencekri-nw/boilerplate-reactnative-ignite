@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useEffect, useState } from "react"
 
 import type { IconTypes } from "../components"
@@ -57,71 +58,9 @@ import {
 const { width } = Dimensions.get("window")
 const isTablet = width > 600
 
-const BackButton: FC<{ onPress: () => void; isPortrait: boolean }> = ({ onPress, isPortrait }) => (
-  <View style={$sideButtonContainer}>
-    <TouchableOpacity onPress={onPress}>
-      <Icon
-        icon="back"
-        style={$actionIconStyle}
-        color={colors.palette.neutral100}
-        size={isTablet && !isPortrait ? 35 : 20}
-      />
-      <Text text="back" style={isPortrait ? $sideButtonTextPortrait : $sideButtonText} />
-    </TouchableOpacity>
-  </View>
-)
+interface JoinSecondScreenProps extends AppStackScreenProps<"Join2"> {}
 
-const CloseButton: FC<{ onPress: () => void; isPortrait: boolean }> = ({ onPress, isPortrait }) => (
-  <View style={$sideButtonContainer}>
-    <TouchableOpacity onPress={onPress}>
-      <Icon
-        icon="close"
-        style={$actionIconStyle}
-        color={colors.palette.neutral100}
-        size={isTablet && !isPortrait ? 35 : 20}
-      />
-      <Text tx="common.cancel" style={isPortrait ? $sideButtonTextPortrait : $sideButtonText} />
-    </TouchableOpacity>
-  </View>
-)
-
-const RoleSelection: FC<{
-  title: string
-  icon: IconTypes
-  label: TxKeyPath
-  isSelected: boolean
-  onSelect: () => void
-}> = ({ icon, label, isSelected, onSelect }) => (
-  <TouchableOpacity
-    onPress={onSelect}
-    style={[$selectionContainer, isSelected && { borderColor: colors.palette.neutral100 }]}
-  >
-    <View style={$roleSelector}>
-      <Icon icon={icon} size={35} style={$selectionIcon} />
-      <Text tx={label} style={$selectionText} />
-    </View>
-    <View style={$selectedRole}>
-      {isSelected && (
-        <Icon icon="check" size={25} style={{ tintColor: colors.palette.neutral100 }} />
-      )}
-    </View>
-  </TouchableOpacity>
-)
-
-const DatePicker: FC<{ label: TxKeyPath; selectedDate?: Date }> = ({ label, selectedDate }) => (
-  <View style={$selectionContainer}>
-    <Icon icon="calendar" size={20} style={$selectionIcon} />
-    {selectedDate === undefined ? (
-      <Text tx={label} style={$selectionText} />
-    ) : (
-      <Text style={$selectionText} text={selectedDate.toLocaleDateString()} />
-    )}
-  </View>
-)
-
-interface JoinScreen2Props extends AppStackScreenProps<"Join2"> {}
-
-export const JoinScreen2: FC<JoinScreen2Props> = observer(function JoinScreen2(_props) {
+export const JoinScreen2: FC<JoinSecondScreenProps> = observer(function JoinScreen2(_props) {
   const { signUpStore } = useStores()
 
   const [selectedRole, setSelectedRole] = useState<string | null>(null)
@@ -142,6 +81,7 @@ export const JoinScreen2: FC<JoinScreen2Props> = observer(function JoinScreen2(_
     })
     return () => {
       subscription.remove()
+      signUpStore.resetStore()
     }
   }, [])
 
@@ -191,6 +131,7 @@ export const JoinScreen2: FC<JoinScreen2Props> = observer(function JoinScreen2(_
     setLoading(false)
 
     if (result.kind === "ok") {
+      signUpStore.resetStore()
       _props.navigation.popToTop()
       _props.navigation.navigate("Login")
     } else {
@@ -328,3 +269,66 @@ export const JoinScreen2: FC<JoinScreen2Props> = observer(function JoinScreen2(_
     </Screen>
   )
 })
+
+
+const BackButton: FC<{ onPress: () => void; isPortrait: boolean }> = ({ onPress, isPortrait }) => (
+  <View style={$sideButtonContainer}>
+    <TouchableOpacity onPress={onPress}>
+      <Icon
+        icon="back"
+        style={$actionIconStyle}
+        color={colors.palette.neutral100}
+        size={isTablet && !isPortrait ? 35 : 20}
+      />
+      <Text text="back" style={isPortrait ? $sideButtonTextPortrait : $sideButtonText} />
+    </TouchableOpacity>
+  </View>
+)
+
+const CloseButton: FC<{ onPress: () => void; isPortrait: boolean }> = ({ onPress, isPortrait }) => (
+  <View style={$sideButtonContainer}>
+    <TouchableOpacity onPress={onPress}>
+      <Icon
+        icon="close"
+        style={$actionIconStyle}
+        color={colors.palette.neutral100}
+        size={isTablet && !isPortrait ? 35 : 20}
+      />
+      <Text tx="common.cancel" style={isPortrait ? $sideButtonTextPortrait : $sideButtonText} />
+    </TouchableOpacity>
+  </View>
+)
+
+const RoleSelection: FC<{
+  title: string
+  icon: IconTypes
+  label: TxKeyPath
+  isSelected: boolean
+  onSelect: () => void
+}> = ({ icon, label, isSelected, onSelect }) => (
+  <TouchableOpacity
+    onPress={onSelect}
+    style={[$selectionContainer, isSelected && { borderColor: colors.palette.neutral100 }]}
+  >
+    <View style={$roleSelector}>
+      <Icon icon={icon} size={35} style={$selectionIcon} />
+      <Text tx={label} style={$selectionText} />
+    </View>
+    <View style={$selectedRole}>
+      {isSelected && (
+        <Icon icon="check" size={25} style={{ tintColor: colors.palette.neutral100 }} />
+      )}
+    </View>
+  </TouchableOpacity>
+)
+
+const DatePicker: FC<{ label: TxKeyPath; selectedDate?: Date }> = ({ label, selectedDate }) => (
+  <View style={$selectionContainer}>
+    <Icon icon="calendar" size={20} style={$selectionIcon} />
+    {selectedDate === undefined ? (
+      <Text tx={label} style={$selectionText} />
+    ) : (
+      <Text style={$selectionText} text={selectedDate.toLocaleDateString()} />
+    )}
+  </View>
+)
