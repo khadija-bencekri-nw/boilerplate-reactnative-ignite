@@ -58,9 +58,9 @@ import {
 const { width } = Dimensions.get("window")
 const isTablet = width > 600
 
-interface JoinSecondScreenProps extends AppStackScreenProps<"Join2"> {}
+interface JoinSecondScreenProps extends AppStackScreenProps<"JoinSecond"> {}
 
-export const JoinScreen2: FC<JoinSecondScreenProps> = observer(function JoinScreen2(_props) {
+export const JoinSecondScreen: FC<JoinSecondScreenProps> = observer(function JoinScreen2(_props) {
   const { signUpStore } = useStores()
 
   const [selectedRole, setSelectedRole] = useState<string | null>(null)

@@ -96,7 +96,7 @@ export const JoinScreen: FC<JoinScreenProps> = observer(function JoinScreen(_pro
     const isPasswordValid = validatePassword()
 
     if (isNameValid && isEmailValid && isPasswordValid) {
-      _props.navigation.navigate("Join2")
+      _props.navigation.navigate("JoinSecond")
     }
   }
 

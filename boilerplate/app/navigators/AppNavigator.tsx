@@ -68,7 +68,7 @@ export type AppStackParamList = {
   Welcome: undefined
   Login?: { username?: string }
   Join: undefined
-  Join2: undefined
+  JoinSecond: undefined
   Dashboard: undefined
   Profile: undefined
   Coworkers: undefined
@@ -213,8 +213,8 @@ const AppStack = observer(function AppStack() {
             options={{ headerShown: false }}
           />
           <Stack.Screen
-            name="Join2"
-            component={Screens.JoinScreen2}
+            name="JoinSecond"
+            component={Screens.JoinSecondScreen}
             options={{ headerShown: false }}
           />
           <Stack.Screen
