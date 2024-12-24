@@ -1,3 +1,5 @@
+/* eslint-disable id-length */
+/* eslint-disable simple-import-sort/imports */
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { load, loadString, save, saveString, clear, remove } from "./storage"
 

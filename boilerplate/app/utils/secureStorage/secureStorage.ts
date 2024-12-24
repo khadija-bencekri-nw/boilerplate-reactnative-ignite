@@ -1,4 +1,4 @@
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store"
 
 /**
  * Loads a string from storage.
@@ -7,11 +7,11 @@ import * as SecureStore from 'expo-secure-store';
  */
 export async function loadString(key: string): Promise<string | null> {
   try {
-    const value = await SecureStore.getItemAsync(key);
-    return value ?? null; // Return value or null if it doesn't exist
+    const value = await SecureStore.getItemAsync(key)
+    return value ?? null // Return value or null if it doesn't exist
   } catch (error) {
-    console.error('Error loading string from secure storage:', error);
-    return null;
+    console.error("Error loading string from secure storage:", error)
+    return null
   }
 }
 
@@ -23,11 +23,11 @@ export async function loadString(key: string): Promise<string | null> {
  */
 export async function saveString(key: string, value: string): Promise<boolean> {
   try {
-    await SecureStore.setItemAsync(key, value);
-    return true;
+    await SecureStore.setItemAsync(key, value)
+    return true
   } catch (error) {
-    console.error('Error saving string to secure storage:', error);
-    return false;
+    console.error("Error saving string to secure storage:", error)
+    return false
   }
 }
 
@@ -38,12 +38,12 @@ export async function saveString(key: string, value: string): Promise<boolean> {
  */
 export async function load(key: string): Promise<unknown | null> {
   try {
-    const value = await SecureStore.getItemAsync(key);
-    //return value ? JSON.parse(value) : null;
-    return value;
+    const value = await SecureStore.getItemAsync(key)
+    // return value ? JSON.parse(value) : null;
+    return value
   } catch (error) {
-    console.error('Error loading JSON from secure storage:', error);
-    return null;
+    console.error("Error loading JSON from secure storage:", error)
+    return null
   }
 }
 
@@ -55,11 +55,11 @@ export async function load(key: string): Promise<unknown | null> {
  */
 export async function save(key: string, value: unknown): Promise<boolean> {
   try {
-    await SecureStore.setItemAsync(key, JSON.stringify(value));
-    return true;
+    await SecureStore.setItemAsync(key, JSON.stringify(value))
+    return true
   } catch (error) {
-    console.error('Error saving JSON to secure storage:', error);
-    return false;
+    console.error("Error saving JSON to secure storage:", error)
+    return false
   }
 }
 
@@ -70,9 +70,9 @@ export async function save(key: string, value: unknown): Promise<boolean> {
  */
 export async function remove(key: string): Promise<void> {
   try {
-    await SecureStore.deleteItemAsync(key);
+    await SecureStore.deleteItemAsync(key)
   } catch (error) {
-    console.error('Error removing item from secure storage:', error);
+    console.error("Error removing item from secure storage:", error)
   }
 }
 
@@ -81,9 +81,8 @@ export async function remove(key: string): Promise<void> {
  */
 export async function clear(keys: string[]): Promise<void> {
   try {
-    // Manually remove each key
-    await Promise.all(keys.map(key => SecureStore.deleteItemAsync(key)));
+    await Promise.all(keys.map(async (key) => SecureStore.deleteItemAsync(key)))
   } catch (error) {
-    console.error('Error clearing secure storage:', error);
+    console.error("Error clearing secure storage:", error)
   }
 }

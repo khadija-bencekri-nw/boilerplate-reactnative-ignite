@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 /**

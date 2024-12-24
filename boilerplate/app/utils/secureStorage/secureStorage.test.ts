@@ -1,5 +1,6 @@
+import { clear, load, loadString, remove, save, saveString } from "./secureStorage"
+
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { load, loadString, save, saveString, clear, remove } from "./secureStorage"
 
 // fixtures
 const VALUE_OBJECT = { x: 1 }
@@ -34,6 +35,6 @@ test("remove", async () => {
 })
 
 test("clear", async () => {
-  await clear()
+  await clear(["something"])
   expect(AsyncStorage.clear).toHaveBeenCalledWith()
 })
