@@ -10,6 +10,8 @@ interface User {
   employmentDate: Date
   shouldReceiveMailNotifications: boolean
   shouldReceiveApprovalNotifications: boolean
+  balance: number
+  purchasesTotal: number
 }
 
 export const AuthenticationStoreModel = types
@@ -21,14 +23,12 @@ export const AuthenticationStoreModel = types
   })
   .views((store) => ({
     get isAuthenticated() {
-      return !!store.authToken
+      return Boolean(store.authToken)
     },
     get validationError() {
       if (store.authEmail.length === 0) return "can't be blank"
       if (store.authEmail.length < 6) return "must be at least 6 characters"
-      // if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(store.authEmail))
-      //   return "must be a valid email address"
-      if (!/^[^\s@]+@theodo\.com$/.test(store.authEmail))
+      if (!/^[^\s@]+@theodo\.com$/u.test(store.authEmail))
         return "must be a valid email address: test@theodo.com"
       return ""
     },
@@ -38,7 +38,7 @@ export const AuthenticationStoreModel = types
       store.authToken = value
     },
     setAuthEmail(value: string) {
-      store.authEmail = value.replace(/ /g, "")
+      store.authEmail = value.replace(/ /gu, "")
     },
     setUser(value?: User) {
       store.user = value
@@ -52,6 +52,5 @@ export const AuthenticationStoreModel = types
       store.user = null
     },
   }))
-
 export interface AuthenticationStore extends Instance<typeof AuthenticationStoreModel> {}
 export interface AuthenticationStoreSnapshot extends SnapshotOut<typeof AuthenticationStoreModel> {}

@@ -1,6 +1,7 @@
-import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
 import { withSetPropAction } from "./helpers/withSetPropAction"
-import { ListFormat } from "typescript";
+
+import type { Instance, SnapshotIn, SnapshotOut } from "mobx-state-tree"
+import { types } from "mobx-state-tree"
 
 /**
  * Model description here for TypeScript hints.
@@ -11,36 +12,36 @@ export const SignUpStoreModel = types
     name: "",
     email: "",
     password: "",
-    joiningDate: new Date,
+    joiningDate: new Date(),
     amount: "",
-    role:"",
+    role: "",
   })
   .actions((store) => ({
     setName(value: string) {
-      store.name = value;
+      store.name = value
     },
     setEmail(value: string) {
-      store.email = value;
+      store.email = value
     },
     setPassword(value: string) {
-      store.password = value;
+      store.password = value
     },
     setRole(value: string) {
-      store.role = value;
+      store.role = value
     },
     setJoiningDate(value: Date) {
-      store.joiningDate = value;
+      store.joiningDate = value
     },
     setAmount(value: string) {
-      store.amount = value;
+      store.amount = value
     },
     resetStore() {
-      store.name = "";
-      store.email = "";
-      store.password = "";
-      store.role = "";
-      store.joiningDate = new Date;
-      store.amount = "0";
+      store.name = ""
+      store.email = ""
+      store.password = ""
+      store.role = ""
+      store.joiningDate = new Date()
+      store.amount = "0"
     },
   }))
   .views((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars

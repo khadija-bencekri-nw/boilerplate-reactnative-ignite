@@ -1,7 +1,10 @@
-import { Instance, SnapshotIn, SnapshotOut, types } from "mobx-state-tree"
-import { withSetPropAction } from "./helpers/withSetPropAction"
 import { api } from "../services/api"
+
+import { withSetPropAction } from "./helpers/withSetPropAction"
 import { PurchaseModel } from "./Purchase"
+
+import type { Instance, SnapshotIn, SnapshotOut } from "mobx-state-tree"
+import { types } from "mobx-state-tree"
 
 /**
  * Model description here for TypeScript hints.
@@ -13,14 +16,14 @@ export const PurchaseStoreModel = types
   })
   .actions(withSetPropAction)
   .actions((store) => ({
-    async fetchPurchases() {
-      const response = await api.getPurchases()
+    async fetchPurchases(id: string) {
+      const response = await api.getPurchases(id)
       if (response.kind === "ok") {
         store.setProp("purchases", response.purchases)
       } else {
         console.error(`Error fetching episodes: ${JSON.stringify(response)}`)
       }
-    }
+    },
   }))
   .views((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
   .actions((self) => ({})) // eslint-disable-line @typescript-eslint/no-unused-vars
