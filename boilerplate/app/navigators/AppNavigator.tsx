@@ -7,7 +7,7 @@
 import React from "react"
 
 import Config from "../config"
-import { useStores } from "../models" // @demo remove-current-line
+import { useStores } from "../models"
 
 import type { MainTabParamList } from "./MainTabNavigator"
 import { MainTabNavigator } from "./MainTabNavigator"
@@ -32,6 +32,7 @@ import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/
 import type { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import CustomHeader from "app/components/CustomHeader"
+import type { Purchase } from "app/models/Purchase"
 import * as Screens from "app/screens"
 import { colors } from "app/theme"
 import { observer } from "mobx-react-lite"
@@ -65,13 +66,13 @@ const $labelStyle: TextStyle = {
  */
 export type AppStackParamList = {
   Welcome: undefined
-  Login?: undefined
+  Login?: { username?: string }
   Join: undefined
   Join2: undefined
   Dashboard: undefined
   Profile: undefined
   Coworkers: undefined
-  Product: undefined
+  Product: { item: Purchase }
   AddProduct: undefined
   Main: NavigatorScreenParams<MainTabParamList>
   Help: undefined
