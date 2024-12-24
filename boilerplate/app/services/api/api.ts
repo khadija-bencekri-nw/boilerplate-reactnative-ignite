@@ -7,7 +7,7 @@
  */
 import Config from "../../config"
 
-import type { ApiConfig, ApiSaveResponse, FormData, PurchaseItem, User } from "./api.types"
+import type { ApiConfig, ApiSaveResponse, FormDropDownData, PurchaseItem, User } from "./api.types"
 import type { GeneralApiProblem } from "./apiProblem"
 import { getGeneralApiProblem } from "./apiProblem"
 
@@ -61,7 +61,7 @@ export class Api {
         headers.Authorization = null
       }
     })
-    const response: ApiResponse<{ token: string; user: object }> = await this.apisauce.post(
+    const response: ApiResponse<{ token: string; user: User }> = await this.apisauce.post(
       "auth/login",
       loginRequest,
     )
@@ -93,13 +93,13 @@ export class Api {
   }
 
   async getUser(): Promise<GeneralApiProblem | { kind: "ok"; user: User }> {
-    const response: ApiResponse<{ user: User }> = await this.apisauce.get("users/iiiiii")
+    const response: ApiResponse<User> = await this.apisauce.get("users/iiiiii")
 
     if (!response.ok) {
       return getGeneralApiProblem(response)
     }
 
-    if (response.data !== undefined) return { kind: "ok", user: response.data.user }
+    if (response.data !== undefined) return { kind: "ok", user: response.data }
     return { kind: "unknown", temporary: true }
   }
 
@@ -228,8 +228,8 @@ export class Api {
     return { kind: "ok", purchase: response.data?.item }
   }
 
-  async getFormData(): Promise<GeneralApiProblem | { kind: "ok"; data: FormData }> {
-    const response: ApiResponse<FormData> = await this.apisauce.get("purchases/form-data")
+  async getFormData(): Promise<GeneralApiProblem | { kind: "ok"; data: FormDropDownData }> {
+    const response: ApiResponse<FormDropDownData> = await this.apisauce.get("purchases/form-data")
 
     if (!response.ok || response.data === undefined) {
       return getGeneralApiProblem(response)

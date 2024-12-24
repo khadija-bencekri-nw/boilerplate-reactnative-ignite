@@ -42,7 +42,7 @@ export interface Store {
   websiteUrl: string
 }
 
-export interface FormData {
+export interface FormDropDownData {
   brands: Brand[]
   stores: Store[]
 }
