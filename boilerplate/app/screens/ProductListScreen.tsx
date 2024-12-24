@@ -148,3 +148,8 @@ export const ProductListScreen: FC<ProductListScreenProps> = observer(
     )
   },
 )
+
+ProductListScreen.defaultProps = {
+  purchases: [],
+  isGridView: false,
+}
