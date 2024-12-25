@@ -48,7 +48,11 @@ export type GeneralApiProblem =
  * @param response The api response.
  */
 
-const apiProblemMapping: Record<string, GeneralApiProblem> = {
+const DEFAULT_CLIENT_ERROR: GeneralApiProblem = { kind: "rejected" };
+const DEFAULT_API_ERROR: GeneralApiProblem = { kind: "unknown", temporary: true };
+
+
+const apiProblemMapping: Record<string, GeneralApiProblem | undefined> = {
   CONNECTION_ERROR: { kind: "cannot-connect", temporary: true },
   NETWORK_ERROR: { kind: "cannot-connect", temporary: true },
   TIMEOUT_ERROR: { kind: "timeout", temporary: true },
@@ -57,22 +61,23 @@ const apiProblemMapping: Record<string, GeneralApiProblem> = {
   CANCEL_ERROR: { kind: "unknown", temporary: true },
 }
 
+const clientErrorMapping: Record<number, GeneralApiProblem | undefined> = {
+  400: { kind: "bad-data" },
+  401: { kind: "unauthorized" },
+  403: { kind: "forbidden" },
+  404: { kind: "not-found" },
+  409: { kind: "user-already-exists" },
+}
+
 export function getGeneralApiProblem(response: ApiResponse<any>): GeneralApiProblem {
   if (response.problem === "CLIENT_ERROR") {
-    const clientErrorMapping: Record<number, GeneralApiProblem> = {
-      400: { kind: "bad-data" },
-      401: { kind: "unauthorized" },
-      403: { kind: "forbidden" },
-      404: { kind: "not-found" },
-      409: { kind: "user-already-exists" },
-    }
-
-    if (response.status !== undefined) return clientErrorMapping[response.status]
-    return { kind: "rejected" }
+    if (response.status !== undefined)
+      return clientErrorMapping[response.status] ?? DEFAULT_CLIENT_ERROR
+    return DEFAULT_CLIENT_ERROR
   }
 
-  if (response.problem !== null) return apiProblemMapping[response.problem]
-  return { kind: "unknown", temporary: true }
+  if (response.problem !== null) return apiProblemMapping[response.problem] ?? DEFAULT_API_ERROR
+  return DEFAULT_API_ERROR
 }
 
 /* export function getGeneralApiProblem(response: ApiResponse<any>): GeneralApiProblem {
