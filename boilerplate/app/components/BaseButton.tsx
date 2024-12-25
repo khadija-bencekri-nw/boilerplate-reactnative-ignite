@@ -8,6 +8,26 @@ import { observer } from "mobx-react-lite"
 import type { TextStyle, ViewStyle } from "react-native"
 import { Pressable, SafeAreaView, Text } from "react-native"
 
+// STYLE START
+
+const $container: ViewStyle = {
+  flex: 1,
+  justifyContent: "center",
+}
+
+const $text: TextStyle = {
+  fontFamily: typography.primary.normal,
+  fontSize: 16,
+  // color: colors.palette.primary500,
+}
+
+const $button: ViewStyle = {
+  width: 148,
+  height: 56,
+  alignItems: "center",
+  justifyContent: "center",
+}
+// STYLE END
 export interface BaseButtonProps {
   text: TxKeyPath | string
   onPress: () => void
@@ -16,12 +36,8 @@ export interface BaseButtonProps {
   primary: boolean
 }
 
-/**
- * Describe your component here
- */
 export const BaseButton = observer(function BaseButton(props: BaseButtonProps) {
   const { style, text, onPress, primary } = props
-  const $styles = [$container, style]
 
   const i18nText = text && translate(text as TxKeyPath)
   const content = i18nText || text
@@ -52,21 +68,3 @@ export const BaseButton = observer(function BaseButton(props: BaseButtonProps) {
     </SafeAreaView>
   )
 })
-
-const $container: ViewStyle = {
-  flex: 1,
-  justifyContent: "center",
-}
-
-const $text: TextStyle = {
-  fontFamily: typography.primary.normal,
-  fontSize: 16,
-  // color: colors.palette.primary500,
-}
-
-const $button: ViewStyle = {
-  width: 148,
-  height: 56,
-  alignItems: "center",
-  justifyContent: "center",
-}
