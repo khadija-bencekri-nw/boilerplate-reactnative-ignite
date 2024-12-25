@@ -193,7 +193,7 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
     title: TxKeyPath | undefined,
     message: TxKeyPath,
     redirectLabel: TxKeyPath,
-    onRedirect: Function,
+    onRedirect: () => void,
   ) => {
     alertRef.current?.set({
       title,
