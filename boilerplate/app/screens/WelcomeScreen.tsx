@@ -1,22 +1,20 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useEffect, useState } from "react"
 
 import { PrimaryButton, SecondaryButton, Text } from "../components"
 import type { AppStackScreenProps } from "../navigators"
 import { colors, spacing } from "../theme"
 
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import { load } from "app/utils/storage"
+import Images from "assets/images"
 import { observer } from "mobx-react-lite"
 import type { FC } from "react"
-import type { ImageStyle, TextStyle, ViewStyle } from "react-native"
+import type { ImageStyle, ScaledSize, TextStyle, ViewStyle } from "react-native"
 import { Dimensions, Image, ImageBackground, View } from "react-native"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { load } from "app/utils/storage"
 
 const { width } = Dimensions.get("window")
 const isTablet = width > 600
-const backgroundImage = require("../../assets/images/backgroundImage.png")
-const logo = require("../../assets/images/logo.png")
-const userFilled = require("../../assets/icons/userFilled.png")
 
 interface WelcomeScreenProps extends AppStackScreenProps<"Welcome"> {}
 
@@ -26,12 +24,14 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
   const [username, setUsername] = useState<string | null>(null)
   const [isPortrait, setIsPortrait] = useState(false)
 
-  const onChange = ({ window: { width, height } }) => {
-    setIsPortrait(height >= width)
+  const onChange = (window: ScaledSize) => {
+    setIsPortrait(window.height >= window.width)
   }
 
   useEffect(() => {
-    const subscription = Dimensions.addEventListener("change", onChange)
+    const subscription = Dimensions.addEventListener("change", ({ window }) => {
+      onChange(window)
+    })
     return () => {
       subscription.remove()
     }
@@ -39,7 +39,9 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
 
   const loadLoastConnectedUserEmail = async () => {
     try {
-      const storedMail = await load("LAST_CONNECTED_USER")
+      const storedMail: { username: string } = (await load("LAST_CONNECTED_USER")) as {
+        username: string
+      }
       setUsername(storedMail.username)
     } catch (error) {
       console.error("Failed to load username", error)
@@ -47,7 +49,9 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
   }
 
   useEffect(() => {
-    loadLoastConnectedUserEmail()
+    loadLoastConnectedUserEmail().catch((er) => {
+      console.log("er", er)
+    })
   }, [])
 
   function handleJoin() {
@@ -55,26 +59,30 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
   }
 
   function handleSignIn(usernameParam?: string) {
-    usernameParam ? navigation.navigate("Login", {usernameParam}) : navigation.navigate("Login")
+    if (usernameParam === undefined) {
+      navigation.navigate("Login")
+    } else {
+      navigation.navigate("Login", { username: usernameParam })
+    }
   }
 
   return (
-    <ImageBackground source={backgroundImage} style={$background}>
-      {username && (
+    <ImageBackground source={Images.backgroundImage} style={$background}>
+      {username !== null && (
         <TouchableOpacity
           style={$loggedInContainer}
           onPress={() => {
             handleSignIn(username)
           }}
         >
-          <Image source={userFilled} style={$iconStyle} />
+          <Image source={Images.userFilled} style={$iconStyle} />
           <Text style={$loggedInText} tx="welcomeScreen.continueAs" />
           <Text style={$userNameText}>{username}</Text>
         </TouchableOpacity>
       )}
       <View style={$container}>
         <View style={$textContainer}>
-          <Image source={logo} style={$logo} />
+          <Image source={Images.logo} style={$logo} />
           <Text
             testID="login-heading"
             tx="signUpScreen.firstHeadline"
@@ -96,7 +104,12 @@ export const WelcomeScreen: FC<WelcomeScreenProps> = observer(function WelcomeSc
         </View>
         <View style={isPortrait ? $buttonContainerPortrait : $buttonContainerLandscape}>
           <PrimaryButton text={"signUpScreen.join"} onPress={handleJoin} />
-          <SecondaryButton text={"signUpScreen.signIn"} onPress={() => handleSignIn()} />
+          <SecondaryButton
+            text={"signUpScreen.signIn"}
+            onPress={() => {
+              handleSignIn()
+            }}
+          />
         </View>
       </View>
     </ImageBackground>

@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useEffect, useRef, useState } from "react"
 
 import { ProductListScreen } from "./ProductListScreen"
 
-import { useIsFocused } from "@react-navigation/native"
 import type { AlertDialogRef } from "app/components"
 import { AlertDialog, Icon, Loader, Text } from "app/components"
 import { useStores } from "app/models"
+import type { Purchase } from "app/models/Purchase"
 import type { AppStackScreenProps } from "app/navigators"
 import type { User } from "app/services/api"
 import { api } from "app/services/api"
@@ -24,14 +25,12 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
   } = useStores()
 
   const [isGridView, setIsGridView] = useState(false)
-  const [purchases, setPurchases] = useState([])
-  const [userState, setUserState] = useState<User>()
+  const [purchases, setPurchases] = useState<Purchase[]>()
+  // const [userState, setUserState] = useState<User>()
   const [loading, setLoading] = useState(false)
   const alertRef = useRef<AlertDialogRef>(null)
 
-  const isFocused = useIsFocused()
-
-  const handleApiError = (response: { kind: string }, mainAction: Function) => {
+  const handleApiError = (response: { kind: string }, mainAction: () => Promise<any>) => {
     const isSessionError = response.kind === "forbidden" || response.kind === "unauthorized"
     alertRef.current?.set({
       title: isSessionError ? "common.sessionExpired" : undefined,
@@ -50,7 +49,7 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
       if (response.kind === "ok") {
         setLoading(false)
         runInAction(() => {
-          setPurchases(response.purchases)
+          setPurchases(response.purchases as Purchase[])
         })
       } else {
         handleApiError(response, async () => fetchPurchases(user.id))
@@ -77,11 +76,10 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
     try {
       const response = await api.getUser()
       if (response.kind === "ok") {
-        runInAction(() => {
-          storeConnectedUser(response.user)
-          setUserState(response.user)
+        await runInAction(async () => {
+          await storeConnectedUser(response.user)
           setUser(response.user)
-          fetchPurchases(response.user.id)
+          await fetchPurchases(response.user.id)
         })
       } else {
         handleApiError(response, fetchUser)
@@ -93,18 +91,16 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
 
   useEffect(() => {
     setLoading(true)
-    fetchUser()
+    fetchUser().catch((er) => {
+      console.log("er", er)
+    })
   }, [])
-
-  useEffect(() => {
-    isFocused && fetchUser()
-  }, [isFocused])
 
   const toggleView = () => {
     setIsGridView((prev) => !prev)
   }
 
-  const goToProduct = (item: object) => {
+  const goToProduct = (item: Purchase) => {
     props.navigation.navigate("Product", { item })
   }
 
@@ -125,7 +121,11 @@ export const DashboardScreen: FC<DashboardScreenProps> = observer(function Dashb
           <Icon icon={"grid"} size={20} color={isGridView ? "white" : "grey"} />
         </TouchableOpacity>
       </View>
-      <ProductListScreen purchases={purchases} goToProduct={goToProduct} isGridView={isGridView} />
+      <ProductListScreen
+        purchases={purchases ?? []}
+        goToProduct={goToProduct}
+        isGridView={isGridView}
+      />
       <AlertDialog ref={alertRef} />
       <Loader loading={loading} />
     </View>

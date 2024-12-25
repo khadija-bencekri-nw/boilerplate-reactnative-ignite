@@ -270,7 +270,6 @@ export const JoinSecondScreen: FC<JoinSecondScreenProps> = observer(function Joi
   )
 })
 
-
 const BackButton: FC<{ onPress: () => void; isPortrait: boolean }> = ({ onPress, isPortrait }) => (
   <View style={$sideButtonContainer}>
     <TouchableOpacity onPress={onPress}>

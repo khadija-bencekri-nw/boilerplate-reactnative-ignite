@@ -85,7 +85,7 @@ const en = {
     back: "Back, my account informations",
     firstHeadline: "Curated tools",
     secondHeadline: "to gear you up!",
-    subtitle: "Join Nimbleway’s worktools initiative to get you suited up for your daily tasks.",
+    subtitle: "Join Theodo’s worktools initiative to get you suited up for your daily tasks.",
     join: "Join",
     signIn: "Sign In",
     Errors: {
