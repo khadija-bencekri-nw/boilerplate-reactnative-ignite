@@ -1,18 +1,30 @@
-import { Translations } from "./en"
+import type { Translations } from "./en"
 
 const ar: Translations = {
   common: {
     ok: "نعم",
     cancel: "حذف",
     back: "خلف",
-    logOut: "تسجيل خروج", // @demo remove-current-line
+    logOut: "تسجيل خروج",
+    confirm: "",
+    errorUnexpectedTitle: "",
+    errorUnexpected: "",
+    tryAgain: "",
+    congrats: "",
+    sessionExpired: "",
+    sessionExpiredMsg: "",
+    proceed: "",
+    permissionDenied: "",
+    close: "",
+    loginAgain: "",
   },
   welcomeScreen: {
     postscript:
       "ربما لا يكون هذا هو الشكل الذي يبدو عليه تطبيقك مالم يمنحك المصمم هذه الشاشات وشحنها في هذه الحالة",
     readyForLaunch: "تطبيقك تقريبا جاهز للتشغيل",
     exciting: "اوه هذا مثير",
-    letsGo: "لنذهب", // @demo remove-current-line
+    letsGo: "لنذهب",
+    continueAs: "",
   },
   errorScreen: {
     title: "هناك خطأ ما",
@@ -42,96 +54,104 @@ const ar: Translations = {
     passwordFieldPlaceholder: "كلمة السر هنا فائقة السر",
     tapToSignIn: "انقر لتسجيل الدخول!",
     hint: "(: تلميح: يمكنك استخدام اي عنوان بريد الكتروني وكلمة السر المفضلة لديك",
-  },
-  joinScreen: {
-    firstHeadline: "أدوات مختارة",
-    secondHeadline: "لتجهيزك!",
-    subtitle: "انضم إلى مبادرة أدوات العمل من Nimbleway لتجهيزك لمهامك اليومية.",
-    join: "انضم",
-    signIn: "تسجيل الدخول",
+    google: "",
+    apple: "",
+    joinSentence: "",
+    errors: {
+      authError: "",
+      mailError: "",
+      mailErrorDesc: "",
+    },
   },
   signUpScreen: {
     firstHeadline: "Outils sélectionnés",
     secondHeadline: "pour vous équiper !",
-    subtitle: "Rejoignez l'initiative des outils de travail de Nimbleway pour être prêt pour vos tâches quotidiennes.",
+    subtitle:
+      "Rejoignez l'initiative des outils de travail de Nimbleway pour être prêt pour vos tâches quotidiennes.",
     join: "Rejoindre",
     signIn: "Se connecter",
-  },    
-  demoNavigator: {
-    componentsTab: "عناصر",
-    debugTab: "تصحيح",
-    communityTab: "واصل اجتماعي",
-    podcastListTab: "البودكاست",
-  },
-  demoCommunityScreen: {
-    title: "تواصل مع المجتمع",
-    tagLine:
-      "قم بالتوصيل لمنتدى Infinite Red الذي يضم تفاعل المهندسين المحلّيين ورفع مستوى تطوير تطبيقك معنا",
-    joinUsOnSlackTitle: "انضم الينا على Slack",
-    joinUsOnSlack:
-      "هل ترغب في وجود مكان للتواصل مع مهندسي React Native حول العالم؟ الانضمام الى المحادثة في سلاك المجتمع الاحمر اللانهائي! مجتمعناالمتنامي هو مساحةآمنة لطرح الاسئلة والتعلم من الآخرين وتنمية شبكتك.",
-    joinSlackLink: "انضم الي مجتمع Slack",
-    makeIgniteEvenBetterTitle: "اجعل Ignite افضل",
-    makeIgniteEvenBetter:
-      "هل لديك فكرة لجعل Ignite افضل؟ نحن سعداء لسماع ذلك! نحن نبحث دائماً عن الآخرين الذين يرغبون في مساعدتنا في بناء افضل الادوات المحلية التفاعلية المتوفرة هناك. انضم الينا عبر GitHub للانضمام الينا في بناء مستقبل Ignite",
-    contributeToIgniteLink: "ساهم في Ignite",
-    theLatestInReactNativeTitle: "الاحدث في React Native",
-    theLatestInReactNative: "نخن هنا لنبقيك محدثاً على جميع React Native التي تعرضها",
-    reactNativeRadioLink: "راديو React Native",
-    reactNativeNewsletterLink: "نشرة اخبار React Native",
-    reactNativeLiveLink: "مباشر React Native",
-    chainReactConferenceLink: "مؤتمر Chain React",
-    hireUsTitle: "قم بتوظيف Infinite Red لمشروعك القادم",
-    hireUs:
-      "سواء كان الامر يتعلّق بتشغيل مشروع كامل او اعداد الفرق بسرعة من خلال التدريب العلمي لدينا، يمكن ان يساعد Infinite Red اللامتناهي في اي مشروع محلي يتفاعل معه.",
-    hireUsLink: "ارسل لنا رسالة",
-  },
-  demoShowroomScreen: {
-    jumpStart: "مكونات او عناصر لبدء مشروعك",
-    lorem2Sentences:
-      "عامل الناس بأخلاقك لا بأخلاقهم. عامل الناس بأخلاقك لا بأخلاقهم. عامل الناس بأخلاقك لا بأخلاقهم",
-    demoHeaderTxExample: "ياي",
-    demoViaTxProp: "عبر `tx` Prop",
-    demoViaSpecifiedTxProp: "Prop `{{prop}}Tx` عبر",
-  },
-  demoDebugScreen: {
-    howTo: "كيف",
-    title: "التصحيح",
-    tagLine: "مبروك، لديك نموذج اصلي متقدم للغاية للتفاعل هنا. الاستفادة من هذه النمذجة",
-    reactotron: "Reactotron ارسل إلى",
-    reportBugs: "الابلاغ عن اخطاء",
-    demoList: "قائمة تجريبية",
-    demoPodcastList: "قائمة البودكاست التجريبي",
-    androidReactotronHint:
-      "اذا لم ينجح ذللك، فتأكد من تشغيل تطبيق الحاسوب الخاص Reactotron، وقم بتشغيل عكس adb tcp:9090 \ntcp:9090 من جهازك الطرفي ، واعد تحميل التطبيق",
-    iosReactotronHint:
-      "اذا لم ينجح ذلك، فتأكد من تشغيل تطبيق الحاسوب الخاص ب Reactotron وأعد تحميل التطبيق",
-    macosReactotronHint: "اذا لم ينجح ذلك، فتأكد من تشغيل الحاسوب ب Reactotron وأعد تحميل التطبيق",
-    webReactotronHint: "اذا لم ينجح ذلك، فتأكد من تشغيل الحاسوب ب Reactotron وأعد تحميل التطبيق",
-    windowsReactotronHint:
-      "اذا لم ينجح ذلك، فتأكد من تشغيل الحاسوب ب Reactotron وأعد تحميل التطبيق",
-  },
-  demoPodcastListScreen: {
-    title: "حلقات إذاعية React Native",
-    onlyFavorites: "المفضلة فقط",
-    favoriteButton: "المفضل",
-    unfavoriteButton: "غير مفضل",
-    accessibility: {
-      cardHint: "انقر مرّتين للاستماع على الحلقة. انقر مرّتين وانتظر لتفعيل {{action}} هذه الحلقة.",
-      switch: "قم بالتبديل لاظهار المفضّلة فقط.",
-      favoriteAction: "تبديل المفضلة",
-      favoriteIcon: "الحلقة الغير مفضّلة",
-      unfavoriteIcon: "الحلقة المفضّلة",
-      publishLabel: "نشرت {{date}}",
-      durationLabel: "المدّة: {{hours}} ساعات {{minutes}} دقائق {{seconds}} ثواني",
+    headline: "",
+    step1: "",
+    step2: "",
+    fullName: "",
+    next: "",
+    headline2: "",
+    pickRole: "",
+    developer: "",
+    techLead: "",
+    chooseDate: "",
+    startdate: "",
+    balance: "",
+    create: "",
+    back: "",
+    Errors: {
+      emailRequired: "",
+      emailNotValid: "",
+      pwdRequired: "",
+      pwdNotValid: "",
     },
-    noFavoritesEmptyState: {
-      heading: "هذا يبدو فارغاً بعض الشيء.",
-      content:
-        "لم تتم اضافة اي مفضلات حتى الان. اضغط على القلب في إحدى الحلقات لإضافته الى المفضلة.",
-    },
+    selectRole: "",
+    pickDate: "",
+    userExistsMsg: "",
   },
-  // @demo remove-block-end
+  header: {
+    balance: "",
+    total: "",
+    balanceInfo: "",
+    totalInfo: "",
+  },
+  dashboardScreen: {
+    fetchUserError: "",
+    fetchPurchaseError: "",
+    purchasesListTitle: "",
+    purchased: "",
+    noPurchases: "",
+    purchases: "",
+  },
+  addProductScreen: {
+    congrats: "",
+    congratsMsg: "",
+    goToList: "",
+    invalidTypes: "",
+    invalidTypesDesc: "",
+    backToForm: "",
+    multipleImages: "",
+    qualityNote: "",
+    fillForm: "",
+  },
+  productScreen: {
+    brand: "",
+    model: "",
+    store: "",
+    purchaseDate: "",
+    price: "",
+    purchased: "",
+    invoiceMedia: "",
+    review: "",
+    rateAction: "",
+    rateText: "",
+  },
+  profileScreen: {
+    userInfo: {
+      title: "",
+      email: "",
+      password: "",
+      role: "",
+    },
+    notification: {
+      title: "",
+      mail: "",
+      approval: "",
+      actionCheck: "",
+    },
+    editInfo: "",
+  },
+  mainTabNavigator: {
+    dashboardTab: "",
+    coworkersTab: "",
+    getInspiredTab: "",
+    profileTab: "",
+  },
 }
 
 export default ar
