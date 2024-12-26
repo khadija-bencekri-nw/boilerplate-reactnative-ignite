@@ -29,7 +29,7 @@ export interface AlertDialogRef {
     message?: TxKeyPath
     redirectLabel?: TxKeyPath
     closeLabel?: TxKeyPath
-    onRedirect?: () => void
+    onRedirect?: (() => Promise<void>) | (() => void)
     onClose?: () => void
     messageOptions?: I18n.TranslateOptions
   }) => void

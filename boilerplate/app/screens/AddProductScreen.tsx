@@ -1,30 +1,31 @@
-/* eslint-disable max-lines */
-/* eslint-disable max-statements */
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import React, { useEffect, useRef, useState } from "react"
 
+import styles from "./AddProductScreen.styles"
+
 import { StackActions } from "@react-navigation/native"
-import type { AlertDialogRef } from "app/components"
+import type { AlertDialogRef, DropDownPickerNwRef } from "app/components"
 import { AlertDialog, DropDownPickerNw, Icon, Loader, Text } from "app/components"
 import type { TxKeyPath } from "app/i18n"
 import { useStores } from "app/models"
 import type { AppStackScreenProps } from "app/navigators"
+import type { Brand, PurchaseItem, Store } from "app/services/api"
 import { api } from "app/services/api"
-import { colors, spacing } from "app/theme"
+import type { GeneralApiProblem } from "app/services/api/apiProblem"
+import { colors } from "app/theme"
+import {
+  constructFormData,
+  getValueFromDropDown,
+  transformtpDropDownData,
+} from "app/utils/formDataUtils"
+import { handleApiError } from "app/utils/handleApiReturns"
+import { useOrientation } from "app/utils/useOrientation"
 import * as ImagePicker from "expo-image-picker"
 import { observer } from "mobx-react-lite"
 import type { FC } from "react"
-import {
-  Alert,
-  Dimensions,
-  Image,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native"
-import type { MIMEType } from "util"
+import { Alert, Image, TextInput, TouchableOpacity, View } from "react-native"
 
-const { width } = Dimensions.get("window")
+// const { width } = Dimensions.get("window")
 // const isTablet = width > 600
 
 interface AddProductScreenProps extends AppStackScreenProps<"AddProduct"> {
@@ -38,37 +39,20 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
     authenticationStore: { user, logout },
   } = useStores()
 
-  const [isPortrait, setIsPortrait] = useState(false)
   const [price, setPrice] = useState("")
   const [model, setModel] = useState("")
-  const [screenWidth, setScreenWidth] = useState(width)
-  const [file, setFile] = useState<string | null>(null)
   const [files, setFiles] = useState<any[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const alertRef = useRef<AlertDialogRef>(null)
   const [loading, setLoading] = useState(false)
-  const [brands, setBrands] = useState([])
-  const [stores, setStores] = useState([])
+  const [brands, setBrands] = useState<Brand[]>()
+  const [stores, setStores] = useState<Store[]>()
   const [brandOpen, setBrandOpen] = useState(false)
   const [storeOpen, setStoreOpen] = useState(false)
-  const brandRef = useRef<AlertDialogRef>(null)
-  const storeRef = useRef<AlertDialogRef>(null)
+  const brandRef = useRef<DropDownPickerNwRef>(null)
+  const storeRef = useRef<DropDownPickerNwRef>(null)
 
-  const onChange = ({ window: { width, height } }: any) => {
-    setScreenWidth(width)
-    setIsPortrait(height >= width)
-  }
-
-  const handleApiError = (response: { kind: string }, mainAction: Function) => {
-    const isSessionError = response.kind === "forbidden" || response.kind === "unauthorized"
-    alertRef.current?.set({
-      title: isSessionError ? "common.sessionExpired" : undefined,
-      message: isSessionError ? "common.sessionExpiredMsg" : "common.errorUnexpected",
-      redirectLabel: isSessionError ? "common.proceed" : "common.tryAgain",
-      onRedirect: isSessionError ? logout : mainAction,
-    })
-    alertRef.current?.show()
-  }
+  const { isPortrait, screenWidth } = useOrientation()
 
   const getFormData = async () => {
     setLoading(true)
@@ -80,7 +64,7 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
         setStores(response.data.stores)
       } else {
         setLoading(false)
-        handleApiError(response, getFormData)
+        handleApiError(alertRef, response, logout, getFormData)
       }
     } catch (error_) {
       setLoading(false)
@@ -89,19 +73,17 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
   }
 
   useEffect(() => {
-    const subscription = Dimensions.addEventListener("change", onChange)
-    getFormData()
-    return () => {
-      subscription.remove()
-    }
+    getFormData().catch((er) => {
+      console.log("er", er)
+    })
   }, [])
 
   const validateForm = () => {
-    if (!model) {
+    if (model === "") {
       setError("Model is required.")
       return false
     }
-    if (!price) {
+    if (price === "") {
       setError("Price is required.")
       return false
     }
@@ -113,63 +95,56 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
     return true
   }
 
+  const handleResponse = (response: GeneralApiProblem | { kind: "ok"; purchase: PurchaseItem }) => {
+    if (response.kind === "ok") {
+      setLoading(false)
+      const title = "addProductScreen.congrats"
+      const message = "addProductScreen.congratsMsg"
+      const redirectLabel = "addProductScreen.goToList"
+      const onRedirect = () => {
+        props.navigation.navigate("Main")
+      }
+      showDialog(title, message, redirectLabel, onRedirect)
+    } else {
+      setLoading(false)
+      if (response.kind === "forbidden" || response.kind === "unauthorized") {
+        const title = "common.sessionExpired"
+        const message = "common.sessionExpiredMsg"
+        const redirectLabel = "common.loginAgain"
+        const onRedirect = () => {
+          logout()
+        }
+        showDialog(title, message, redirectLabel, onRedirect)
+      } else if (response.kind === "bad-data") {
+        const title = "addProductScreen.invalidTypes"
+        const message = "addProductScreen.invalidTypesDesc"
+        const redirectLabel = "addProductScreen.backToForm"
+        const onRedirect = () => alertRef.current?.hide()
+        showDialog(title, message, redirectLabel, onRedirect)
+      } else {
+        const message = "common.errorUnexpected"
+        const redirectLabel = "common.tryAgain"
+        const onRedirect = async () => saveProduct()
+        showDialog(undefined, message, redirectLabel, onRedirect)
+      }
+    }
+  }
+
   async function saveProduct() {
     if (!validateForm()) return
     setLoading(true)
-    const body = new FormData()
-    const data = {
-      brand: brandRef.current?.getValue()?.label,
+    const productData = {
+      brand: getValueFromDropDown(brandRef),
       model,
-      store: storeRef.current?.getValue()?.label,
+      store: getValueFromDropDown(storeRef),
       price,
       userId: user.id,
+      files,
     }
-    body.append("purchase", JSON.stringify(data))
-    // body.append("files", files)
-    files?.forEach((item: { uri: string; mimeType: MIMEType }) => {
-      const localUri = item.uri
-      const filename = localUri.split("/").pop()
-      const type = item.mimeType || "image"
-      body.append("files", {
-        uri: localUri,
-        name: filename,
-        type,
-      })
-    })
+    const body = constructFormData(productData)
     try {
       const response = await api.savePurchase(body)
-      if (response.kind === "ok") {
-        setLoading(false)
-        const title = "addProductScreen.congrats"
-        const message = "addProductScreen.congratsMsg"
-        const redirectLabel = "addProductScreen.goToList"
-        const onRedirect = () => {
-          props.navigation.navigate("Main", { screen: "MainTabNavigator" })
-        }
-        showDialog(title, message, redirectLabel, onRedirect)
-      } else {
-        setLoading(false)
-        if (response.kind === "forbidden" || response.kind === "unauthorized") {
-          const title = "common.sessionExpired"
-          const message = "common.sessionExpiredMsg"
-          const redirectLabel = "common.loginAgain"
-          const onRedirect = () => {
-            logout()
-          }
-          showDialog(title, message, redirectLabel, onRedirect)
-        } else if (response.kind === "bad-data") {
-          const title = "addProductScreen.invalidTypes"
-          const message = "addProductScreen.invalidTypesDesc"
-          const redirectLabel = "addProductScreen.backToForm"
-          const onRedirect = () => alertRef.current?.hide()
-          showDialog(title, message, redirectLabel, onRedirect)
-        } else {
-          const message = "common.errorUnexpected"
-          const redirectLabel = "common.tryAgain"
-          const onRedirect = async () => saveProduct()
-          showDialog(undefined, message, redirectLabel, onRedirect)
-        }
-      }
+      handleResponse(response)
     } catch (error_) {
       setLoading(false)
       console.error("An error occurred while fetching purchases:", error_)
@@ -184,7 +159,9 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
     }
     const result = await ImagePicker.launchImageLibraryAsync({ allowsMultipleSelection })
     if (!result.canceled) {
-      allowsMultipleSelection ? setFiles(result.assets) : setFile(result.assets[0]?.uri || null)
+      allowsMultipleSelection
+        ? setFiles(result.assets)
+        : setFiles([result.assets.length > 0 ? result.assets[0].uri : null])
       setError(null)
     }
   }
@@ -193,7 +170,7 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
     title: TxKeyPath | undefined,
     message: TxKeyPath,
     redirectLabel: TxKeyPath,
-    onRedirect: () => void,
+    onRedirect: (() => Promise<void>) | (() => void),
   ) => {
     alertRef.current?.set({
       title,
@@ -221,7 +198,7 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
           ref={brandRef}
           open={brandOpen}
           placeholder="Brand"
-          data={brands}
+          data={transformtpDropDownData(brands)}
           setOpen={() => {
             handleDropdownOpen("brand")
           }}
@@ -254,7 +231,7 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
         <DropDownPickerNw
           ref={storeRef}
           placeholder="Store"
-          data={stores}
+          data={transformtpDropDownData(stores)}
           open={storeOpen}
           setOpen={() => {
             handleDropdownOpen("store")
@@ -277,13 +254,17 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
                 onPress={async () => pickImage(false)}
               >
                 <View style={styles.imageContainer}>
-                  {file ? (
-                    <Image
-                      source={{ uri: file }}
-                      style={isPortrait ? styles.image : styles.imageLandscape}
+                  {files === null ? (
+                    <Icon
+                      icon="add"
+                      color={colors.palette.neutral600P}
+                      style={styles.iconContainer}
                     />
                   ) : (
-                    <Icon icon="add" color={colors.palette.neutral600P} style={{ flex: 1 }} />
+                    <Image
+                      source={{ uri: files[index] as string }}
+                      style={isPortrait ? styles.image : styles.imageLandscape}
+                    />
                   )}
                 </View>
               </TouchableOpacity>
@@ -306,7 +287,7 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
             />
           </View>
         </View>
-        {error && <Text style={styles.errorMessage} tx="addProductScreen.fillForm" />}
+        {error !== null && <Text style={styles.errorMessage} tx="addProductScreen.fillForm" />}
       </View>
       <View style={isPortrait ? styles.footerPortrait : styles.footerLandscape}>
         <TouchableOpacity
@@ -325,173 +306,4 @@ export const AddProductScreen: FC<AddProductScreenProps> = observer(function Add
       <Loader loading={loading} />
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  addIcon: {
-    marginRight: 10,
-  },
-  button: {
-    borderColor: colors.palette.neutral100,
-    borderRadius: 30,
-    borderWidth: 2,
-    flexDirection: "row",
-    justifyContent: "center",
-    marginVertical: 15,
-    padding: 10,
-  },
-  buttonText: {
-    color: colors.palette.neutral100,
-  },
-  cancelButton: {
-    alignItems: "center",
-    borderColor: colors.palette.neutral100,
-    borderRadius: 30,
-    borderWidth: 2,
-    flex: 1,
-    justifyContent: "center",
-    marginRight: 20,
-  },
-  cancelText: {
-    color: colors.palette.neutral100,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  confirmButton: {
-    alignItems: "center",
-    backgroundColor: colors.palette.neutral100,
-    borderRadius: 30,
-    flex: 2.8,
-    justifyContent: "center",
-    marginLeft: 20,
-  },
-  confirmText: {
-    color: colors.palette.neutral600P,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  errorMessage: {
-    color: colors.error,
-    marginBottom: spacing.md,
-  },
-  footerLandscape: {
-    flex: 0.2,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 30,
-    marginHorizontal: 30,
-  },
-  footerPortrait: {
-    flex: 0.14,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 100,
-    marginHorizontal: 30,
-  },
-  formContainer: {
-    alignContent: "center",
-    flex: 2,
-  },
-  image: {
-    alignSelf: "center",
-    borderRadius: 8,
-    height: 250,
-    width: 300,
-  },
-  imageContainer: {
-    alignSelf: "center",
-    borderRadius: 8,
-  },
-  imageLandscape: {
-    alignSelf: "center",
-    borderRadius: 8,
-    height: 80,
-    width: 100,
-  },
-  infoIcon: {
-    marginRight: 10,
-  },
-  infoRow: {
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  infoRowLandscape: {
-    justifyContent: "flex-start",
-  },
-  infoRowPortrait: {
-    justifyContent: "center",
-    marginTop: 20,
-  },
-  infoText: {
-    color: colors.palette.neutral520,
-  },
-  infoTextLandscape: {
-    fontSize: 16,
-  },
-  infoTextPortrait: {
-    fontSize: 20,
-  },
-  invoiceSection: {
-    flex: 1,
-    paddingHorizontal: 5,
-  },
-  invoiceSectionLandscape: {
-    marginTop: 30,
-  },
-  invoiceSectionPortrait: {
-    marginVertical: 35,
-  },
-  mediaContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  mediaContainerLandscape: {
-    marginHorizontal: 30,
-  },
-  pickPicture: {
-    backgroundColor: colors.palette.neutral750,
-    borderColor: colors.palette.neutral600P,
-    borderRadius: 8,
-    borderStyle: "dashed",
-    borderWidth: 1,
-    height: 250,
-    marginTop: 30,
-    width: 300,
-  },
-  pickPictureLandscape: {
-    height: 100,
-    width: 100,
-  },
-  root: {
-    backgroundColor: colors.background,
-    flex: 1,
-  },
-  rootLandscape: {
-    marginBottom: 50,
-    paddingHorizontal: 50,
-    paddingTop: 15,
-  },
-  rootPortrait: {
-    padding: 50,
-  },
-  sectionHeader: {
-    alignSelf: "flex-start",
-    color: colors.palette.neutral100,
-    fontWeight: "bold",
-  },
-  textInput: {
-    alignSelf: "center",
-    borderBottomWidth: 1,
-    borderColor: colors.palette.neutral600P,
-    borderRadius: 5,
-    color: colors.palette.neutral100,
-    paddingHorizontal: 5,
-  },
-  textInputLandscape: {
-    marginBottom: 5,
-    marginTop: 18,
-  },
-  textInputPortrait: {
-    marginVertical: 30,
-  },
 })

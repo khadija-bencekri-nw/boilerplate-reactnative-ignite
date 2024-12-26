@@ -57,7 +57,7 @@ export interface DropDownPickerNwProps {
 }
 
 export interface DropDownPickerNwRef {
-  getValue?: () => { label: string; value: string } | undefined
+  getValue?: () => { label: string; value: string } | null
   setUserValue?: (param: string) => void
 }
 
@@ -89,7 +89,7 @@ export const DropDownPickerNw = observer(
     }
 
     React.useImperativeHandle(ref, () => ({
-      getValue: () => findSelectedItem(),
+      getValue: () => findSelectedItem() ?? null,
       setUserValue: (userValue: string) => {
         setValue(userValue)
       },
