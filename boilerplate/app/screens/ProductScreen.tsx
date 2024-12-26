@@ -1,27 +1,32 @@
-import React, { useCallback, useEffect, useState } from "react"
+/* eslint-disable @typescript-eslint/no-use-before-define */
+import React, { useEffect, useState } from "react"
 
 import { Rating, Text } from "app/components"
+import type { TxKeyPath } from "app/i18n"
 import type { AppStackScreenProps } from "app/navigators"
 import { api } from "app/services/api"
 import { colors } from "app/theme"
 import { observer } from "mobx-react-lite"
 import type { FC } from "react"
+import type { ScaledSize } from "react-native"
 import { Dimensions, Image, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 
 const { width, height } = Dimensions.get("window")
-const isTablet = width > 600
+// const isTablet = width > 600
 
 interface ProductScreenProps extends AppStackScreenProps<"Product"> {}
 export const ProductScreen: FC<ProductScreenProps> = observer(({ route }) => {
   const { item } = route.params
   const [isPortrait, setIsPortrait] = useState(height >= width)
 
-  const onChange = useCallback(({ window: { width, height } }) => {
-    setIsPortrait(height >= width)
-  }, [])
+  const onChange = (window: ScaledSize) => {
+    setIsPortrait(window.height >= window.width)
+  }
 
   useEffect(() => {
-    const subscription = Dimensions.addEventListener("change", onChange)
+    const subscription = Dimensions.addEventListener("change", ({ window }) => {
+      onChange(window)
+    })
     return () => {
       subscription.remove()
     }
@@ -42,8 +47,8 @@ export const ProductScreen: FC<ProductScreenProps> = observer(({ route }) => {
       { title: "price", value: `$${item.price}` },
     ].map(({ title, value }, index) => (
       <View key={index} style={styles.detailRow}>
-        <Text style={styles.detailTitle} tx={`productScreen.${title}`} />
-        <Text style={styles.detailValue}>{value}</Text>
+        <Text style={styles.detailTitle} tx={`productScreen.${title}` as TxKeyPath} />
+        <Text style={styles.detailValue}>{value as string}</Text>
       </View>
     ))
 
@@ -52,54 +57,33 @@ export const ProductScreen: FC<ProductScreenProps> = observer(({ route }) => {
       <Image
         key={index}
         source={{ uri: image }}
-        style={[styles.productImage, { width: isPortrait ? 150 : 200 }]}
+        style={isPortrait ? styles.productImage : styles.productImageLandscape}
         resizeMode="cover"
       />
     ))
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={[styles.header, { flex: isPortrait ? 0.5 : 0.2 }]}>
+      <View style={isPortrait ? styles.header : styles.headerLandscape}>
         <TouchableOpacity style={styles.purchaseStatus}>
           <Text style={styles.purchaseText} tx={"productScreen.purchased"} />
         </TouchableOpacity>
         <Text style={styles.productName}>{`${item.brand} ${item.model}`}</Text>
       </View>
 
-      <View style={[styles.productDetails, { flex: 0.6 }]}>{renderDetails()}</View>
+      <View style={styles.productDetails}>{renderDetails()}</View>
 
-      <View
-        style={[
-          styles.mediaSection,
-          isPortrait
-            ? { flex: 0.2, paddingVertical: 10, marginBottom: 30 }
-            : { flex: 0.5, marginVertical: 10 },
-        ]}
-      >
-        <Text
-          style={{ fontWeight: "bold", color: colors.palette.neutral100 }}
-          tx="productScreen.invoiceMedia"
-        />
-        <View
-          style={{
-            width: "100%",
-            flexDirection: isPortrait ? "row" : "row",
-            flexWrap: isPortrait ? "wrap" : "nowrap",
-            justifyContent: "space-between",
-            marginTop: 10,
-          }}
-        >
+      <View style={isPortrait ? styles.mediaSection : styles.mediaSectionLandscape}>
+        <Text style={styles.mediaText} tx="productScreen.invoiceMedia" />
+        <View style={isPortrait ? styles.mediaWrapper : styles.mediaWrapperLandscape}>
           {renderMedia()}
         </View>
       </View>
 
-      <View style={[styles.reviewSection, { flex: isPortrait ? 0.5 : 0.4 }]}>
-        <Text
-          style={{ fontWeight: "bold", color: colors.palette.neutral100, paddingBottom: 10 }}
-          tx="productScreen.review"
-        />
-        <View style={{ flex: 1 }}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+      <View style={isPortrait ? styles.reviewSection : styles.reviewSectionLandscape}>
+        <Text style={styles.reviewText} tx="productScreen.review" />
+        <View style={styles.reviewSubSection}>
+          <View style={styles.ratingSectionConrainer}>
             <Text style={styles.reviewTitle} tx="productScreen.rateAction" />
             <Rating
               maxRating={5}
@@ -107,8 +91,8 @@ export const ProductScreen: FC<ProductScreenProps> = observer(({ route }) => {
               onRatingChange={handleRatingChange}
               starSize={20}
               starColor={colors.palette.nwColor}
-              style={{ alignItems: "flex-end", maxHeight: 30 }}
-              starsContainerStyle={{ justifyContent: "flex-end" }}
+              style={styles.ratingConrainer}
+              starsContainerStyle={styles.starsContainerStyle}
             />
           </View>
           <Text style={styles.reviewDescription} tx="productScreen.rateText" />
@@ -144,19 +128,52 @@ const styles = StyleSheet.create({
     flex: 0.5,
     marginTop: 25,
   },
+  headerLandscape: {
+    alignItems: "flex-start",
+    flex: 0.2,
+    marginTop: 25,
+  },
   mediaSection: {
     alignItems: "flex-start",
-    flex: 1.5,
+    flex: 0.2,
     justifyContent: "center",
     marginBottom: 30,
     marginTop: 20,
+    paddingVertical: 10,
+  },
+  mediaSectionLandscape: {
+    alignItems: "flex-start",
+    flex: 0.2,
+    justifyContent: "center",
+    marginBottom: 30,
+    marginTop: 20,
+    marginVertical: 10,
+    paddingVertical: 10,
+  },
+  mediaText: {
+    color: colors.palette.neutral100,
+    fontWeight: "bold",
+  },
+  mediaWrapper: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginTop: 10,
+    width: "100%",
+  },
+  mediaWrapperLandscape: {
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    justifyContent: "space-between",
+    marginTop: 10,
+    width: "100%",
   },
   productDetails: {
     backgroundColor: colors.palette.subbackgroundColor1,
     borderColor: colors.palette.neutral710,
     borderRadius: 10,
     borderWidth: 1,
-    flex: 2,
+    flex: 0.6,
     paddingHorizontal: 20,
     paddingTop: 20,
   },
@@ -164,6 +181,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     height: 150,
     marginHorizontal: 5,
+    width: 150,
+  },
+  productImageLandscape: {
+    borderRadius: 10,
+    height: 150,
+    marginHorizontal: 5,
+    width: 200,
   },
   productName: {
     color: colors.palette.neutral100,
@@ -189,6 +213,8 @@ const styles = StyleSheet.create({
     color: colors.palette.accent600,
     fontSize: 22,
   },
+  ratingConrainer: { alignItems: "flex-end", maxHeight: 30 },
+  ratingSectionConrainer: { flexDirection: "row", justifyContent: "space-between" },
   reviewDescription: {
     color: colors.palette.neutral300,
     fontSize: 14,
@@ -199,13 +225,28 @@ const styles = StyleSheet.create({
     borderColor: colors.palette.neutral710,
     borderRadius: 10,
     borderWidth: 1,
-    flex: 1,
+    flex: 0.5,
+    padding: 20,
+  },
+  reviewSectionLandscape: {
+    backgroundColor: colors.palette.subbackgroundColor1,
+    borderColor: colors.palette.neutral710,
+    borderRadius: 10,
+    borderWidth: 1,
+    flex: 0.4,
     marginTop: 10,
     padding: 20,
+  },
+  reviewSubSection: { flex: 1 },
+  reviewText: {
+    color: colors.palette.neutral100,
+    fontWeight: "bold",
+    paddingBottom: 10,
   },
   reviewTitle: {
     color: colors.palette.neutral100,
     fontSize: 18,
     marginBottom: 10,
   },
+  starsContainerStyle: { justifyContent: "flex-end" },
 })

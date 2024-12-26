@@ -103,17 +103,10 @@ export const LoginScreen: FC<LoginScreenProps> = observer(function LoginScreen(_
   }, [])
 
   useEffect(() => {
-    // setAuthPassword("password")
-    // setAuthEmail("khadija.bencekri@theodo.com")
-    return () => {
-      // setAuthPassword("password")
-      // setAuthEmail("khadija.bencekri@theodo.com")
-    }
-  }, [])
-
-  useEffect(() => {
     if (userInfo?.idToken !== undefined && userInfo.idToken !== null) {
-      login()
+      login().catch((er) => {
+        console.log("er", er)
+      })
     }
   }, [userInfo])
 
