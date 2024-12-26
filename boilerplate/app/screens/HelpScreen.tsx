@@ -1,20 +1,27 @@
 import React from "react"
 
+import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
+import type { CompositeScreenProps } from "@react-navigation/native"
 import { Screen, Text } from "app/components"
-import type { AppStackScreenProps } from "app/navigators"
+import type { AppStackParamList, AppStackScreenProps } from "app/navigators"
+import type { MainTabParamList } from "app/navigators/MainTabNavigator"
 import { observer } from "mobx-react-lite"
 import type { FC } from "react"
 import type { ViewStyle } from "react-native"
 // import { useNavigation } from "@react-navigation/native"
 // import { useStores } from "app/models"
 
-interface HelpScreenProps extends AppStackScreenProps<"Help"> {}
+export type HelpScreenProps<T extends keyof MainTabParamList> = CompositeScreenProps<
+  BottomTabScreenProps<MainTabParamList, T>,
+  AppStackScreenProps<keyof AppStackParamList>
+>
+// interface HelpScreenProps extends AppStackScreenProps<"Help"> {}
 
 const $root: ViewStyle = {
   flex: 1,
 }
 
-export const HelpScreen: FC<HelpScreenProps> = observer(function HelpScreen() {
+export const HelpScreen = observer(function HelpScreen() {
   // Pull in one of our MST stores
   // const { someStore, anotherStore } = useStores()
 

@@ -1,6 +1,6 @@
 export interface ConfigBaseProps {
-  persistNavigation: "always" | "dev" | "prod" | "never"
-  catchErrors: "always" | "dev" | "prod" | "never"
+  persistNavigation: "always" | "dev" | "never" | "prod"
+  catchErrors: "always" | "dev" | "never" | "prod"
   exitRoutes: string[]
 }
 

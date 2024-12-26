@@ -107,9 +107,9 @@ export class Api {
     id: string,
     request: Partial<{ password: string; mailNotif: boolean; approvalNotif: boolean }>,
   ): Promise<GeneralApiProblem | { kind: "ok"; user: User }> {
-    const response: ApiResponse<{ user: User }> = await this.apisauce.put(`users/${id}`, request)
+    const response: ApiResponse<User> = await this.apisauce.put(`users/${id}`, request)
     if (!response.ok) return getGeneralApiProblem(response)
-    if (response.data !== undefined) return { kind: "ok", user: response.data.user }
+    if (response.data !== undefined) return { kind: "ok", user: response.data }
     return { kind: "unknown", temporary: true }
   }
 

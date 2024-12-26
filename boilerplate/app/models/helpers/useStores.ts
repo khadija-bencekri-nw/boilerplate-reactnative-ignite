@@ -1,5 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react"
-import { RootStore, RootStoreModel } from "../RootStore"
+
+import type { RootStore } from "../RootStore"
+import { RootStoreModel } from "../RootStore"
+
 import { setupRootStore } from "./setupRootStore"
 
 /**
@@ -49,7 +52,7 @@ export const useStores = () => useContext(RootStoreContext)
  * @param {() => void | Promise<void>} callback - an optional callback that's invoked once the store is ready
  * @returns {object} - the RootStore and rehydrated state
  */
-export const useInitialRootStore = (callback?: () => void | Promise<void>) => {
+export const useInitialRootStore = (callback?: () => Promise<void> | void) => {
   const rootStore = useStores()
   const [rehydrated, setRehydrated] = useState(false)
 

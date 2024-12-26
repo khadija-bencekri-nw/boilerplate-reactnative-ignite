@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import * as React from "react"
 
 import { Ionicons } from "@expo/vector-icons" // Import Ionicons for the close button
@@ -25,14 +26,14 @@ export const Modal = observer(function Modal(props: ModalProps) {
 
   return (
     <RNModal animationType="slide" transparent={true} visible={visible} onRequestClose={onClose}>
-      <View style={$modalOverlay}>
+      <View style={[$modalOverlay, $styles]}>
         <View style={$modalContainer}>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton as ViewStyle}>
             <Ionicons name="close" size={24} color="white" />
           </TouchableOpacity>
           <Text style={$modalText}>Congratulations!</Text>
           <Text style={$congratsMessage}>Now you can sign in using your email as username.</Text>
-          <TouchableOpacity style={styles.customButton} onPress={onRedirectToLogin}>
+          <TouchableOpacity style={styles.customButton as ViewStyle} onPress={onRedirectToLogin}>
             <Text style={styles.buttonText}>Go to Login</Text>
           </TouchableOpacity>
         </View>
