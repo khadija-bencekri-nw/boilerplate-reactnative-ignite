@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import type { Instance, SnapshotOut } from "mobx-state-tree"
 import { types } from "mobx-state-tree"
 
@@ -40,7 +41,7 @@ export const AuthenticationStoreModel = types
     setAuthEmail(value: string) {
       store.authEmail = value.replace(/ /gu, "")
     },
-    setUser(value?: User) {
+    setUser(value: User) {
       store.user = value
     },
     getUser() {
