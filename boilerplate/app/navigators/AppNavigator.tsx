@@ -76,6 +76,7 @@ export type AppStackParamList = {
   AddProduct: undefined
   Main: NavigatorScreenParams<MainTabParamList>
   Help: undefined
+  Example: undefined
 }
 
 type DrawerItemListProps = {
@@ -176,7 +177,7 @@ const AppStack = observer(function AppStack() {
   return (
     <Stack.Navigator
       screenOptions={{ navigationBarColor: colors.background }}
-      initialRouteName={isAuthenticated ? "Main" : "Welcome"}
+      initialRouteName={isAuthenticated ? "Main" : "Example"}
     >
       {isAuthenticated ? (
         <>
@@ -202,6 +203,7 @@ const AppStack = observer(function AppStack() {
         </>
       ) : (
         <>
+          <Stack.Screen name="Example" component={Screens.WelcomeConsentScreen} />
           <Stack.Screen
             name="Welcome"
             component={Screens.WelcomeScreen}

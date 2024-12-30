@@ -1,14 +1,19 @@
-// Learn more https://docs.expo.io/guides/customizing-metro
-const { getDefaultConfig } = require('expo/metro-config');
+const { getDefaultConfig } = require("expo/metro-config")
+const { withNativeWind } = require("nativewind/metro")
 
-/** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(__dirname);
+// Get the default Metro configuration for the project
+const config = getDefaultConfig(__dirname)
 
+// Add custom transformer options
 config.transformer.getTransformOptions = async () => ({
   transform: {
     experimentalImportSupport: false,
-    inlineRequires: true,
+    inlineRequires: true, // Retain inlineRequires for performance optimization
   },
-});
+})
 
-module.exports = config;
+// Integrate NativeWind's configuration
+module.exports = withNativeWind(config, {
+  input: "./global.css", // Specify the global CSS file for NativeWind
+  inlineRem: 16, // Set the root em size for NativeWind
+})
