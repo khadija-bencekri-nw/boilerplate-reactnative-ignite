@@ -76,10 +76,6 @@ export default function RootLayout(props: AppProps) {
 
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <StatusBar
-        key={`root-status-bar-${isDarkColorScheme ? "light" : "dark"}`}
-        style={isDarkColorScheme ? "light" : "dark"}
-      />
       <NavThemeProvider value={NAV_THEME[colorScheme]}>
         <AppNavigator
           linking={linking}

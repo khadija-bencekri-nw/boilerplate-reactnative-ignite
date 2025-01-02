@@ -203,12 +203,16 @@ const AppStack = observer(function AppStack() {
         </>
       ) : (
         <>
-          <Stack.Screen name="Example" component={Screens.WelcomeConsentScreen} />
           <Stack.Screen
+            name="Example"
+            component={Screens.WelcomeNativewindScreen}
+            options={{ headerShown: false }}
+          />
+          {/* <Stack.Screen
             name="Welcome"
             component={Screens.WelcomeScreen}
             options={{ headerShown: false }}
-          />
+          /> */}
           <Stack.Screen
             name="Join"
             component={Screens.JoinScreen}
