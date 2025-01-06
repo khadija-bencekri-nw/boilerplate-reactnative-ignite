@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 
-import { PrimaryButton, SecondaryButton, Text } from "../components"
+import { PrimaryButton, SecondaryButton } from "../components"
+import { Text } from "../components/nativewindui/Text"
 import type { AppStackScreenProps } from "../navigators"
 
 import { load } from "app/utils/storage"
@@ -10,13 +11,12 @@ import { COLORS } from "lib/theme/colors"
 import { observer } from "mobx-react-lite"
 import type { FC } from "react"
 import type { ScaledSize } from "react-native"
-import { Dimensions, Image, ImageBackground, View } from "react-native"
-import { TouchableOpacity } from "react-native-gesture-handler"
+import { Dimensions, Image, ImageBackground, TouchableOpacity, View } from "react-native"
 
 const { width } = Dimensions.get("window")
 const isTablet = width > 600
 
-interface WelcomeNativewindScreenProps extends AppStackScreenProps<"Example"> {}
+interface WelcomeNativewindScreenProps extends AppStackScreenProps<"Welcome"> {}
 
 export const WelcomeNativewindScreen: FC<WelcomeNativewindScreenProps> = observer(
   function WelcomeNativewindScreen({ navigation }) {
@@ -79,10 +79,10 @@ export const WelcomeNativewindScreen: FC<WelcomeNativewindScreenProps> = observe
               className={clsx("mr-2", isTablet ? "w-6 h-6" : "w-4 h-4")}
             />
             <Text
-              className={clsx("text-neutral-500", isTablet ? "text-lg" : "text-xs")}
+              className={clsx("text-gray-500", isTablet ? "text-lg" : "text-xs")}
               tx="welcomeScreen.continueAs"
             />
-            <Text className={clsx("font-bold text-neutral-100", isTablet ? "text-lg" : "text-xs")}>
+            <Text className={clsx("text-white font-bold ", isTablet ? "text-lg" : "text-xs")}>
               {username}
             </Text>
           </TouchableOpacity>
@@ -99,21 +99,21 @@ export const WelcomeNativewindScreen: FC<WelcomeNativewindScreenProps> = observe
             <Text
               testID="login-heading"
               tx="signUpScreen.firstHeadline"
-              preset="heading"
               style={{ color: COLORS.light.grey4 }}
-              className={clsx("font-bold text-center mb-2", isTablet ? "text-[55px]" : "text-2xl")}
+              className={clsx(
+                "text-black font-bold text-center mb-2",
+                isTablet ? "text-[55px]" : "text-2xl",
+              )}
             />
             <Text
               testID="join-heading-1"
               tx="signUpScreen.secondHeadline"
-              preset="heading"
               style={{ color: COLORS.light.grey4 }}
               className={clsx("font-bold text-center mb-2", isTablet ? "text-[55px]" : "text-2xl")}
             />
             <Text
               testID="join-heading-2"
               tx="signUpScreen.subtitle"
-              preset="subheading"
               style={{ color: COLORS.light.grey3 }}
               className={clsx("text-center mt-4", isTablet ? "text-xl" : "text-sm")}
             />
@@ -123,7 +123,7 @@ export const WelcomeNativewindScreen: FC<WelcomeNativewindScreenProps> = observe
             <PrimaryButton
               text={"signUpScreen.join"}
               onPress={handleJoin}
-              className="w-40 h-14 mx-8 bg-black text-white shadow-md rounded-full border border-white"
+              className="w-40 h-14 mx-8 bg-black text-white shadow-md rounded-full border-l border-white"
               textClassName="text-lg"
             />
             <SecondaryButton

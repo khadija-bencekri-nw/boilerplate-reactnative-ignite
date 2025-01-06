@@ -1,16 +1,16 @@
-import React, { ComponentType, forwardRef, Ref, useImperativeHandle, useRef } from "react"
-import {
-  StyleProp,
-  TextInput,
-  TextInputProps,
-  TextStyle,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from "react-native"
+/* eslint-disable complexity */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+import React, { forwardRef, useImperativeHandle, useRef } from "react"
+
 import { isRTL, translate } from "../i18n"
 import { colors, spacing, typography } from "../theme"
-import { Text, TextProps } from "./Text"
+
+import type { TextProps } from "./Text"
+import { Text } from "./Text"
+
+import type { ComponentType, Ref } from "react"
+import type { StyleProp, TextInputProps, TextStyle, ViewStyle } from "react-native"
+import { TextInput, TouchableOpacity, View } from "react-native"
 
 export interface TextFieldAccessoryProps {
   style: StyleProp<any>
@@ -140,8 +140,8 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     $inputWrapperStyle,
     status === "error" && { borderColor: colors.error },
     TextInputProps.multiline && { minHeight: 112 },
-    LeftAccessory && { paddingStart: 0 },
-    RightAccessory && { paddingEnd: 0 },
+    LeftAccessory != null && { paddingStart: 0 },
+    RightAccessory != null && { paddingEnd: 0 },
     $inputWrapperStyleOverride,
   ]
 
@@ -168,7 +168,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     input.current?.focus()
   }
 
-  useImperativeHandle(ref, () => input.current as TextInput)
+  useImperativeHandle(ref, () => input.current!)
 
   return (
     <TouchableOpacity
@@ -177,7 +177,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
       onPress={focusInput}
       accessibilityState={{ disabled }}
     >
-      {!!(label || labelTx) && (
+      {Boolean(label || labelTx) && (
         <Text
           preset="formLabel"
           text={label}
@@ -189,7 +189,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
       )}
 
       <View style={$inputWrapperStyles}>
-        {!!LeftAccessory && (
+        {Boolean(LeftAccessory) && (
           <LeftAccessory
             style={$leftAccessoryStyle}
             status={status}
@@ -209,7 +209,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
           style={$inputStyles}
         />
 
-        {!!RightAccessory && (
+        {Boolean(RightAccessory) && (
           <RightAccessory
             style={$rightAccessoryStyle}
             status={status}
@@ -219,7 +219,7 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
         )}
       </View>
 
-      {!!(helper || helperTx) && (
+      {Boolean(helper || helperTx) && (
         <Text
           preset="formHelper"
           text={helper}
@@ -242,7 +242,7 @@ const $inputWrapperStyle: ViewStyle = {
   alignItems: "flex-start",
   borderWidth: 1,
   borderRadius: 4,
-  //backgroundColor: colors.palette.neutral200,
+  // backgroundColor: colors.palette.neutral200,
   borderColor: colors.palette.neutral100,
   borderTopWidth: 0,
   borderRightWidth: 0,

@@ -177,7 +177,7 @@ const AppStack = observer(function AppStack() {
   return (
     <Stack.Navigator
       screenOptions={{ navigationBarColor: colors.background }}
-      initialRouteName={isAuthenticated ? "Main" : "Example"}
+      initialRouteName={isAuthenticated ? "Main" : "Welcome"}
     >
       {isAuthenticated ? (
         <>
@@ -204,7 +204,7 @@ const AppStack = observer(function AppStack() {
       ) : (
         <>
           <Stack.Screen
-            name="Example"
+            name="Welcome"
             component={Screens.WelcomeNativewindScreen}
             options={{ headerShown: false }}
           />
@@ -225,7 +225,7 @@ const AppStack = observer(function AppStack() {
           />
           <Stack.Screen
             name="Login"
-            component={Screens.LoginScreen}
+            component={Screens.LoginNativeWindScreen}
             options={{ headerShown: false }}
           />
         </>

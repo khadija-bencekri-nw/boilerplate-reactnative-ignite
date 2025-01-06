@@ -1,51 +1,41 @@
-import * as React from "react"
+import React from "react"
 
 import { cn } from "../../../lib/cn"
+import { COLORS } from "../../../lib/theme/colors"
+import { useColorScheme } from "../../../lib/useColorScheme"
 
-import type { VariantProps } from "class-variance-authority"
-import { cva } from "class-variance-authority"
-import { Text as RNText } from "react-native"
+import { Icon } from "@roninoss/icons"
+import { Pressable, View } from "react-native"
+import Animated, { LayoutAnimationConfig, ZoomInRotate } from "react-native-reanimated"
 
-const textVariants = cva("text-foreground", {
-  variants: {
-    variant: {
-      largeTitle: "text-4xl",
-      title1: "text-2xl",
-      title2: "text-[22px] leading-7",
-      title3: "text-xl",
-      heading: "text-[17px] leading-6 font-semibold",
-      body: "text-[17px] leading-6",
-      callout: "text-base",
-      subhead: "text-[15px] leading-6",
-      footnote: "text-[13px] leading-5",
-      caption1: "text-xs",
-      caption2: "text-[11px] leading-4",
-    },
-    color: {
-      primary: "",
-      secondary: "text-secondary-foreground/90",
-      tertiary: "text-muted-foreground/90",
-      quarternary: "text-muted-foreground/50",
-    },
-  },
-  defaultVariants: {
-    variant: "body",
-    color: "primary",
-  },
-})
-
-const TextClassContext = React.createContext<string | undefined>(undefined)
-
-function Text({
-  className,
-  variant,
-  color,
-  ...props
-}: React.ComponentPropsWithoutRef<typeof RNText> & VariantProps<typeof textVariants>) {
-  const textClassName = React.useContext(TextClassContext)
+export function ThemeToggle() {
+  const { colorScheme, setColorScheme } = useColorScheme()
   return (
-    <RNText className={cn(textVariants({ variant, color }), textClassName, className)} {...props} />
+    <LayoutAnimationConfig skipEntering>
+      <Animated.View
+        className="items-center justify-center"
+        key={`toggle-${colorScheme}`}
+        entering={ZoomInRotate}
+      >
+        <Pressable
+          onPress={async () => {
+            await setColorScheme(colorScheme === "dark" ? "light" : "dark")
+          }}
+          className="opacity-80"
+        >
+          {colorScheme === "dark"
+            ? ({ pressed }) => (
+                <View className={cn("px-0.5", pressed && "opacity-50")}>
+                  <Icon namingScheme="sfSymbol" name="moon.stars" color={COLORS.white} />
+                </View>
+              )
+            : ({ pressed }) => (
+                <View className={cn("px-0.5", pressed && "opacity-50")}>
+                  <Icon namingScheme="sfSymbol" name="sun.min" color={COLORS.black} />
+                </View>
+              )}
+        </Pressable>
+      </Animated.View>
+    </LayoutAnimationConfig>
   )
 }
-
-export { Text, TextClassContext, textVariants }

@@ -10,8 +10,7 @@ import Images from "assets/images"
 import { observer } from "mobx-react-lite"
 import type { FC } from "react"
 import type { ImageStyle, ScaledSize, TextStyle, ViewStyle } from "react-native"
-import { Dimensions, Image, ImageBackground, View } from "react-native"
-import { TouchableOpacity } from "react-native-gesture-handler"
+import { Dimensions, Image, ImageBackground, TouchableOpacity, View } from "react-native"
 
 const { width } = Dimensions.get("window")
 const isTablet = width > 600

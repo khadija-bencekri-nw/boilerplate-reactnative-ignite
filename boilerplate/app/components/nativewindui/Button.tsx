@@ -6,6 +6,8 @@ import { useColorScheme } from "../../../lib/useColorScheme"
 
 import { TextClassContext } from "./Text"
 
+import type { TxKeyPath } from "app/i18n"
+import { translate } from "app/i18n"
 // import * as Slot from "@rn-primitives/slot"
 import { cva, type VariantProps } from "class-variance-authority"
 import type { PressableProps, ViewStyle } from "react-native"
@@ -116,16 +118,28 @@ type AndroidOnlyButtonProps = {
   androidRootClassName?: string
 }
 
-type ButtonProps = AndroidOnlyButtonProps & ButtonVariantProps & PressableProps
+type ButtonProps = AndroidOnlyButtonProps &
+  ButtonVariantProps &
+  PressableProps & { text?: TxKeyPath }
 
 const Root = Platform.OS === "android" ? View : View
 // const Root = Platform.OS === "android" ? View : Slot.Pressable
 
 const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>(
   (
-    { className, variant = "primary", size, style = BORDER_CURVE, androidRootClassName, ...props },
+    {
+      className,
+      variant = "primary",
+      size,
+      style = BORDER_CURVE,
+      androidRootClassName,
+      text,
+      ...props
+    },
     ref,
   ) => {
+    const i18nText = text && translate(text)
+
     const { colorScheme } = useColorScheme()
 
     return (

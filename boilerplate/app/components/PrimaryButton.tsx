@@ -9,6 +9,7 @@ export interface PrimaryButtonProps {
   onPress: () => void
   className?: string
   textClassName?: string
+  testID?: string
 }
 
 export const PrimaryButton = observer(function PrimaryButton({
@@ -16,6 +17,7 @@ export const PrimaryButton = observer(function PrimaryButton({
   onPress,
   className,
   textClassName,
+  testID,
 }: PrimaryButtonProps) {
   return (
     <BaseButton
@@ -24,6 +26,7 @@ export const PrimaryButton = observer(function PrimaryButton({
       primary={true}
       className={className}
       textClassName={textClassName}
+      testID={testID}
     />
   )
 })

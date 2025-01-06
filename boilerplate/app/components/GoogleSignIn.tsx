@@ -6,13 +6,13 @@ import { Button } from "./Button"
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
 import type { TxKeyPath } from "app/i18n"
 import type { ComponentType } from "react"
+import { SecondaryButton } from "./SecondaryButton"
 
 type GoogleSignInProps = {
   testID?: string
   tx: TxKeyPath
-  style?: object
-  preset?: "default" | "filled" | "reversed" | undefined
-  textStyle?: object
+  className?: string
+  textClassName?: string
   onPress?: () => void
   LeftAccessory?: ComponentType<ButtonAccessoryProps>
   onSignInSuccess: (userInfo: any) => void
@@ -21,16 +21,15 @@ type GoogleSignInProps = {
 const defaultProps: Partial<GoogleSignInProps> = {
   testID: "google-sign-in",
   tx: "loginScreen.google",
-  style: {},
-  preset: "default",
-  textStyle: {},
+  className: "",
+  textClassName: "",
   onPress: () => {
     console.log("GoogleSignIn button pressed")
   },
   LeftAccessory: () => null,
 }
 const GoogleSignIn = forwardRef<any, GoogleSignInProps>(function GoogleSignIn(props, ref) {
-  const { testID, tx, style, preset, textStyle, LeftAccessory, onSignInSuccess } = {
+  const { testID, tx, className, textClassName, LeftAccessory, onSignInSuccess } = {
     ...defaultProps,
     ...props,
   }
@@ -51,12 +50,11 @@ const GoogleSignIn = forwardRef<any, GoogleSignInProps>(function GoogleSignIn(pr
   }
 
   return (
-    <Button
+    <SecondaryButton
       testID={testID}
-      tx={tx}
-      style={style}
-      preset={preset}
-      textStyle={textStyle}
+      text={tx}
+      className={className}
+      textClassName={textClassName}
       onPress={async () => signIn()}
       LeftAccessory={LeftAccessory}
     />
